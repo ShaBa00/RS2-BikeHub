@@ -17,6 +17,8 @@ public partial class Bicikl
 
     public int? BrojBrzina { get; set; }
 
+    public string? Status { get; set; }
+
     public virtual ICollection<NarudzbaBicikli> NarudzbaBiciklis { get; set; } = new List<NarudzbaBicikli>();
 
     public virtual ICollection<PromocijaBicikli> PromocijaBiciklis { get; set; } = new List<PromocijaBicikli>();

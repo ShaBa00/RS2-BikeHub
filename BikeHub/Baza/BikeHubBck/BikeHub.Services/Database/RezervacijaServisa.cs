@@ -15,9 +15,9 @@ public partial class RezervacijaServisa
 
     public DateTime DatumRezervacije { get; set; }
 
-    public bool? Odradena { get; set; }
-
     public decimal? Ocjena { get; set; }
+
+    public string? Status { get; set; }
 
     public virtual Korisnik Korisnik { get; set; } = null!;
 

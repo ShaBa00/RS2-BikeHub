@@ -9,9 +9,15 @@ public partial class Korisnik
 
     public string Username { get; set; } = null!;
 
-    public string Password { get; set; } = null!;
-
     public string Email { get; set; } = null!;
+
+    public string? LozinkaSalt { get; set; }
+
+    public string? LozinkaHash { get; set; }
+
+    public string? Status { get; set; }
+
+    public bool? IsAdmin { get; set; }
 
     public virtual ICollection<Adresa> Adresas { get; set; } = new List<Adresa>();
 

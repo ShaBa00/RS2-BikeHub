@@ -13,6 +13,8 @@ public partial class Dijelovi
 
     public string? Opis { get; set; }
 
+    public string? Status { get; set; }
+
     public virtual ICollection<NarudzbaDijelovi> NarudzbaDijelovis { get; set; } = new List<NarudzbaDijelovi>();
 
     public virtual ICollection<PromocijaDijelovi> PromocijaDijelovis { get; set; } = new List<PromocijaDijelovi>();

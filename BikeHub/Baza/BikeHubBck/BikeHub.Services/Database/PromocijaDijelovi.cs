@@ -15,5 +15,7 @@ public partial class PromocijaDijelovi
 
     public decimal CijenaPromocije { get; set; }
 
+    public string? Status { get; set; }
+
     public virtual Dijelovi Dijelovi { get; set; } = null!;
 }
