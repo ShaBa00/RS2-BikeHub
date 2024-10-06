@@ -1,4 +1,4 @@
-﻿using BikeHub.Model.NarudzbaFM;
+﻿using BikeHub.Model.ServisFM;
 using BikeHub.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,9 +6,9 @@ namespace BikeHubBck.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class NarudzbaController : BaseController<Narudzba, NarudzbaSearchObject>
+    public class ServiserController : BaseController<Serviser, ServiserSearchObject>
     {
-        public NarudzbaController(INarudzbaService service) 
+        public ServiserController(IServiserService service) 
         : base(service){        }
     }
 }

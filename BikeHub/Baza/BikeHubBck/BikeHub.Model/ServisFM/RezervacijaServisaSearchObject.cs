@@ -7,15 +7,15 @@ namespace BikeHub.Model.ServisFM
 {
     public class RezervacijaServisaSearchObject : BaseSearchObject
     {
-        public int? RezervacijaId { get; set; }
+        //public int? RezervacijaId { get; set; }
 
-        public int? KorisnikId { get; set; }
+        //public int? KorisnikId { get; set; }
 
-        public int? ServiserId { get; set; }
+        //public int? ServiserId { get; set; }
 
-        public DateTime? DatumKreiranja { get; set; }
+        //public DateTime? DatumKreiranja { get; set; }
 
-        public DateTime? DatumRezervacije { get; set; }
+        //public DateTime? DatumRezervacije { get; set; }
 
         public decimal? Ocjena { get; set; }
 

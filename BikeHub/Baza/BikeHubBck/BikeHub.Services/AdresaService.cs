@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace BikeHub.Services
 {
-    public class AdresaService : BaseService<Model.PromocijaFM.Adresa, Model.PromocijaFM.AdresaSearchObject, Database.Adresa>, IAdresaService
+    public class AdresaService : BaseService<Model.AdresaFM.Adresa, Model.AdresaFM.AdresaSearchObject, Database.Adresa>, IAdresaService
     {
         public AdresaService(BikeHubDbContext context, IMapper mapper) 
         : base(context, mapper){     }

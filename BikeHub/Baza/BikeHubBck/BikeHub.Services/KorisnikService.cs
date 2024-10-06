@@ -1,6 +1,4 @@
-﻿using BikeHub.Model;
-using BikeHub.Model.BicikliFM;
-using BikeHub.Model.KorisnikFM;
+﻿using BikeHub.Model.KorisnikFM;
 using BikeHub.Services.Database;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
@@ -18,39 +16,28 @@ namespace BikeHub.Services
         public KorisnikService(BikeHubDbContext context, IMapper mapper)
         : base(context,mapper){        }
 
-        //public virtual PagedResult<Model.KorisnikFM.Korisnik> GetList( Model.KorisnikFM.KorisniciSearchObject searchObject)
-        //{
-        //    List<Model.KorisnikFM.Korisnik> result = new List<Model.KorisnikFM.Korisnik>();
-        //    var query = Context.Korisniks.AsQueryable();
-        //    if (!string.IsNullOrWhiteSpace(searchObject?.Username))
-        //    {
-        //        query = query.Where(x=>x.Username.StartsWith(searchObject.Username));
-        //    }
-        //    if (!string.IsNullOrWhiteSpace(searchObject?.Email))
-        //    {
-        //        query = query.Where(x => x.Email.StartsWith(searchObject.Email));
-        //    }
-        //    if (searchObject?.IsAdmin != null)
-        //    {
-        //        query = query.Where(x => x.IsAdmin == searchObject.IsAdmin);
-        //    }
-        //    if (searchObject?.IsInfoIncluded != null)
-        //    {
-        //        query = query.Include(x=>x.KorisnikInfos);
-        //    }
-        //    int count = query.Count();
-        //    if(searchObject?.Page.HasValue==true && searchObject?.PageSize.HasValue == true)
-        //    {
-        //        query = query.Skip(searchObject.Page.Value * searchObject.PageSize.Value).Take(searchObject.PageSize.Value);
-        //    }
+        public override IQueryable<Database.Korisnik> AddFilter(KorisniciSearchObject search, IQueryable<Database.Korisnik> query)
+        {
+            var NoviQuery = base.AddFilter(search, query);
+            if (!string.IsNullOrWhiteSpace(search?.Username))
+            {
+                NoviQuery = NoviQuery.Where(x => x.Username.StartsWith(search.Username));
+            }
+            if (!string.IsNullOrWhiteSpace(search?.Email))
+            {
+                NoviQuery = NoviQuery.Where(x => x.Email.StartsWith(search.Email));
+            }
+            if (search?.IsAdmin != null)
+            {
+                NoviQuery = NoviQuery.Where(x => x.IsAdmin == search.IsAdmin);
+            }
+            if (search?.IsInfoIncluded == true)
+            {
+                NoviQuery = NoviQuery.Include(x => x.KorisnikInfos);
+            }
 
-        //    var list = query.ToList();
-        //    result = Mapper.Map(list, result);
-        //    PagedResult<Model.KorisnikFM.Korisnik> response = new PagedResult<Model.KorisnikFM.Korisnik>();
-        //    response.ResultsList = result;
-        //    response.Count = count;
-        //    return response;
-        //}
+            return NoviQuery;
+        }
 
         public virtual Model.KorisnikFM.Korisnik Insert(KorisniciInsertR request)
         {

@@ -7,9 +7,9 @@ namespace BikeHub.Model.ServisFM
 {
     public class ServiserSearchObject : BaseSearchObject
     {
-        public int? ServiserId { get; set; }
+        //public int? ServiserId { get; set; }
 
-        public int? KorisnikId { get; set; }
+        //public int? KorisnikId { get; set; }
 
         public decimal? Cijena { get; set; }
 

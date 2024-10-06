@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BikeHub.Model.AdresaFM;
+using BikeHub.Model.SlikeFM;
 
 namespace BikeHub.Services
 {
-    public interface IAdresaService : IService<Adresa, AdresaSearchObject>
+    public interface ISlikeDijeloviService : IService<SlikeDijelovi, SlikeDijeloviSearchObject>
     {
     }
 }

@@ -6,9 +6,9 @@ namespace BikeHubBck.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class NarudzbaController : BaseController<Narudzba, NarudzbaSearchObject>
+    public class NarudzbaDijeloviController : BaseController<NarudzbaDijelovi, NarudzbaDijeloviSearchObject>
     {
-        public NarudzbaController(INarudzbaService service) 
+        public NarudzbaDijeloviController(INarudzbaDijeloviService service) 
         : base(service){        }
     }
 }

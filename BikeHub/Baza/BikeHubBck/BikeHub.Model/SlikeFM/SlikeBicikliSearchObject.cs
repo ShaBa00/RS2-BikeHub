@@ -7,10 +7,10 @@ namespace BikeHub.Model.SlikeFM
 {
     public class SlikeBicikliSearchObject : BaseSearchObject
     {
-        public int? SlikeBicikliId { get; set; }
+        //public int? SlikeBicikliId { get; set; }
 
         public int? BiciklId { get; set; }
 
-        public byte[]? Slika { get; set; }
+        //public byte[]? Slika { get; set; }
     }
 }

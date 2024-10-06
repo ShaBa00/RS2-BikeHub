@@ -1,5 +1,4 @@
-﻿using BikeHub.Model.AdresaFM;
-using BikeHub.Model.KorisnikFM;
+﻿using BikeHub.Model.KorisnikFM;
 using BikeHub.Services;
 using Microsoft.AspNetCore.Mvc;
 

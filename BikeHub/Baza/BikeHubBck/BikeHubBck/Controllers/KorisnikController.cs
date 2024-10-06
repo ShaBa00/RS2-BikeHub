@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using BikeHub.Services;
 using BikeHub.Model.KorisnikFM;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;

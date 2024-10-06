@@ -14,6 +14,16 @@ builder.Services.AddTransient<IBicikliService, BicikliService>();
 builder.Services.AddTransient<IAdresaService, AdresaService>();
 builder.Services.AddTransient<IKorisnikInfoService, KorisnikInfoService>();
 builder.Services.AddTransient<INarudzbaService, NarudzbaService>();
+builder.Services.AddTransient<IPromocijaBicikliService, PromocijaBicikliService>();
+builder.Services.AddTransient<IPromocijaDijeloviService, PromocijaDijeloviService>();
+builder.Services.AddTransient<INarudzbaBicikliService, NarudzbaBicikliService>();
+builder.Services.AddTransient<INarudzbaDijeloviService, NarudzbaDijeloviService>();
+builder.Services.AddTransient<IRezervacijaServisaService, RezervacijaServisaService>();
+builder.Services.AddTransient<IServiserService, ServiserService>();
+builder.Services.AddTransient<ISlikeBicikliService, SlikeBicikliService>();
+builder.Services.AddTransient<ISlikeDijeloviService, SlikeDijeloviService>();
+builder.Services.AddTransient<ISpaseniBicikliService, SpaseniBicikliService>();
+builder.Services.AddTransient<ISpaseniDijeloviService, SpaseniDijeloviService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

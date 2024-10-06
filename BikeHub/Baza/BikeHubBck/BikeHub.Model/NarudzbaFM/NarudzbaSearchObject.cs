@@ -7,9 +7,9 @@ namespace BikeHub.Model.NarudzbaFM
 {
     public class NarudzbaSearchObject : BaseSearchObject
     {
-        public int? NarudzbaId { get; set; }
+        //public int? NarudzbaId { get; set; }
 
-        public int? KorisnikId { get; set; }
+        //public int? KorisnikId { get; set; }
 
         public DateTime? DatumNarudzbe { get; set; }
 

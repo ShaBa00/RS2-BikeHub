@@ -7,13 +7,13 @@ namespace BikeHub.Model.PromocijaFM
 {
     public class PromocijaDijeloviSearchObject : BaseSearchObject
     {
-        public int? PromocijaDijeloviId { get; set; }
+        //public int? PromocijaDijeloviId { get; set; }
 
-        public int? DijeloviId { get; set; }
+        //public int? DijeloviId { get; set; }
 
-        public DateTime? DatumPocetka { get; set; }
+        //public DateTime? DatumPocetka { get; set; }
 
-        public DateTime? DatumZavrsetka { get; set; }
+        //public DateTime? DatumZavrsetka { get; set; }
 
         public decimal? CijenaPromocije { get; set; }
 
