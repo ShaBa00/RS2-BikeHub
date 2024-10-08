@@ -11,10 +11,13 @@ using System.Threading.Tasks;
 
 namespace BikeHub.Services
 {
-    public class KorisnikService : BaseService<Model.KorisnikFM.Korisnik, KorisniciSearchObject, Database.Korisnik>, IKorisnikService
+    public class KorisnikService : BaseCRUDService<Model.KorisnikFM.Korisnik, KorisniciSearchObject, Database.Korisnik, KorisniciInsertR, KorisniciUpdateR>, IKorisnikService
     {
-        public KorisnikService(BikeHubDbContext context, IMapper mapper)
-        : base(context,mapper){        }
+        //public class KorisnikService : BaseService<Model.KorisnikFM.Korisnik, KorisniciSearchObject, Database.Korisnik>, IKorisnikService
+        //{
+        public KorisnikService(BikeHubDbContext context, IMapper mapper) : base(context, mapper)
+        {
+        }
 
         public override IQueryable<Database.Korisnik> AddFilter(KorisniciSearchObject search, IQueryable<Database.Korisnik> query)
         {
@@ -39,22 +42,15 @@ namespace BikeHub.Services
             return NoviQuery;
         }
 
-        public virtual Model.KorisnikFM.Korisnik Insert(KorisniciInsertR request)
+        public override void BeforeInsert(KorisniciInsertR request, Database.Korisnik entity)
         {
             if (request.Lozinka != request.LozinkaPotvrda)
             {
-                return null;
+                throw new Exception("Lozinka i LozinkaPotvrda moraju biti iste");
             }
-            Database.Korisnik entity = new Database.Korisnik();
-            Mapper.Map(request, entity);
-
             entity.LozinkaSalt = GenerateSalt();
             entity.LozinkaHash = GenerateHash(entity.LozinkaSalt, request.Lozinka);
-
-            Context.Add(entity);
-            Context.SaveChanges();
-
-            return Mapper.Map<Model.KorisnikFM.Korisnik>(entity);
+            base.BeforeInsert(request, entity);
         }
         public static string GenerateSalt()
         {
@@ -78,7 +74,22 @@ namespace BikeHub.Services
             return Convert.ToBase64String(inArray);
         }
 
-        public Model.KorisnikFM.Korisnik Promjeni(int id, KorisnikPromjeniR request)
+        public override void BeforeUpdate(KorisniciUpdateR request, Database.Korisnik entity)
+        {
+            base.BeforeUpdate(request, entity);
+            if (request.Lozinka != null)
+            {
+                if (request.Lozinka != request.LozinkaPotvrda)
+                {
+                    throw new Exception("Lozinka i LozinkaPotvrda moraju biti iste");
+                }
+
+                entity.LozinkaSalt = GenerateSalt();
+                entity.LozinkaHash = GenerateHash(entity.LozinkaSalt, request.Lozinka);
+            }
+        }
+
+        public Model.KorisnikFM.Korisnik Promjeni(int id, KorisniciUpdateR request)
         {
             var entity = Context.Korisniks.Find(id);
             Mapper.Map(request, entity);

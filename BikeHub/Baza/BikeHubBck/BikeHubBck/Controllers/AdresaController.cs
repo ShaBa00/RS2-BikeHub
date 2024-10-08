@@ -6,7 +6,7 @@ namespace BikeHubBck.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class AdresaController : BaseController<Adresa, AdresaSearchObject>
+    public class AdresaController : BaseCRUDController<Adresa, AdresaSearchObject,AdresaInsertR,AdresaUpdateR>
     {
         public AdresaController(IAdresaService service) 
         : base(service){        }

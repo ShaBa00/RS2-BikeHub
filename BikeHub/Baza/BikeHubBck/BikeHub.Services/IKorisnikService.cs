@@ -1,5 +1,6 @@
 ﻿using BikeHub.Model;
 using BikeHub.Model.KorisnikFM;
+using BikeHub.Services.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,10 +9,8 @@ using System.Threading.Tasks;
 
 namespace BikeHub.Services
 {
-    public interface IKorisnikService : IService<Model.KorisnikFM.Korisnik, Model.KorisnikFM.KorisniciSearchObject>
+    public interface IKorisnikService : ICRUDService<Model.KorisnikFM.Korisnik, KorisniciSearchObject, Model.KorisnikFM.KorisniciInsertR, Model.KorisnikFM.KorisniciUpdateR>
     {
-        Korisnik Insert(KorisniciInsertR request);
-        Korisnik Promjeni(int id, KorisnikPromjeniR request);
 
     }
 }

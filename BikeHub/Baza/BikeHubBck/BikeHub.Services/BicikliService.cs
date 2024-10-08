@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BikeHub.Services
 {
-    public class BicikliService : BaseService<Model.BicikliFM.Bicikli, BicikliSearchObject, Database.Bicikl> , IBicikliService
+    public class BicikliService : BaseCRUDService<Model.BicikliFM.Bicikli, BicikliSearchObject, Database.Bicikl, Model.BicikliFM.BicikliInsertR, Model.BicikliFM.BicikliUpdateR> , IBicikliService
     {
 
         public BicikliService(BikeHubDbContext context, IMapper mapper)
@@ -32,30 +32,75 @@ namespace BikeHub.Services
             }
             return NoviQuery;
         }
-        //public virtual List<Model.BicikliFM.Bicikli> GetList(BicikliSearchObject searchObject)
-        //{
-        //    List<Model.BicikliFM.Bicikli> result = new List<Model.BicikliFM.Bicikli>();
-
-        //    var query = Context.Bicikls.AsQueryable();
-        //    if (!string.IsNullOrWhiteSpace(searchObject?.Naziv))
-        //    {
-        //        query = query.Where(x => x.Naziv.StartsWith(searchObject.Naziv));
-        //    }
-        //    if (!string.IsNullOrWhiteSpace(searchObject?.Status))
-        //    {
-        //        query = query.Where(x => x.Status.StartsWith(searchObject.Status));
-        //    }
-        //    if (searchObject?.Cijena != null)
-        //    {
-        //        query = query.Where(x => x.Cijena == searchObject.Cijena);
-        //    }
-        //    if (searchObject?.Page.HasValue == true && searchObject?.PageSize.HasValue == true)
-        //    {
-        //        query = query.Skip(searchObject.Page.Value * searchObject.PageSize.Value).Take(searchObject.PageSize.Value);
-        //    }
-        //    var list = query.ToList();
-        //    result = Mapper.Map(list, result);
-        //    return result;
-        //}
+        public override void BeforeInsert(BicikliInsertR request, Bicikl entity)
+        {
+            if (string.IsNullOrWhiteSpace(request.Naziv))
+            {
+                throw new Exception("Naziv bicikla ne smije biti prazan");
+            }
+            entity.Naziv = request.Naziv;
+            if (request.Cijena <= 0)
+            {
+                throw new Exception("Cijena bicikla mora biti veća od nule");
+            }
+            entity.Cijena = request.Cijena;
+            if (string.IsNullOrWhiteSpace(request.VelicinaRama))
+            {
+                throw new Exception("Veličina rama ne smije biti prazna");
+            }
+            entity.VelicinaRama = request.VelicinaRama;
+            if (string.IsNullOrWhiteSpace(request.VelicinaTocka))
+            {
+                throw new Exception("Veličina točka ne smije biti prazna");
+            }
+            entity.VelicinaTocka = request.VelicinaTocka;
+            if (request.BrojBrzina <= 0)
+            {
+                throw new Exception("Broj brzina mora biti veći od nule");
+            }
+            entity.BrojBrzina = request.BrojBrzina;
+            if (string.IsNullOrWhiteSpace(request.Status))
+            {
+                throw new Exception("Status bicikla ne smije biti prazan");
+            }
+            entity.Status = request.Status;
+            base.BeforeInsert(request, entity);
+        }
+        public override void BeforeUpdate(BicikliUpdateR request, Bicikl entity)
+        {
+            if (!string.IsNullOrWhiteSpace(request.Naziv))
+            {
+                entity.Naziv = request.Naziv;
+            }
+            if (request.Cijena.HasValue)
+            {
+                if (request.Cijena <= 0)
+                {
+                    throw new Exception("Cijena bicikla mora biti veća od nule");
+                }
+                entity.Cijena = request.Cijena.Value; 
+            }
+            if (!string.IsNullOrWhiteSpace(request.VelicinaRama))
+            {
+                entity.VelicinaRama = request.VelicinaRama;
+            }
+            if (!string.IsNullOrWhiteSpace(request.VelicinaTocka))
+            {
+                entity.VelicinaTocka = request.VelicinaTocka;
+            }
+            if (request.BrojBrzina.HasValue)
+            {
+                if (request.BrojBrzina <= 0)
+                {
+                    throw new Exception("Broj brzina mora biti veći od nule");
+                }
+                entity.BrojBrzina = request.BrojBrzina.Value;
+            }
+            if (!string.IsNullOrWhiteSpace(request.Status))
+            {
+                entity.Status = request.Status;
+            }
+            base.BeforeUpdate(request, entity);
+        }
     }
 }

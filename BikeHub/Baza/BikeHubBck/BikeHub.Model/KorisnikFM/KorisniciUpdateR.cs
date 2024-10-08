@@ -4,7 +4,7 @@ using System.Text;
 
 namespace BikeHub.Model.KorisnikFM
 {
-    public class KorisnikPromjeniR
+    public class KorisniciUpdateR
     {
         public string Username { get; set; } = null!;
         public string? Lozinka { get; set; }

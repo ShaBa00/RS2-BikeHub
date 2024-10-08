@@ -1,5 +1,4 @@
 ﻿using BikeHub.Model.BicikliFM;
-using BikeHub.Services.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BikeHub.Services
 {
-    public interface IBicikliService : IService<Bicikli,BicikliSearchObject>
+    public interface IBicikliService : ICRUDService<Bicikli, BicikliSearchObject, BicikliInsertR, BicikliUpdateR>
     {
     }
 }
