@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BikeHub.Services
 {
-    public interface IKorisnikInfoService : IService<Model.KorisnikFM.KorisnikInfo, Model.KorisnikFM.KorisnikInfoSearchObject>
+    public interface IKorisnikInfoService : ICRUDService<Model.KorisnikFM.KorisnikInfo, Model.KorisnikFM.KorisnikInfoSearchObject,Model.KorisnikFM.KorisnikInfoInsertR, Model.KorisnikFM.KorisnikInfoUpdateR>
     {
     }
 }

@@ -24,6 +24,9 @@ builder.Services.AddTransient<ISlikeBicikliService, SlikeBicikliService>();
 builder.Services.AddTransient<ISlikeDijeloviService, SlikeDijeloviService>();
 builder.Services.AddTransient<ISpaseniBicikliService, SpaseniBicikliService>();
 builder.Services.AddTransient<ISpaseniDijeloviService, SpaseniDijeloviService>();
+builder.Services.AddTransient<IKategorijaService, KategorijaService>();
+builder.Services.AddTransient<IRecommendedKategorijaService, RecommendedKategorijaService>();
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

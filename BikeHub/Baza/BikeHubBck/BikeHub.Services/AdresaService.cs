@@ -1,8 +1,4 @@
 ﻿using BikeHub.Model.AdresaFM;
-using BikeHub.Model.PromocijaFM;
-using BikeHub.Model.ServisFM;
-using BikeHub.Model.SlikeFM;
-using BikeHub.Model.SpaseniFM;
 using BikeHub.Services.Database;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +18,10 @@ namespace BikeHub.Services
         public override IQueryable<Database.Adresa> AddFilter(AdresaSearchObject search, IQueryable<Database.Adresa> query)
         {
             var NoviQuery = base.AddFilter(search, query);
+            if (search?.KorisnikId != null)
+            {
+                NoviQuery = NoviQuery.Where(x => x.KorisnikId == search.KorisnikId);
+            }
             if (!string.IsNullOrWhiteSpace(search?.Grad))
             {
                 NoviQuery = NoviQuery.Where(x => x.Grad.StartsWith(search.Grad));

@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace BikeHub.Services
 {
-    public interface INarudzbaService : IService<Model.NarudzbaFM.Narudzba, Model.NarudzbaFM.NarudzbaSearchObject>
+    public interface INarudzbaService : ICRUDService<Model.NarudzbaFM.Narudzba, Model.NarudzbaFM.NarudzbaSearchObject,
+                                                    Model.NarudzbaFM.NarudzbaInsertR, Model.NarudzbaFM.NarudzbaUpdateR>
     {
     }
 }

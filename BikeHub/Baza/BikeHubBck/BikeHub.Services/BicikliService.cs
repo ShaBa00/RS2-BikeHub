@@ -11,9 +11,9 @@ namespace BikeHub.Services
 {
     public class BicikliService : BaseCRUDService<Model.BicikliFM.Bicikli, BicikliSearchObject, Database.Bicikl, Model.BicikliFM.BicikliInsertR, Model.BicikliFM.BicikliUpdateR> , IBicikliService
     {
-
+        private BikeHubDbContext _context;
         public BicikliService(BikeHubDbContext context, IMapper mapper)
-        :base(context,mapper){}
+        :base(context,mapper){ _context = context; }
 
         public override IQueryable<Bicikl> AddFilter(BicikliSearchObject search, IQueryable<Bicikl> query)
         {
@@ -29,6 +29,25 @@ namespace BikeHub.Services
             if (search?.Cijena != null)
             {
                 NoviQuery = NoviQuery.Where(x => x.Cijena == search.Cijena);
+            }
+            if (!string.IsNullOrWhiteSpace(search?.VelicinaRama))
+            {
+                NoviQuery = NoviQuery.Where(x => x.VelicinaRama == search.VelicinaRama);
+            }
+
+            if (!string.IsNullOrWhiteSpace(search?.VelicinaTocka))
+            {
+                NoviQuery = NoviQuery.Where(x => x.VelicinaTocka == search.VelicinaTocka);
+            }
+
+            if (search?.BrojBrzina != null)
+            {
+                NoviQuery = NoviQuery.Where(x => x.BrojBrzina == search.BrojBrzina);
+            }
+
+            if (search?.KategorijaId != null)
+            {
+                NoviQuery = NoviQuery.Where(x => x.KategorijaId == search.KategorijaId);
             }
             return NoviQuery;
         }
@@ -64,6 +83,16 @@ namespace BikeHub.Services
                 throw new Exception("Status bicikla ne smije biti prazan");
             }
             entity.Status = request.Status;
+            if (request.KategorijaId <= 0)
+            {
+                throw new Exception("Kategorija mora biti odabrana");
+            }
+            var kategorija = _context.Kategorijas.Find(request.KategorijaId);
+            if (kategorija == null)
+            {
+                throw new Exception("Kategorija sa datim ID-om ne postoji");
+            }
+            entity.KategorijaId = request.KategorijaId;
             base.BeforeInsert(request, entity);
         }
         public override void BeforeUpdate(BicikliUpdateR request, Bicikl entity)
@@ -95,6 +124,15 @@ namespace BikeHub.Services
                     throw new Exception("Broj brzina mora biti veći od nule");
                 }
                 entity.BrojBrzina = request.BrojBrzina.Value;
+            }
+            if (request.KategorijaId.HasValue)
+            {
+                var kategorija = _context.Kategorijas.Find(request.KategorijaId);
+                if (kategorija == null)
+                {
+                    throw new Exception("Kategorija sa datim ID-om ne postoji");
+                }
+                entity.KategorijaId = request.KategorijaId.Value;
             }
             if (!string.IsNullOrWhiteSpace(request.Status))
             {

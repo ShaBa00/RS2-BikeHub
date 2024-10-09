@@ -6,7 +6,7 @@ namespace BikeHubBck.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class KorisnikInfoController : BaseController<KorisnikInfo, KorisnikInfoSearchObject>
+    public class KorisnikInfoController : BaseCRUDController<KorisnikInfo, KorisnikInfoSearchObject,KorisnikInfoInsertR,KorisnikInfoUpdateR>
     {
         public KorisnikInfoController(IKorisnikInfoService service) 
         : base(service){        }

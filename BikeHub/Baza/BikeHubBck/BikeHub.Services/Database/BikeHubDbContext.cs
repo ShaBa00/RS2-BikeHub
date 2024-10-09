@@ -21,6 +21,8 @@ public partial class BikeHubDbContext : DbContext
 
     public virtual DbSet<Dijelovi> Dijelovis { get; set; }
 
+    public virtual DbSet<Kategorija> Kategorijas { get; set; }
+
     public virtual DbSet<Korisnik> Korisniks { get; set; }
 
     public virtual DbSet<KorisnikInfo> KorisnikInfos { get; set; }
@@ -34,6 +36,8 @@ public partial class BikeHubDbContext : DbContext
     public virtual DbSet<PromocijaBicikli> PromocijaBiciklis { get; set; }
 
     public virtual DbSet<PromocijaDijelovi> PromocijaDijelovis { get; set; }
+
+    public virtual DbSet<RecommendedKategorija> RecommendedKategorijas { get; set; }
 
     public virtual DbSet<RezervacijaServisa> RezervacijaServisas { get; set; }
 
@@ -92,6 +96,10 @@ public partial class BikeHubDbContext : DbContext
             entity.Property(e => e.VelicinaTocka)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+
+            entity.HasOne(d => d.Kategorija).WithMany(p => p.Bicikls)
+                .HasForeignKey(d => d.KategorijaId)
+                .HasConstraintName("FK_Bicikl_Kategorija");
         });
 
         modelBuilder.Entity<Dijelovi>(entity =>
@@ -104,10 +112,23 @@ public partial class BikeHubDbContext : DbContext
             entity.Property(e => e.Naziv)
                 .HasMaxLength(100)
                 .IsUnicode(false);
-            entity.Property(e => e.Opis).HasColumnType("text");
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
                 .HasDefaultValueSql("('Aktivan')");
+
+            entity.HasOne(d => d.Kategorija).WithMany(p => p.Dijelovis)
+                .HasForeignKey(d => d.KategorijaId)
+                .HasConstraintName("FK_Dijelovi_Kategorija");
+        });
+
+        modelBuilder.Entity<Kategorija>(entity =>
+        {
+            entity.HasKey(e => e.KategorijaId).HasName("PK__Kategori__6C3B8FEEE2B9895F");
+
+            entity.ToTable("Kategorija");
+
+            entity.Property(e => e.Naziv).HasMaxLength(100);
+            entity.Property(e => e.Status).HasMaxLength(50);
         });
 
         modelBuilder.Entity<Korisnik>(entity =>
@@ -248,6 +269,31 @@ public partial class BikeHubDbContext : DbContext
                 .HasForeignKey(d => d.DijeloviId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Promocija__Dijel__656C112C");
+        });
+
+        modelBuilder.Entity<RecommendedKategorija>(entity =>
+        {
+            entity.HasKey(e => e.RecommendedKategorijaId).HasName("PK__Recommen__EC73A5F08D44C318");
+
+            entity.ToTable("RecommendedKategorija");
+
+            entity.Property(e => e.BrojPreporuka).HasDefaultValueSql("((0))");
+            entity.Property(e => e.DatumKreiranja)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasDefaultValueSql("('Aktivan')");
+
+            entity.HasOne(d => d.Bicikli).WithMany(p => p.RecommendedKategorijas)
+                .HasForeignKey(d => d.BicikliId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Recommend__Bicik__7E37BEF6");
+
+            entity.HasOne(d => d.Dijelovi).WithMany(p => p.RecommendedKategorijas)
+                .HasForeignKey(d => d.DijeloviId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Recommend__Dijel__7D439ABD");
         });
 
         modelBuilder.Entity<RezervacijaServisa>(entity =>

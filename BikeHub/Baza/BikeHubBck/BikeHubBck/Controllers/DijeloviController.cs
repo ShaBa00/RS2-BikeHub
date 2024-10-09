@@ -6,7 +6,7 @@ namespace BikeHubBck.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class DijeloviController : BaseController<Dijelovi, DijeloviSearchObject>
+    public class DijeloviController : BaseCRUDController<Dijelovi, DijeloviSearchObject,DijeloviInsertR,DijeloviUpdateR>
     {
         public DijeloviController(IDijeloviService service)
         :base(service){        }

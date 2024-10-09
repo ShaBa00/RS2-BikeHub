@@ -19,9 +19,15 @@ public partial class Bicikl
 
     public string? Status { get; set; }
 
+    public int? KategorijaId { get; set; }
+
+    public virtual Kategorija? Kategorija { get; set; }
+
     public virtual ICollection<NarudzbaBicikli> NarudzbaBiciklis { get; set; } = new List<NarudzbaBicikli>();
 
     public virtual ICollection<PromocijaBicikli> PromocijaBiciklis { get; set; } = new List<PromocijaBicikli>();
+
+    public virtual ICollection<RecommendedKategorija> RecommendedKategorijas { get; set; } = new List<RecommendedKategorija>();
 
     public virtual ICollection<SlikeBicikli> SlikeBiciklis { get; set; } = new List<SlikeBicikli>();
 

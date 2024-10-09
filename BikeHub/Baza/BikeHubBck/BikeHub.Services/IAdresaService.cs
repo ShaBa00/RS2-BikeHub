@@ -7,7 +7,8 @@ using BikeHub.Model.AdresaFM;
 
 namespace BikeHub.Services
 {
-    public interface IAdresaService : ICRUDService<Model.AdresaFM.Adresa, AdresaSearchObject, Model.AdresaFM.AdresaInsertR, Model.AdresaFM.AdresaUpdateR>
+    public interface IAdresaService : ICRUDService<Model.AdresaFM.Adresa, AdresaSearchObject, Model.AdresaFM.AdresaInsertR,
+                                                    Model.AdresaFM.AdresaUpdateR>
     {
     }
 }
