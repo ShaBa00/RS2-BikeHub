@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace BikeHub.Services
 {
-    public interface ISpaseniDijeloviService : IService<Model.SpaseniFM.SpaseniDijelovi, Model.SpaseniFM.SpaseniDijeloviSearchObject>
+    public interface ISpaseniDijeloviService : ICRUDService<Model.SpaseniFM.SpaseniDijelovi, Model.SpaseniFM.SpaseniDijeloviSearchObject,
+                                                            Model.SpaseniFM.SpaseniDijeloviInsertR, Model.SpaseniFM.SpaseniDijeloviUpdateR>
     {
     }
 }

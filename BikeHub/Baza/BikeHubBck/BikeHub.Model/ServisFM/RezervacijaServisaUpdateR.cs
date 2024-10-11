@@ -6,10 +6,6 @@ namespace BikeHub.Model.ServisFM
 {
     public class RezervacijaServisaUpdateR
     {
-        public int? KorisnikId { get; set; }
-
-        public int? ServiserId { get; set; }
-
         public DateTime? DatumKreiranja { get; set; }
 
         public DateTime? DatumRezervacije { get; set; }

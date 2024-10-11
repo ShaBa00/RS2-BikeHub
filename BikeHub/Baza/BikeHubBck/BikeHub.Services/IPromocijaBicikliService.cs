@@ -7,7 +7,8 @@ using BikeHub.Model.PromocijaFM;
 
 namespace BikeHub.Services
 {
-    public interface IPromocijaBicikliService : IService<PromocijaBicikli, PromocijaBicikliSearchObject>
+    public interface IPromocijaBicikliService : ICRUDService<PromocijaBicikli, PromocijaBicikliSearchObject, 
+                                                            PromocijaBicikliInsertR, PromocijaBicikliUpdateR>
     {
     }
 }

@@ -4,8 +4,10 @@ using System.Text;
 
 namespace BikeHub.Model.PromocijaFM
 {
-    public class PromocijaBicikliUpdateR
+    public class PromocijaBicikli
     {
+        public int? PromocijaBicikliId { get; set; }
+
         public int? BiciklId { get; set; }
 
         public DateTime? DatumPocetka { get; set; }

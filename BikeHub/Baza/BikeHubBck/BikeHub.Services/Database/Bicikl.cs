@@ -21,6 +21,8 @@ public partial class Bicikl
 
     public int? KategorijaId { get; set; }
 
+    public int Kolicina { get; set; }
+
     public virtual Kategorija? Kategorija { get; set; }
 
     public virtual ICollection<NarudzbaBicikli> NarudzbaBiciklis { get; set; } = new List<NarudzbaBicikli>();

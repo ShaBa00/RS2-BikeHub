@@ -10,8 +10,8 @@ namespace BikeHub.Model.ServisFM
 
         public decimal Cijena { get; set; }
 
-        public int BrojServisa { get; set; }
+        //public int BrojServisa { get; set; }
 
-        public string Status { get; set; }
+        //public string Status { get; set; }
     }
 }

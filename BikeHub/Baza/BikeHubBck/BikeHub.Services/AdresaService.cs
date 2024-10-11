@@ -73,18 +73,6 @@ namespace BikeHub.Services
         }
         public override void BeforeUpdate(AdresaUpdateR request, Database.Adresa entity)
         {
-            //if (request?.KorisnikId != null)
-            //{
-            //    var korisnik = _context.Korisniks.Find(request.KorisnikId);
-            //    if (korisnik != null)
-            //    {
-            //        entity.KorisnikId = request.KorisnikId.Value;
-            //    }
-            //    else
-            //    {
-            //        throw new Exception("Korisnik sa datim ID-om ne postoji");
-            //    }
-            //}
             if (!string.IsNullOrWhiteSpace(request.Grad))
             {
                 entity.Grad = request.Grad;

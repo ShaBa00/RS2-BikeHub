@@ -9,10 +9,12 @@ using System.Threading.Tasks;
 
 namespace BikeHub.Services
 {
-    public class SlikeBicikliService : BaseService<Model.SlikeFM.SlikeBicikli, Model.SlikeFM.SlikeBicikliSearchObject, Database.SlikeBicikli>, ISlikeBicikliService
+    public class SlikeBicikliService : BaseCRUDService<Model.SlikeFM.SlikeBicikli, Model.SlikeFM.SlikeBicikliSearchObject,
+        Database.SlikeBicikli, Model.SlikeFM.SlikeBicikliInsertR, Model.SlikeFM.SlikeBicikliUpdateR>, ISlikeBicikliService
     {
+        private BikeHubDbContext _context;
         public SlikeBicikliService(BikeHubDbContext context, IMapper mapper) 
-        : base(context, mapper){     }
+        : base(context, mapper){ _context = context; }
         public override IQueryable<Database.SlikeBicikli> AddFilter(SlikeBicikliSearchObject search, IQueryable<Database.SlikeBicikli> query)
         {
             var NoviQuery = base.AddFilter(search, query);
@@ -21,6 +23,42 @@ namespace BikeHub.Services
                 NoviQuery = NoviQuery.Where(x => x.BiciklId == search.BiciklId);
             }
             return NoviQuery;
+        }
+        public override void BeforeInsert(SlikeBicikliInsertR request, Database.SlikeBicikli entity)
+        {
+            if (request?.BiciklId == null)
+            {
+                throw new Exception("BiciklId ne smije biti null.");
+            }
+            var bicikl = _context.Bicikls.Find(request.BiciklId);
+            if (bicikl == null)
+            {
+                throw new Exception("Bicikl sa datim ID-om ne postoji.");
+            }
+            if (request?.Slika == null || request.Slika.Length == 0)
+            {
+                throw new Exception("Slika ne smije biti prazna.");
+            }
+            entity.BiciklId = request.BiciklId;
+            entity.Slika = request.Slika;
+            base.BeforeInsert(request, entity);
+        }
+        public override void BeforeUpdate(SlikeBicikliUpdateR request, Database.SlikeBicikli entity)
+        {
+            if (request.BiciklId.HasValue)
+            {
+                var bicikl = _context.Bicikls.Find(request.BiciklId.Value);
+                if (bicikl == null)
+                {
+                    throw new Exception("Bicikl sa datim ID-om ne postoji.");
+                }
+                entity.BiciklId = request.BiciklId.Value;
+            }
+            if (request.Slika != null && request.Slika.Length > 0)
+            {
+                entity.Slika = request.Slika;
+            }
+            base.BeforeUpdate(request, entity);
         }
     }
 }

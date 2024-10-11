@@ -7,7 +7,8 @@ using BikeHub.Model.ServisFM;
 
 namespace BikeHub.Services
 {
-    public interface IRezervacijaServisaService : IService<RezervacijaServisa, RezervacijaServisaSearchObject>
+    public interface IRezervacijaServisaService : ICRUDService<RezervacijaServisa, RezervacijaServisaSearchObject,
+                                                                RezervacijaServisaInsertR, RezervacijaServisaUpdateR>
     {
     }
 }

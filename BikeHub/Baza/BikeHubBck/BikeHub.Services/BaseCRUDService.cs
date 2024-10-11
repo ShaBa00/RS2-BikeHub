@@ -38,9 +38,9 @@ namespace BikeHub.Services
 
             var entity = set.Find(id);
 
-            Mapper.Map(request, entity);
-
             BeforeUpdate(request, entity);
+
+            Mapper.Map(request, entity);
 
             Context.SaveChanges();
 

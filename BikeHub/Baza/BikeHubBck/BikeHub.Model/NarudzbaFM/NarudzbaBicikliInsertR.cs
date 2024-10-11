@@ -11,7 +11,5 @@ namespace BikeHub.Model.NarudzbaFM
         public int BiciklId { get; set; }
 
         public int Kolicina { get; set; }
-
-        public decimal Cijena { get; set; }
     }
 }

@@ -7,7 +7,7 @@ using BikeHub.Model.ServisFM;
 
 namespace BikeHub.Services
 {
-    public interface IServiserService : IService<Serviser, ServiserSearchObject>
+    public interface IServiserService : ICRUDService<Serviser, ServiserSearchObject, ServiserInsertR, ServiserUpdateR>
     {
     }
 }
