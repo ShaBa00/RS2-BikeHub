@@ -12,6 +12,5 @@ namespace BikeHub.Model.RecommendedKategorijaFM
 
         public int? BrojPreporuka { get; set; }
 
-        public string? Status { get; set; }
     }
 }

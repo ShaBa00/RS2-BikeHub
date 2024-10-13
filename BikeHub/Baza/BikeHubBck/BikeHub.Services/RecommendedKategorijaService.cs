@@ -1,5 +1,6 @@
 ﻿using BikeHub.Model.KorisnikFM;
 using BikeHub.Model.RecommendedKategorijaFM;
+using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
@@ -11,11 +12,23 @@ using System.Threading.Tasks;
 
 namespace BikeHub.Services
 {
-    public class RecommendedKategorijaService : BaseCRUDService<Model.RecommendedKategorijaFM.RecommendedKategorija, RecommendedKategorijaSearchObject, Database.RecommendedKategorija, Model.RecommendedKategorijaFM.RecommendedKategorijaInsertR, Model.RecommendedKategorijaFM.RecommendedKategorijaUpdateR>, IRecommendedKategorijaService
+    public class RecommendedKategorijaService : BaseCRUDService<Model.RecommendedKategorijaFM.RecommendedKategorija,
+        RecommendedKategorijaSearchObject, Database.RecommendedKategorija, Model.RecommendedKategorijaFM.RecommendedKategorijaInsertR,
+        Model.RecommendedKategorijaFM.RecommendedKategorijaUpdateR>, IRecommendedKategorijaService
     {
         private BikeHubDbContext _context;
-        public RecommendedKategorijaService(BikeHubDbContext context, IMapper mapper) 
-        : base(context, mapper){ _context = context;   }
+        public BasePrvaGrupaState<Model.RecommendedKategorijaFM.RecommendedKategorija, Database.RecommendedKategorija,
+            Model.RecommendedKategorijaFM.RecommendedKategorijaInsertR,Model.RecommendedKategorijaFM.RecommendedKategorijaUpdateR> _basePrvaGrupaState;
+
+        public RecommendedKategorijaService(BikeHubDbContext context, IMapper mapper,
+            BasePrvaGrupaState<Model.RecommendedKategorijaFM.RecommendedKategorija, Database.RecommendedKategorija,
+            Model.RecommendedKategorijaFM.RecommendedKategorijaInsertR, Model.RecommendedKategorijaFM.RecommendedKategorijaUpdateR> basePrvaGrupaState) 
+        : base(context, mapper)
+        {
+            _context = context;
+            _basePrvaGrupaState = basePrvaGrupaState;
+        }
+
         public override IQueryable<Database.RecommendedKategorija> AddFilter(RecommendedKategorijaSearchObject search, IQueryable<Database.RecommendedKategorija> query)
         {
             var NoviQuery = base.AddFilter(search, query);
@@ -69,11 +82,6 @@ namespace BikeHub.Services
             }
             entity.BicikliId = request.BicikliId;
             entity.DijeloviId = request.DijeloviId;
-            if (string.IsNullOrWhiteSpace(request.Status))
-            {
-                throw new Exception("Status ne smije biti prazan");
-            }
-            entity.Status = request.Status;
             if(request?.DatumKreiranja==null)
             {
                 entity.DatumKreiranja = DateTime.Now;
@@ -87,10 +95,6 @@ namespace BikeHub.Services
         }
         public override void BeforeUpdate(RecommendedKategorijaUpdateR request, Database.RecommendedKategorija entity)
         {
-            if (!string.IsNullOrWhiteSpace(request.Status))
-            {
-                entity.Status = request.Status;
-            }
             if (request.BicikliId.HasValue)
             {
                 var bicikl = _context.Bicikls.Find(request.BicikliId);
@@ -126,6 +130,36 @@ namespace BikeHub.Services
                 entity.BrojPreporuka = request.BrojPreporuka.Value;
             }
             base.BeforeUpdate(request, entity);
+        }
+        public override Model.RecommendedKategorijaFM.RecommendedKategorija Insert(RecommendedKategorijaInsertR request)
+        {
+            var entity = new Database.RecommendedKategorija();
+            BeforeInsert(request, entity);
+            var state = _basePrvaGrupaState.CreateState("kreiran");
+            return state.Insert(request);
+        }
+        public override Model.RecommendedKategorijaFM.RecommendedKategorija Update(int id, RecommendedKategorijaUpdateR request)
+        {
+            var set = Context.Set<Database.RecommendedKategorija>();
+            var entity = set.Find(id);
+            if (entity == null)
+            {
+                throw new Exception("Entitet sa datim ID-om ne postoji");
+            }
+            BeforeUpdate(request, entity);
+            var state = _basePrvaGrupaState.CreateState(entity.Status);
+            return state.Update(id, request);
+        }
+        public override void SoftDelete(int id)
+        {
+            var entity = GetById(id);
+            if (entity == null)
+            {
+                throw new Exception("Entity not found.");
+            }
+
+            var state = _basePrvaGrupaState.CreateState(entity.Status);
+            state.Delete(id);
         }
     }
 }

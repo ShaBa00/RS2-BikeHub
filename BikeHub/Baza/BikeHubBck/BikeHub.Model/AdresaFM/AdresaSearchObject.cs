@@ -13,5 +13,6 @@ namespace BikeHub.Model.AdresaFM
         public string? PostanskiBroj { get; set; } = null!;
 
         public string? Ulica { get; set; } = null!;
+        public string? Status { get; set; }
     }
 }

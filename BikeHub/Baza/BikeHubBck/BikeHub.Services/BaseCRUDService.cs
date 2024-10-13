@@ -49,5 +49,19 @@ namespace BikeHub.Services
 
         public virtual void BeforeUpdate(TUpdate request, TDbEntity entity) { }
 
+        public virtual void SoftDelete(int id)
+        {
+            var set = Context.Set<TDbEntity>();
+            var entity = set.Find(id);
+            if (entity == null)
+            {
+                throw new Exception($"{typeof(TDbEntity).Name} not found.");
+            }
+            var property = entity.GetType().GetProperty("Status");
+            property.SetValue(entity, "obrisan");
+
+            Context.SaveChanges();
+        }
+        //public virtual void BeforeSoftDelete(TModel request, TDbEntity r) { }
     }
 }

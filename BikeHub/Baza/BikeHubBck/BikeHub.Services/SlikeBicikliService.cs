@@ -1,4 +1,5 @@
 ﻿using BikeHub.Model.SlikeFM;
+using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
 using MapsterMapper;
 using System;
@@ -13,14 +14,26 @@ namespace BikeHub.Services
         Database.SlikeBicikli, Model.SlikeFM.SlikeBicikliInsertR, Model.SlikeFM.SlikeBicikliUpdateR>, ISlikeBicikliService
     {
         private BikeHubDbContext _context;
-        public SlikeBicikliService(BikeHubDbContext context, IMapper mapper) 
-        : base(context, mapper){ _context = context; }
+
+        public BasePrvaGrupaState<Model.SlikeFM.SlikeBicikli, Database.SlikeBicikli, Model.SlikeFM.SlikeBicikliInsertR,
+                                Model.SlikeFM.SlikeBicikliUpdateR> _basePrvaGrupaState;
+        public SlikeBicikliService(BikeHubDbContext context, IMapper mapper, BasePrvaGrupaState<Model.SlikeFM.SlikeBicikli, Database.SlikeBicikli, Model.SlikeFM.SlikeBicikliInsertR,
+                                Model.SlikeFM.SlikeBicikliUpdateR> basePrvaGrupaState) 
+        : base(context, mapper)
+        {
+            _context = context;
+            _basePrvaGrupaState = basePrvaGrupaState;
+        }
         public override IQueryable<Database.SlikeBicikli> AddFilter(SlikeBicikliSearchObject search, IQueryable<Database.SlikeBicikli> query)
         {
             var NoviQuery = base.AddFilter(search, query);
             if (search?.BiciklId != null)
             {
                 NoviQuery = NoviQuery.Where(x => x.BiciklId == search.BiciklId);
+            }
+            if (!string.IsNullOrWhiteSpace(search?.Status))
+            {
+                NoviQuery = NoviQuery.Where(x => x.Status.StartsWith(search.Status));
             }
             return NoviQuery;
         }
@@ -60,5 +73,36 @@ namespace BikeHub.Services
             }
             base.BeforeUpdate(request, entity);
         }
+        public override Model.SlikeFM.SlikeBicikli Insert(SlikeBicikliInsertR request)
+        {
+            var entity = new Database.SlikeBicikli();
+            BeforeInsert(request, entity);
+            var state = _basePrvaGrupaState.CreateState("kreiran");
+            return state.Insert(request);
+        }
+        public override Model.SlikeFM.SlikeBicikli Update(int id, SlikeBicikliUpdateR request)
+        {
+            var set = Context.Set<Database.SlikeBicikli>();
+            var entity = set.Find(id);
+            if (entity == null)
+            {
+                throw new Exception("Entitet sa datim ID-om ne postoji");
+            }
+            BeforeUpdate(request, entity);
+            var state = _basePrvaGrupaState.CreateState(entity.Status);
+            return state.Update(id, request);
+        }
+        public override void SoftDelete(int id)
+        {
+            var entity = GetById(id);
+            if (entity == null)
+            {
+                throw new Exception("Entity not found.");
+            }
+
+            var state = _basePrvaGrupaState.CreateState(entity.Status);
+            state.Delete(id);
+        }
+    
     }
 }

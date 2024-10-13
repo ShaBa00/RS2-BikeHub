@@ -19,8 +19,6 @@ namespace BikeHub.Model.BicikliFM
         public string VelicinaTocka { get; set; }
 
         public int BrojBrzina { get; set; }
-
-        public string Status { get; set; }
         public int KategorijaId { get; set; }
 
         public int Kolicina { get; set; }

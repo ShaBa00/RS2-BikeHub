@@ -18,5 +18,6 @@ namespace BikeHub.Model.KorisnikFM
         public int? BrojNarudbi { get; set; }
 
         public int? BrojServisa { get; set; }
+        public string? Status { get; set; }
     }
 }

@@ -15,5 +15,6 @@ namespace BikeHub.Model.NarudzbaFM
         public int? Kolicina { get; set; }
 
         public decimal? Cijena { get; set; }
+        public string? Status { get; set; }
     }
 }

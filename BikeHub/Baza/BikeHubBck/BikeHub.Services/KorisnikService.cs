@@ -1,4 +1,5 @@
 ﻿using BikeHub.Model.KorisnikFM;
+using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
@@ -11,12 +12,18 @@ using System.Threading.Tasks;
 
 namespace BikeHub.Services
 {
-    public class KorisnikService : BaseCRUDService<Model.KorisnikFM.Korisnik, KorisniciSearchObject, Database.Korisnik, KorisniciInsertR, KorisniciUpdateR>, IKorisnikService
+    public class KorisnikService : BaseCRUDService<Model.KorisnikFM.Korisnik, KorisniciSearchObject, Database.Korisnik,
+        KorisniciInsertR, KorisniciUpdateR>, IKorisnikService
     {
-        //public class KorisnikService : BaseService<Model.KorisnikFM.Korisnik, KorisniciSearchObject, Database.Korisnik>, IKorisnikService
-        //{
-        public KorisnikService(BikeHubDbContext context, IMapper mapper) : base(context, mapper)
+        public BasePrvaGrupaState<Model.KorisnikFM.Korisnik, Database.Korisnik,
+        KorisniciInsertR, KorisniciUpdateR> _basePrvaGrupaState;
+        private BikeHubDbContext _context;
+
+        public KorisnikService(BikeHubDbContext context, IMapper mapper, BasePrvaGrupaState<Model.KorisnikFM.Korisnik, Database.Korisnik,
+        KorisniciInsertR, KorisniciUpdateR> basePrvaGrupaState) : base(context, mapper)
         {
+            _context = context;
+            _basePrvaGrupaState = basePrvaGrupaState;
         }
 
         public override IQueryable<Database.Korisnik> AddFilter(KorisniciSearchObject search, IQueryable<Database.Korisnik> query)
@@ -38,7 +45,10 @@ namespace BikeHub.Services
             {
                 NoviQuery = NoviQuery.Include(x => x.KorisnikInfos);
             }
-
+            if (!string.IsNullOrWhiteSpace(search?.Status))
+            {
+                NoviQuery = NoviQuery.Where(x => x.Status.StartsWith(search.Status));
+            }
             return NoviQuery;
         }
 
@@ -76,7 +86,11 @@ namespace BikeHub.Services
 
         public override void BeforeUpdate(KorisniciUpdateR request, Database.Korisnik entity)
         {
-            base.BeforeUpdate(request, entity);
+            var korisnik = _context.Korisniks.FirstOrDefault(x=>x.Username==request.Username);
+            if(korisnik != null)
+            {
+                throw new Exception("Username je zauzet");
+            }
             if (request.Lozinka != null)
             {
                 if (request.Lozinka != request.LozinkaPotvrda)
@@ -87,7 +101,46 @@ namespace BikeHub.Services
                 entity.LozinkaSalt = GenerateSalt();
                 entity.LozinkaHash = GenerateHash(entity.LozinkaSalt, request.Lozinka);
             }
+            base.BeforeUpdate(request, entity);
         }
+
+        public override Model.KorisnikFM.Korisnik Insert(KorisniciInsertR request)
+        {
+            var entity = new Database.Korisnik();
+            BeforeInsert(request, entity);
+            var state = _basePrvaGrupaState.CreateState("kreiran");
+            return state.Insert(request);
+        }
+
+        public override Model.KorisnikFM.Korisnik Update(int id, KorisniciUpdateR request)
+        {
+            var set = Context.Set<Database.Korisnik>();
+            var entity = set.Find(id);
+            if (entity == null)
+            {
+                throw new Exception("Entitet sa datim ID-om ne postoji");
+            }
+            BeforeUpdate(request, entity);
+            var state = _basePrvaGrupaState.CreateState(entity.Status);
+            return state.Update(id, request);
+        }
+        public override void SoftDelete(int id)
+        {
+            var entity = GetById(id);
+            if (entity == null)
+            {
+                throw new Exception("Entity not found.");
+            }
+            var korisnikInfo = _context.KorisnikInfos.FirstOrDefault(x => x.KorisnikId == id);
+            if (korisnikInfo != null)
+            {
+                korisnikInfo.Status = "obrisan";
+                _context.KorisnikInfos.Update(korisnikInfo);
+            }
+            var state = _basePrvaGrupaState.CreateState(entity.Status);
+            state.Delete(id);
+        }
+
 
         public Model.KorisnikFM.Korisnik Promjeni(int id, KorisniciUpdateR request)
         {

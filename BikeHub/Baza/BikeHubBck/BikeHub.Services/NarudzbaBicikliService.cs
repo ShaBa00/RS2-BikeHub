@@ -28,6 +28,10 @@ namespace BikeHub.Services
             {
                 NoviQuery = NoviQuery.Where(x => x.Cijena == search.Cijena);
             }
+            if (!string.IsNullOrWhiteSpace(search?.Status))
+            {
+                NoviQuery = NoviQuery.Where(x => x.Status.StartsWith(search.Status));
+            }
             return NoviQuery;
         }
         public override void BeforeInsert(NarudzbaBicikliInsertR request, Database.NarudzbaBicikli entity)
@@ -69,6 +73,7 @@ namespace BikeHub.Services
             entity.BiciklId = request.BiciklId;
             entity.Kolicina = request.Kolicina;
             entity.Cijena = bicikl.Cijena*request.Kolicina;
+            entity.Status = "Kreiran";
             base.BeforeInsert(request, entity);
         }
         public override void BeforeUpdate(NarudzbaBicikliUpdateR request, Database.NarudzbaBicikli entity)
@@ -139,6 +144,7 @@ namespace BikeHub.Services
                 }
                 entity.NarudzbaId = request.NarudzbaId.Value;
             }
+            entity.Status = "Izmjenjen";
             base.BeforeUpdate(request, entity);
         }
     }

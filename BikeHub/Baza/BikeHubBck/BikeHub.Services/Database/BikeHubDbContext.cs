@@ -69,6 +69,9 @@ public partial class BikeHubDbContext : DbContext
             entity.Property(e => e.PostanskiBroj)
                 .HasMaxLength(10)
                 .IsUnicode(false);
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasDefaultValueSql("('Kreiran')");
             entity.Property(e => e.Ulica)
                 .HasMaxLength(100)
                 .IsUnicode(false);
@@ -166,6 +169,9 @@ public partial class BikeHubDbContext : DbContext
             entity.Property(e => e.ImePrezime)
                 .HasMaxLength(100)
                 .IsUnicode(false);
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasDefaultValueSql("('Kreiran')");
             entity.Property(e => e.Telefon)
                 .HasMaxLength(20)
                 .IsUnicode(false);
@@ -202,6 +208,9 @@ public partial class BikeHubDbContext : DbContext
             entity.ToTable("NarudzbaBicikli");
 
             entity.Property(e => e.Cijena).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasDefaultValueSql("('Kreiran')");
 
             entity.HasOne(d => d.Bicikl).WithMany(p => p.NarudzbaBiciklis)
                 .HasForeignKey(d => d.BiciklId)
@@ -221,6 +230,9 @@ public partial class BikeHubDbContext : DbContext
             entity.ToTable("NarudzbaDijelovi");
 
             entity.Property(e => e.Cijena).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasDefaultValueSql("('Kreiran')");
 
             entity.HasOne(d => d.Dijelovi).WithMany(p => p.NarudzbaDijelovis)
                 .HasForeignKey(d => d.DijeloviId)
@@ -346,6 +358,10 @@ public partial class BikeHubDbContext : DbContext
 
             entity.ToTable("SlikeBicikli");
 
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasDefaultValueSql("('Kreiran')");
+
             entity.HasOne(d => d.Bicikl).WithMany(p => p.SlikeBiciklis)
                 .HasForeignKey(d => d.BiciklId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -357,6 +373,10 @@ public partial class BikeHubDbContext : DbContext
             entity.HasKey(e => e.SlikeDijeloviId).HasName("PK__SlikeDij__70EC898A0F0F6418");
 
             entity.ToTable("SlikeDijelovi");
+
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasDefaultValueSql("('Kreiran')");
 
             entity.HasOne(d => d.Dijelovi).WithMany(p => p.SlikeDijelovis)
                 .HasForeignKey(d => d.DijeloviId)
@@ -373,6 +393,9 @@ public partial class BikeHubDbContext : DbContext
             entity.Property(e => e.DatumSpasavanja)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasDefaultValueSql("('Kreiran')");
 
             entity.HasOne(d => d.Bicikl).WithMany(p => p.SpaseniBiciklis)
                 .HasForeignKey(d => d.BiciklId)
@@ -389,6 +412,9 @@ public partial class BikeHubDbContext : DbContext
             entity.Property(e => e.DatumSpasavanja)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasDefaultValueSql("('Kreiran')");
 
             entity.HasOne(d => d.Dijelovi).WithMany(p => p.SpaseniDijelovis)
                 .HasForeignKey(d => d.DijeloviId)

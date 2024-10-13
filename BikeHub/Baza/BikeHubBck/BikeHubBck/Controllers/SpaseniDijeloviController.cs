@@ -6,7 +6,7 @@ namespace BikeHubBck.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class SpaseniDijeloviController : BaseController<SpaseniDijelovi, SpaseniDijeloviSearchObject>
+    public class SpaseniDijeloviController : BaseCRUDController<SpaseniDijelovi, SpaseniDijeloviSearchObject, SpaseniDijeloviInsertR, SpaseniDijeloviUpdateR>
     {
         public SpaseniDijeloviController(ISpaseniDijeloviService service) 
         : base(service){        }

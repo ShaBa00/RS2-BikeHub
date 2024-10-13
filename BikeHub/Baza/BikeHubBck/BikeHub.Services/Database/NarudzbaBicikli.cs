@@ -15,6 +15,8 @@ public partial class NarudzbaBicikli
 
     public decimal Cijena { get; set; }
 
+    public string? Status { get; set; }
+
     public virtual Bicikl Bicikl { get; set; } = null!;
 
     public virtual Narudzba Narudzba { get; set; } = null!;

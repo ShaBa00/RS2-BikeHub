@@ -1,4 +1,5 @@
 ﻿using BikeHub.Model.BicikliFM;
+using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
 using MapsterMapper;
 using System;
@@ -9,11 +10,17 @@ using System.Threading.Tasks;
 
 namespace BikeHub.Services
 {
-    public class BicikliService : BaseCRUDService<Model.BicikliFM.Bicikli, BicikliSearchObject, Database.Bicikl, Model.BicikliFM.BicikliInsertR, Model.BicikliFM.BicikliUpdateR> , IBicikliService
+    public class BicikliService : BaseCRUDService<Model.BicikliFM.Bicikli, BicikliSearchObject, Database.Bicikl,
+        Model.BicikliFM.BicikliInsertR, Model.BicikliFM.BicikliUpdateR> , IBicikliService
     {
         private BikeHubDbContext _context;
-        public BicikliService(BikeHubDbContext context, IMapper mapper)
-        :base(context,mapper){ _context = context; }
+
+        public BasePrvaGrupaState<Model.BicikliFM.Bicikli, Database.Bicikl,
+        Model.BicikliFM.BicikliInsertR, Model.BicikliFM.BicikliUpdateR> _basePrvaGrupaState;
+
+        public BicikliService(BikeHubDbContext context, IMapper mapper, BasePrvaGrupaState<Model.BicikliFM.Bicikli, Database.Bicikl,
+        Model.BicikliFM.BicikliInsertR, Model.BicikliFM.BicikliUpdateR> basePrvaGrupaState)
+        :base(context,mapper){ _context = context; _basePrvaGrupaState = basePrvaGrupaState; }
 
         public override IQueryable<Bicikl> AddFilter(BicikliSearchObject search, IQueryable<Bicikl> query)
         {
@@ -87,11 +94,6 @@ namespace BikeHub.Services
                 throw new Exception("Kolicina mora biti veći od nule");
             }
             entity.Kolicina = request.Kolicina;
-            if (string.IsNullOrWhiteSpace(request.Status))
-            {
-                throw new Exception("Status bicikla ne smije biti prazan");
-            }
-            entity.Status = request.Status;
             if (request.KategorijaId <= 0)
             {
                 throw new Exception("Kategorija mora biti odabrana");
@@ -151,11 +153,38 @@ namespace BikeHub.Services
                 }
                 entity.KategorijaId = request.KategorijaId.Value;
             }
-            if (!string.IsNullOrWhiteSpace(request.Status))
-            {
-                entity.Status = request.Status;
-            }
             base.BeforeUpdate(request, entity);
+        }
+
+        public override Bicikli Insert(BicikliInsertR request)
+        {
+            var entity = new Database.Bicikl();
+            BeforeInsert(request, entity);
+            var state = _basePrvaGrupaState.CreateState("kreiran");
+            return state.Insert(request);
+        }
+        public override Bicikli Update(int id, BicikliUpdateR request)
+        {
+            var set = Context.Set<Database.Bicikl>();
+            var entity = set.Find(id);
+            if (entity == null)
+            {
+                throw new Exception("Entitet sa datim ID-om ne postoji");
+            }
+            BeforeUpdate(request, entity);
+            var state = _basePrvaGrupaState.CreateState(entity.Status);
+            return state.Update(id, request);
+        }
+        public override void SoftDelete(int id)
+        {
+            var entity = GetById(id);
+            if (entity == null)
+            {
+                throw new Exception("Entitet sa datim ID-om ne postoji.");
+            }
+
+            var state = _basePrvaGrupaState.CreateState(entity.Status);
+            state.Delete(id);
         }
     }
 }

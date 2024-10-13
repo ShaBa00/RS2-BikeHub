@@ -1,9 +1,20 @@
 using BikeHub.Services;
+using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
 using Mapster;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using BikeHub.Model.AdresaFM;
+using BikeHubBck.Ostalo;
+using BikeHub.Model.BicikliFM;
+using BikeHub.Model.DijeloviFM;
+using BikeHub.Model.KategorijaFM;
+using BikeHub.Model.KorisnikFM;
+using BikeHub.Model.RecommendedKategorijaFM;
+using BikeHub.Model.ServisFM;
+using BikeHub.Model.SlikeFM;
+using BikeHub.Model.SpaseniFM;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +38,19 @@ builder.Services.AddTransient<ISpaseniDijeloviService, SpaseniDijeloviService>()
 builder.Services.AddTransient<IKategorijaService, KategorijaService>();
 builder.Services.AddTransient<IRecommendedKategorijaService, RecommendedKategorijaService>();
 
+
+
+StateRegistrationHelper.RegisterStates<BikeHub.Model.AdresaFM.Adresa, BikeHub.Services.Database.Adresa, AdresaInsertR, AdresaUpdateR>(builder.Services);
+StateRegistrationHelper.RegisterStates<BikeHub.Model.BicikliFM.Bicikli, BikeHub.Services.Database.Bicikl, BicikliInsertR, BicikliUpdateR>(builder.Services);
+StateRegistrationHelper.RegisterStates<BikeHub.Model.DijeloviFM.Dijelovi, BikeHub.Services.Database.Dijelovi, DijeloviInsertR, DijeloviUpdateR>(builder.Services);
+StateRegistrationHelper.RegisterStates<BikeHub.Model.KategorijaFM.Kategorija, BikeHub.Services.Database.Kategorija, KategorijaInsertR, KategorijaUpdateR>(builder.Services);
+StateRegistrationHelper.RegisterStates<BikeHub.Model.KorisnikFM.Korisnik, BikeHub.Services.Database.Korisnik, KorisniciInsertR, KorisniciUpdateR>(builder.Services);
+StateRegistrationHelper.RegisterStates<BikeHub.Model.KorisnikFM.KorisnikInfo, BikeHub.Services.Database.KorisnikInfo, KorisnikInfoInsertR, KorisnikInfoUpdateR>(builder.Services);
+StateRegistrationHelper.RegisterStates<BikeHub.Model.RecommendedKategorijaFM.RecommendedKategorija, BikeHub.Services.Database.RecommendedKategorija, RecommendedKategorijaInsertR, RecommendedKategorijaUpdateR>(builder.Services);
+StateRegistrationHelper.RegisterStates<BikeHub.Model.ServisFM.Serviser, BikeHub.Services.Database.Serviser, ServiserInsertR, ServiserUpdateR>(builder.Services);
+StateRegistrationHelper.RegisterStates<BikeHub.Model.SlikeFM.SlikeBicikli, BikeHub.Services.Database.SlikeBicikli, SlikeBicikliInsertR, SlikeBicikliUpdateR>(builder.Services);
+StateRegistrationHelper.RegisterStates<BikeHub.Model.SpaseniFM.SpaseniBicikli, BikeHub.Services.Database.SpaseniBicikli, SpaseniBicikliInsertR, SpaseniBicikliUpdateR>(builder.Services);
+StateRegistrationHelper.RegisterStates<BikeHub.Model.SpaseniFM.SpaseniDijelovi, BikeHub.Services.Database.SpaseniDijelovi, SpaseniDijeloviInsertR, SpaseniDijeloviUpdateR>(builder.Services);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

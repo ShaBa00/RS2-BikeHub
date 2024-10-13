@@ -1,4 +1,5 @@
 ﻿using BikeHub.Model.AdresaFM;
+using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
@@ -10,11 +11,23 @@ using System.Threading.Tasks;
 
 namespace BikeHub.Services
 {
-    public class AdresaService : BaseCRUDService<Model.AdresaFM.Adresa, AdresaSearchObject,Database.Adresa, Model.AdresaFM.AdresaInsertR, Model.AdresaFM.AdresaUpdateR>, IAdresaService
+    public class AdresaService : BaseCRUDService<Model.AdresaFM.Adresa, AdresaSearchObject,Database.Adresa, Model.AdresaFM.AdresaInsertR,
+                                                   Model.AdresaFM.AdresaUpdateR>, IAdresaService
     {
         private BikeHubDbContext _context;
-        public AdresaService(BikeHubDbContext context, IMapper mapper) 
-        : base(context, mapper){ _context = context;   }
+
+        public BasePrvaGrupaState<Model.AdresaFM.Adresa, Database.Adresa ,Model.AdresaFM.AdresaInsertR,
+                                Model.AdresaFM.AdresaUpdateR> _basePrvaGrupaState;
+
+        public AdresaService(BikeHubDbContext context, IMapper mapper, BasePrvaGrupaState<Model.AdresaFM.Adresa, Database.Adresa, Model.AdresaFM.AdresaInsertR,
+                                Model.AdresaFM.AdresaUpdateR> basePrvaGrupaState)  
+        : base(context, mapper)
+        {
+            _context = context;
+            _basePrvaGrupaState = basePrvaGrupaState;
+        }
+
+
         public override IQueryable<Database.Adresa> AddFilter(AdresaSearchObject search, IQueryable<Database.Adresa> query)
         {
             var NoviQuery = base.AddFilter(search, query);
@@ -33,6 +46,10 @@ namespace BikeHub.Services
             if (!string.IsNullOrWhiteSpace(search?.Ulica))
             {
                 NoviQuery = NoviQuery.Where(x => x.Ulica.StartsWith(search.Ulica));
+            }
+            if (!string.IsNullOrWhiteSpace(search?.Status))
+            {
+                NoviQuery = NoviQuery.Where(x => x.Status.StartsWith(search.Status));
             }
             return NoviQuery;
         }
@@ -71,6 +88,8 @@ namespace BikeHub.Services
             entity.Ulica = request.Ulica;
             base.BeforeInsert(request, entity);
         }
+
+
         public override void BeforeUpdate(AdresaUpdateR request, Database.Adresa entity)
         {
             if (!string.IsNullOrWhiteSpace(request.Grad))
@@ -87,5 +106,38 @@ namespace BikeHub.Services
             }
             base.BeforeUpdate(request, entity);
         }
+
+        public override Model.AdresaFM.Adresa Insert(AdresaInsertR request)
+        {
+            var entity = new Database.Adresa();
+            BeforeInsert(request, entity);
+            var state = _basePrvaGrupaState.CreateState("kreiran");
+            return state.Insert(request);
+        }
+        public override Model.AdresaFM.Adresa Update(int id, AdresaUpdateR request)
+        {
+            var set = Context.Set<Database.Adresa>();
+            var entity = set.Find(id);
+            if (entity == null)
+            {
+                throw new Exception("Entitet sa datim ID-om ne postoji");
+            }
+            BeforeUpdate(request,entity);
+            var state = _basePrvaGrupaState.CreateState(entity.Status);
+            return state.Update(id,request);
+        }
+        public override void SoftDelete(int id)
+        {
+            var entity = GetById(id);
+            if (entity == null)
+            {
+                throw new Exception("Entity not found.");
+            }
+
+            var state = _basePrvaGrupaState.CreateState(entity.Status);
+            state.Delete(id);
+        }
+
+
     }
 }

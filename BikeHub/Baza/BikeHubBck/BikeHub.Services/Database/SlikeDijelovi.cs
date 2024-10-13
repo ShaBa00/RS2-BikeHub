@@ -11,5 +11,7 @@ public partial class SlikeDijelovi
 
     public byte[]? Slika { get; set; }
 
+    public string? Status { get; set; }
+
     public virtual Dijelovi Dijelovi { get; set; } = null!;
 }

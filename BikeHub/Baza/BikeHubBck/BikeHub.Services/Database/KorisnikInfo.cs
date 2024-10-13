@@ -17,5 +17,7 @@ public partial class KorisnikInfo
 
     public int? BrojServisa { get; set; }
 
+    public string? Status { get; set; }
+
     public virtual Korisnik Korisnik { get; set; } = null!;
 }

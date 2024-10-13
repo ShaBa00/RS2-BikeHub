@@ -11,5 +11,6 @@ namespace BikeHub.Model.KorisnikFM
         public string? Email { get; set; }
         public bool? IsAdmin { get; set; }
         public bool? IsInfoIncluded { get; set; }
+        public string? Status { get; set; }
     }
 }

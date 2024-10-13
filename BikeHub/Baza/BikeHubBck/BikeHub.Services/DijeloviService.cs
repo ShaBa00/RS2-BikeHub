@@ -1,5 +1,6 @@
 ﻿using BikeHub.Model.DijeloviFM;
 using BikeHub.Model.KorisnikFM;
+using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
 using MapsterMapper;
 using System;
@@ -10,11 +11,17 @@ using System.Threading.Tasks;
 
 namespace BikeHub.Services
 {
-    public class DijeloviService : BaseCRUDService<Model.DijeloviFM.Dijelovi,Model.DijeloviFM.DijeloviSearchObject,Database.Dijelovi,Model.DijeloviFM.DijeloviInsertR, Model.DijeloviFM.DijeloviUpdateR>, IDijeloviService
+    public class DijeloviService : BaseCRUDService<Model.DijeloviFM.Dijelovi,Model.DijeloviFM.DijeloviSearchObject,
+        Database.Dijelovi,Model.DijeloviFM.DijeloviInsertR, Model.DijeloviFM.DijeloviUpdateR>, IDijeloviService
     {
         private BikeHubDbContext _context;
-        public DijeloviService(BikeHubDbContext context, IMapper mapper)
-        : base(context, mapper){ _context = context; }
+
+        public BasePrvaGrupaState<Model.DijeloviFM.Dijelovi,Database.Dijelovi, Model.DijeloviFM.DijeloviInsertR,
+            Model.DijeloviFM.DijeloviUpdateR> _basePrvaGrupaState;
+
+        public DijeloviService(BikeHubDbContext context, IMapper mapper, BasePrvaGrupaState<Model.DijeloviFM.Dijelovi, Database.Dijelovi, Model.DijeloviFM.DijeloviInsertR,
+            Model.DijeloviFM.DijeloviUpdateR> basePrvaGrupaState)
+        : base(context, mapper){ _context = context; _basePrvaGrupaState = basePrvaGrupaState; }
         public override IQueryable<Database.Dijelovi> AddFilter(DijeloviSearchObject search, IQueryable<Database.Dijelovi> query)
         {
             var NoviQuery = base.AddFilter(search, query);
@@ -62,11 +69,6 @@ namespace BikeHub.Services
                 throw new Exception("Kolicina dijela mora biti veća od nule");
             }
             entity.Kolicina = request.Kolicina;
-            if (string.IsNullOrWhiteSpace(request.Status))
-            {
-                throw new Exception("Status dijela ne smije biti prazan");
-            }
-            entity.Status = request.Status;
             if (request.KategorijaId <= 0)
             {
                 throw new Exception("Kategorija mora biti odabrana");
@@ -101,10 +103,6 @@ namespace BikeHub.Services
             }
             if (request.Kolicina.HasValue)
             {
-                if (request.Kolicina < 0)
-                {
-                    throw new Exception("Kolicina dijela ne može biti manja od nule");
-                }
                 entity.Kolicina = request.Kolicina.Value;
             }
             if (request.KategorijaId.HasValue)
@@ -116,15 +114,41 @@ namespace BikeHub.Services
                 }
                 entity.KategorijaId = request.KategorijaId.Value;
             }
-            if (!string.IsNullOrWhiteSpace(request.Status))
-            {
-                entity.Status = request.Status;
-            }
             if (!string.IsNullOrWhiteSpace(request.Opis))
             {
                 entity.Opis = request.Opis;
             }
             base.BeforeUpdate(request, entity);
+        }
+        public override Model.DijeloviFM.Dijelovi Insert(DijeloviInsertR request)
+        {
+            var entity = new Database.Dijelovi();
+            BeforeInsert(request, entity);
+            var state = _basePrvaGrupaState.CreateState("kreiran");
+            return state.Insert(request);
+        }
+        public override Model.DijeloviFM.Dijelovi Update(int id, DijeloviUpdateR request)
+        {
+            var set = Context.Set<Database.Dijelovi>();
+            var entity = set.Find(id);
+            if (entity == null)
+            {
+                throw new Exception("Entitet sa datim ID-om ne postoji");
+            }
+            BeforeUpdate(request, entity);
+            var state = _basePrvaGrupaState.CreateState(entity.Status);
+            return state.Update(id, request);
+        }
+        public override void SoftDelete(int id)
+        {
+            var entity = GetById(id);
+            if (entity == null)
+            {
+                throw new Exception("Entity not found.");
+            }
+
+            var state = _basePrvaGrupaState.CreateState(entity.Status);
+            state.Delete(id);
         }
     }
 }

@@ -11,5 +11,7 @@ public partial class SpaseniBicikli
 
     public DateTime DatumSpasavanja { get; set; }
 
+    public string? Status { get; set; }
+
     public virtual Bicikl Bicikl { get; set; } = null!;
 }

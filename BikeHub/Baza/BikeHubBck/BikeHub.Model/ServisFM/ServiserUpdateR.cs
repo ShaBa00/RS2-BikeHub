@@ -12,6 +12,5 @@ namespace BikeHub.Model.ServisFM
 
         public int? BrojServisa { get; set; }
 
-        public string? Status { get; set; }
     }
 }

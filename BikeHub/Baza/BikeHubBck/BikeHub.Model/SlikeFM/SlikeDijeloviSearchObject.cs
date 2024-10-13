@@ -10,6 +10,7 @@ namespace BikeHub.Model.SlikeFM
         //public int? SlikeDijeloviId { get; set; }
 
         public int? DijeloviId { get; set; }
+        public string? Status { get; set; }
 
         //public byte[]? Slika { get; set; }
     }

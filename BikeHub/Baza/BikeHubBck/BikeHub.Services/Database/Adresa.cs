@@ -15,5 +15,7 @@ public partial class Adresa
 
     public string Ulica { get; set; } = null!;
 
+    public string? Status { get; set; }
+
     public virtual Korisnik Korisnik { get; set; } = null!;
 }

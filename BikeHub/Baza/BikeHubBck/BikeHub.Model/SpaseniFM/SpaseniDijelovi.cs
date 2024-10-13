@@ -11,5 +11,6 @@ namespace BikeHub.Model.SpaseniFM
         public int? DijeloviId { get; set; }
 
         public DateTime? DatumSpasavanja { get; set; }
+        public string? Status { get; set; }
     }
 }

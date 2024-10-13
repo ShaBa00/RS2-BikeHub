@@ -1,4 +1,5 @@
 ﻿using BikeHub.Model.ServisFM;
+using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
 using MapsterMapper;
 using System;
@@ -13,8 +14,16 @@ namespace BikeHub.Services
                                                     , Model.ServisFM.ServiserInsertR, Model.ServisFM.ServiserUpdateR>, IServiserService
     {
         private BikeHubDbContext _context;
-        public ServiserService(BikeHubDbContext context, IMapper mapper) 
-        : base(context, mapper){ _context = context; }
+        public BasePrvaGrupaState<Model.ServisFM.Serviser, Database.Serviser, Model.ServisFM.ServiserInsertR,
+                        Model.ServisFM.ServiserUpdateR> _basePrvaGrupaState;
+
+        public ServiserService(BikeHubDbContext context, IMapper mapper, BasePrvaGrupaState<Model.ServisFM.Serviser, Database.Serviser, Model.ServisFM.ServiserInsertR,
+                        Model.ServisFM.ServiserUpdateR> basePrvaGrupaState) 
+        : base(context, mapper)
+        {
+            _context = context;
+            _basePrvaGrupaState = basePrvaGrupaState;
+        }
         public override IQueryable<Database.Serviser> AddFilter(ServiserSearchObject search, IQueryable<Database.Serviser> query)
         {
             var NoviQuery = base.AddFilter(search, query);
@@ -47,7 +56,6 @@ namespace BikeHub.Services
             {
                 throw new Exception("Cijena mora biti veća od 0.");
             }
-            entity.Status = "U procesu";
             entity.BrojServisa = 0;
             entity.KorisnikId = request.KorisnikId;
             entity.Cijena = request.Cijena;
@@ -71,11 +79,37 @@ namespace BikeHub.Services
                 }
                 entity.BrojServisa = request.BrojServisa.Value;
             }
-            if (!string.IsNullOrWhiteSpace(request.Status))
-            {
-                entity.Status = request.Status;
-            }
             base.BeforeUpdate(request, entity);
+        }
+        public override Model.ServisFM.Serviser Insert(ServiserInsertR request)
+        {
+            var entity = new Database.Serviser();
+            BeforeInsert(request, entity);
+            var state = _basePrvaGrupaState.CreateState("kreiran");
+            return state.Insert(request);
+        }
+        public override Model.ServisFM.Serviser Update(int id, ServiserUpdateR request)
+        {
+            var set = Context.Set<Database.Serviser>();
+            var entity = set.Find(id);
+            if (entity == null)
+            {
+                throw new Exception("Entitet sa datim ID-om ne postoji");
+            }
+            BeforeUpdate(request, entity);
+            var state = _basePrvaGrupaState.CreateState(entity.Status);
+            return state.Update(id, request);
+        }
+        public override void SoftDelete(int id)
+        {
+            var entity = GetById(id);
+            if (entity == null)
+            {
+                throw new Exception("Entity not found.");
+            }
+
+            var state = _basePrvaGrupaState.CreateState(entity.Status);
+            state.Delete(id);
         }
     }
 }
