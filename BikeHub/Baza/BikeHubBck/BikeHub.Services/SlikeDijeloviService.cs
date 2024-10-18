@@ -38,5 +38,10 @@ namespace BikeHub.Services
             }
             return NoviQuery;
         }
+
+        //public override void Zavrsavanje(int id)
+        //{
+        //    throw new Exception("Za ovaj entitet nije moguce izvrsiti ovu naredbu");
+        //}
     }
 }

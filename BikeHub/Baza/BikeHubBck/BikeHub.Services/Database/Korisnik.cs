@@ -28,4 +28,8 @@ public partial class Korisnik
     public virtual ICollection<RezervacijaServisa> RezervacijaServisas { get; set; } = new List<RezervacijaServisa>();
 
     public virtual ICollection<Serviser> Servisers { get; set; } = new List<Serviser>();
+
+    public virtual ICollection<SpaseniBicikli> SpaseniBiciklis { get; set; } = new List<SpaseniBicikli>();
+
+    public virtual ICollection<SpaseniDijelovi> SpaseniDijelovis { get; set; } = new List<SpaseniDijelovi>();
 }

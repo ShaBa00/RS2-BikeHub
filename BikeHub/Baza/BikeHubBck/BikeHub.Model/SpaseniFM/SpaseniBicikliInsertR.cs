@@ -9,5 +9,6 @@ namespace BikeHub.Model.SpaseniFM
         public int BiciklId { get; set; }
 
         public DateTime DatumSpasavanja { get; set; }
+        public int KorisnikId { get; set; }
     }
 }

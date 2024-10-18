@@ -11,7 +11,5 @@ namespace BikeHub.Model.PromocijaFM
         public DateTime? DatumPocetka { get; set; }
 
         public DateTime? DatumZavrsetka { get; set; }
-
-        public string? Status { get; set; }
     }
 }

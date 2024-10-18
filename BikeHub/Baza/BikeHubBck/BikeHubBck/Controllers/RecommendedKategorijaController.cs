@@ -1,5 +1,7 @@
-﻿using BikeHub.Model.RecommendedKategorijaFM;
+﻿using BikeHub.Model;
+using BikeHub.Model.RecommendedKategorijaFM;
 using BikeHub.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BikeHubBck.Controllers
@@ -10,5 +12,11 @@ namespace BikeHubBck.Controllers
     {
         public RecommendedKategorijaController(IRecommendedKategorijaService service) 
         : base(service){        }
+
+        [AllowAnonymous]
+        public override PagedResult<RecommendedKategorija> GetList([FromQuery] RecommendedKategorijaSearchObject searchObject)
+        {
+            return base.GetList(searchObject);
+        }
     }
 }

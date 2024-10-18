@@ -1,4 +1,5 @@
-﻿using BikeHub.Model.AdresaFM;
+﻿using BikeHub.Model;
+using BikeHub.Model.AdresaFM;
 using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
 using MapsterMapper;
@@ -58,37 +59,36 @@ namespace BikeHub.Services
         {
             if (request?.KorisnikId == null)
             {
-                throw new Exception("KorisnikId ne smije biti null");
+                throw new UserException("KorisnikId ne smije biti null");
             }
             var korisnik = _context.Korisniks.Find(request.KorisnikId);
             if (korisnik == null)
             {
-                throw new Exception("Korisnik sa datim ID-om ne postoji");
+                throw new UserException("Korisnik sa datim ID-om ne postoji");
             }
             var existingAddress = _context.Adresas.FirstOrDefault(a => a.KorisnikId == request.KorisnikId);
             if (existingAddress != null)
             {
-                throw new Exception("Nova adresa se ne može dodati jer već postoji stara adresa za istog korisnika. Potrebno je ažurirati postojeću adresu.");
+                throw new UserException("Nova adresa se ne može dodati jer već postoji stara adresa za istog korisnika. Potrebno je ažurirati postojeću adresu.");
             }
             entity.KorisnikId = request.KorisnikId;
             if (string.IsNullOrWhiteSpace(request.Grad))
             {
-                throw new Exception("Grad ne smije biti prazan");
+                throw new UserException("Grad ne smije biti prazan");
             }
             entity.Grad = request.Grad;
             if (string.IsNullOrWhiteSpace(request.PostanskiBroj))
             {
-                throw new Exception("Poštanski broj ne smije biti prazan");
+                throw new UserException("Poštanski broj ne smije biti prazan");
             }
             entity.PostanskiBroj = request.PostanskiBroj;
             if (string.IsNullOrWhiteSpace(request.Ulica))
             {
-                throw new Exception("Ulica ne smije biti prazna");
+                throw new UserException("Ulica ne smije biti prazna");
             }
             entity.Ulica = request.Ulica;
             base.BeforeInsert(request, entity);
         }
-
 
         public override void BeforeUpdate(AdresaUpdateR request, Database.Adresa entity)
         {
@@ -120,7 +120,7 @@ namespace BikeHub.Services
             var entity = set.Find(id);
             if (entity == null)
             {
-                throw new Exception("Entitet sa datim ID-om ne postoji");
+                throw new UserException("Entitet sa datim ID-om ne postoji");
             }
             BeforeUpdate(request,entity);
             var state = _basePrvaGrupaState.CreateState(entity.Status);
@@ -131,13 +131,27 @@ namespace BikeHub.Services
             var entity = GetById(id);
             if (entity == null)
             {
-                throw new Exception("Entity not found.");
+                throw new UserException("Entity not found.");
             }
 
             var state = _basePrvaGrupaState.CreateState(entity.Status);
             state.Delete(id);
         }
+        public override void Zavrsavanje(int id)
+        {
+            throw new UserException("Za ovaj entitet nije moguce izvrsiti ovu naredbu");
+        }
+        //public override void Aktivacija(int id, bool aktivacija)
+        //{
+        //    var entity = GetById(id);
+        //    if (entity == null)
+        //    {
+        //        throw new Exception("Entity not found.");
+        //    }
 
+        //    var state = _basePrvaGrupaState.CreateState(entity.Status);
+        //    state.Activate(id);
+        //}
 
     }
 }

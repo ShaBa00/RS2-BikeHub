@@ -401,6 +401,10 @@ public partial class BikeHubDbContext : DbContext
                 .HasForeignKey(d => d.BiciklId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__SpaseniBi__Bicik__6B24EA82");
+
+            entity.HasOne(d => d.Korisnik).WithMany(p => p.SpaseniBiciklis)
+                .HasForeignKey(d => d.KorisnikId)
+                .HasConstraintName("FK_SpaseniBicikli_Korisnik");
         });
 
         modelBuilder.Entity<SpaseniDijelovi>(entity =>
@@ -420,6 +424,10 @@ public partial class BikeHubDbContext : DbContext
                 .HasForeignKey(d => d.DijeloviId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__SpaseniDi__Dijel__6C190EBB");
+
+            entity.HasOne(d => d.Korisnik).WithMany(p => p.SpaseniDijelovis)
+                .HasForeignKey(d => d.KorisnikId)
+                .HasConstraintName("FK_SpaseniDijelovi_Korisnik");
         });
 
         OnModelCreatingPartial(modelBuilder);

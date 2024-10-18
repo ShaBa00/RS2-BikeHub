@@ -15,6 +15,12 @@ using BikeHub.Model.RecommendedKategorijaFM;
 using BikeHub.Model.ServisFM;
 using BikeHub.Model.SlikeFM;
 using BikeHub.Model.SpaseniFM;
+using BikeHub.Model.NarudzbaFM;
+using BikeHub.Model.PromocijaFM;
+using BikeHubBck.Filters;
+using BikeHubBck;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,7 +50,7 @@ StateRegistrationHelper.RegisterStates<BikeHub.Model.AdresaFM.Adresa, BikeHub.Se
 StateRegistrationHelper.RegisterStates<BikeHub.Model.BicikliFM.Bicikli, BikeHub.Services.Database.Bicikl, BicikliInsertR, BicikliUpdateR>(builder.Services);
 StateRegistrationHelper.RegisterStates<BikeHub.Model.DijeloviFM.Dijelovi, BikeHub.Services.Database.Dijelovi, DijeloviInsertR, DijeloviUpdateR>(builder.Services);
 StateRegistrationHelper.RegisterStates<BikeHub.Model.KategorijaFM.Kategorija, BikeHub.Services.Database.Kategorija, KategorijaInsertR, KategorijaUpdateR>(builder.Services);
-StateRegistrationHelper.RegisterStates<BikeHub.Model.KorisnikFM.Korisnik, BikeHub.Services.Database.Korisnik, KorisniciInsertR, KorisniciUpdateR>(builder.Services);
+StateRegistrationHelper.RegisterStates<BikeHub.Model.KorisnikFM.Korisnik, BikeHub.Services.Database.Korisnik, KorisniciInsertRHS, KorisniciUpdateR>(builder.Services);
 StateRegistrationHelper.RegisterStates<BikeHub.Model.KorisnikFM.KorisnikInfo, BikeHub.Services.Database.KorisnikInfo, KorisnikInfoInsertR, KorisnikInfoUpdateR>(builder.Services);
 StateRegistrationHelper.RegisterStates<BikeHub.Model.RecommendedKategorijaFM.RecommendedKategorija, BikeHub.Services.Database.RecommendedKategorija, RecommendedKategorijaInsertR, RecommendedKategorijaUpdateR>(builder.Services);
 StateRegistrationHelper.RegisterStates<BikeHub.Model.ServisFM.Serviser, BikeHub.Services.Database.Serviser, ServiserInsertR, ServiserUpdateR>(builder.Services);
@@ -52,10 +58,38 @@ StateRegistrationHelper.RegisterStates<BikeHub.Model.SlikeFM.SlikeBicikli, BikeH
 StateRegistrationHelper.RegisterStates<BikeHub.Model.SpaseniFM.SpaseniBicikli, BikeHub.Services.Database.SpaseniBicikli, SpaseniBicikliInsertR, SpaseniBicikliUpdateR>(builder.Services);
 StateRegistrationHelper.RegisterStates<BikeHub.Model.SpaseniFM.SpaseniDijelovi, BikeHub.Services.Database.SpaseniDijelovi, SpaseniDijeloviInsertR, SpaseniDijeloviUpdateR>(builder.Services);
 
-builder.Services.AddControllers();
+StateRegistrationHelper.DrugiRegisterStates<BikeHub.Model.ServisFM.RezervacijaServisa, BikeHub.Services.Database.RezervacijaServisa, RezervacijaServisaInsertR, RezervacijaServisaUpdateR>(builder.Services);
+StateRegistrationHelper.DrugiRegisterStates<BikeHub.Model.NarudzbaFM.Narudzba, BikeHub.Services.Database.Narudzba, NarudzbaInsertR, NarudzbaUpdateR>(builder.Services);
+StateRegistrationHelper.DrugiRegisterStates<BikeHub.Model.NarudzbaFM.NarudzbaDijelovi, BikeHub.Services.Database.NarudzbaDijelovi, NarudzbaDijeloviInsertR, NarudzbaDijeloviUpdateR>(builder.Services);
+StateRegistrationHelper.DrugiRegisterStates<BikeHub.Model.NarudzbaFM.NarudzbaBicikli, BikeHub.Services.Database.NarudzbaBicikli, NarudzbaBicikliInsertR, NarudzbaBicikliUpdateR>(builder.Services);
+StateRegistrationHelper.DrugiRegisterStates<BikeHub.Model.PromocijaFM.PromocijaBicikli, BikeHub.Services.Database.PromocijaBicikli, PromocijaBicikliInsertR, PromocijaBicikliUpdateR>(builder.Services);
+StateRegistrationHelper.DrugiRegisterStates<BikeHub.Model.PromocijaFM.PromocijaDijelovi, BikeHub.Services.Database.PromocijaDijelovi, PromocijaDijeloviInsertR, PromocijaDijeloviUpdateR>(builder.Services);
+
+builder.Services.AddControllers(x =>
+{
+    x.Filters.Add<ExceptionFilter>();
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("basicAuth", new Microsoft.OpenApi.Models.OpenApiSecurityScheme()
+    {
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "basic"
+    });
+
+    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement()
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference{Type = ReferenceType.SecurityScheme, Id = "basicAuth"}
+            },
+            new string[]{}
+    } });
+
+});
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
@@ -76,7 +110,8 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 });
 
 builder.Services.AddMapster();
-
+builder.Services.AddAuthentication("BasicAuthentication")
+    .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

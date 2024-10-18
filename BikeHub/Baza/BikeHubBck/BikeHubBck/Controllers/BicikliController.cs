@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using MapsterMapper;
 using BikeHub.Model.BicikliFM;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using BikeHub.Model;
+using Microsoft.AspNetCore.Authorization;
 namespace BikeHubBck.Controllers
 {
     [ApiController]
@@ -11,5 +13,11 @@ namespace BikeHubBck.Controllers
     {
         public BicikliController(IBicikliService service)
         : base(service){        }
+
+        [AllowAnonymous]
+        public override PagedResult<Bicikli> GetList([FromQuery] BicikliSearchObject searchObject)
+        {
+            return base.GetList(searchObject);
+        }
     }
 }

@@ -13,5 +13,9 @@ public partial class SpaseniDijelovi
 
     public string? Status { get; set; }
 
+    public int? KorisnikId { get; set; }
+
     public virtual Dijelovi Dijelovi { get; set; } = null!;
+
+    public virtual Korisnik? Korisnik { get; set; }
 }

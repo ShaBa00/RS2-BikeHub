@@ -1,4 +1,5 @@
-﻿using BikeHub.Model.DijeloviFM;
+﻿using BikeHub.Model;
+using BikeHub.Model.DijeloviFM;
 using BikeHub.Model.KorisnikFM;
 using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
@@ -56,32 +57,32 @@ namespace BikeHub.Services
         {
             if (string.IsNullOrWhiteSpace(request.Naziv))
             {
-                throw new Exception("Naziv dijela ne smije biti prazan");
+                throw new UserException("Naziv dijela ne smije biti prazan");
             }
             entity.Naziv = request.Naziv;
             if (request.Cijena <= 0)
             {
-                throw new Exception("Cijena dijela mora biti veća od nule");
+                throw new UserException("Cijena dijela mora biti veća od nule");
             }
             entity.Cijena = request.Cijena;
             if (request.Kolicina <= 0)
             {
-                throw new Exception("Kolicina dijela mora biti veća od nule");
+                throw new UserException("Kolicina dijela mora biti veća od nule");
             }
             entity.Kolicina = request.Kolicina;
             if (request.KategorijaId <= 0)
             {
-                throw new Exception("Kategorija mora biti odabrana");
+                throw new UserException("Kategorija mora biti odabrana");
             }
             var kategorija = _context.Kategorijas.Find(request.KategorijaId);
             if (kategorija == null)
             {
-                throw new Exception("Kategorija sa datim ID-om ne postoji");
+                throw new UserException("Kategorija sa datim ID-om ne postoji");
             }
             entity.KategorijaId = request.KategorijaId;
             if (string.IsNullOrWhiteSpace(request.Opis))
             {
-                throw new Exception("Opis dijela ne smije biti prazan");
+                throw new UserException("Opis dijela ne smije biti prazan");
             }
             entity.Opis = request.Opis;
             base.BeforeInsert(request, entity);
@@ -97,7 +98,7 @@ namespace BikeHub.Services
             {
                 if (request.Cijena <= 0)
                 {
-                    throw new Exception("Cijena dijela mora biti veća od nule");
+                    throw new UserException("Cijena dijela mora biti veća od nule");
                 }
                 entity.Cijena = request.Cijena.Value;
             }
@@ -110,7 +111,7 @@ namespace BikeHub.Services
                 var kategorija = _context.Kategorijas.Find(request.KategorijaId);
                 if (kategorija == null)
                 {
-                    throw new Exception("Kategorija sa datim ID-om ne postoji");
+                    throw new UserException("Kategorija sa datim ID-om ne postoji");
                 }
                 entity.KategorijaId = request.KategorijaId.Value;
             }
@@ -133,7 +134,7 @@ namespace BikeHub.Services
             var entity = set.Find(id);
             if (entity == null)
             {
-                throw new Exception("Entitet sa datim ID-om ne postoji");
+                throw new UserException("Entitet sa datim ID-om ne postoji");
             }
             BeforeUpdate(request, entity);
             var state = _basePrvaGrupaState.CreateState(entity.Status);
@@ -144,11 +145,16 @@ namespace BikeHub.Services
             var entity = GetById(id);
             if (entity == null)
             {
-                throw new Exception("Entity not found.");
+                throw new UserException("Entity not found.");
             }
 
             var state = _basePrvaGrupaState.CreateState(entity.Status);
             state.Delete(id);
+        }
+
+        public override void Zavrsavanje(int id)
+        {
+            throw new UserException("Za ovaj entitet nije moguce izvrsiti ovu naredbu");
         }
     }
 }

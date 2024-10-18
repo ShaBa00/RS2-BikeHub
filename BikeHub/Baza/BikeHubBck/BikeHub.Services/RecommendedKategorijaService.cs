@@ -1,4 +1,5 @@
-﻿using BikeHub.Model.KorisnikFM;
+﻿using BikeHub.Model;
+using BikeHub.Model.KorisnikFM;
 using BikeHub.Model.RecommendedKategorijaFM;
 using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
@@ -54,31 +55,32 @@ namespace BikeHub.Services
             }
             return NoviQuery;
         }
+
         public override void BeforeInsert(RecommendedKategorijaInsertR request, Database.RecommendedKategorija entity)
         {
             if (request?.DijeloviId == null)
             {
-                throw new Exception("DijeloviId ne smije biti null");
+                throw new UserException("DijeloviId ne smije biti null");
             }
             var dijelovi = _context.Dijelovis.Find(request.DijeloviId);
             if (dijelovi == null)
             {
-                throw new Exception("Dio sa datim ID-om ne postoji");
+                throw new UserException("Dio sa datim ID-om ne postoji");
             }
             if (request?.BicikliId == null)
             {
-                throw new Exception("BicikliId ne smije biti null");
+                throw new UserException("BicikliId ne smije biti null");
             }
             var bicikl = _context.Bicikls.Find(request.BicikliId);
             if (bicikl == null)
             {
-                throw new Exception("Bicikl sa datim ID-om ne postoji");
+                throw new UserException("Bicikl sa datim ID-om ne postoji");
             }
             var existingRecommendation = _context.RecommendedKategorijas
             .FirstOrDefault(r => r.DijeloviId == request.DijeloviId && r.BicikliId == request.BicikliId);
             if (existingRecommendation != null)
             {
-                throw new Exception("Već postoji preporučena kategorija sa istom kombinacijom DijeloviId i BicikliId.");
+                throw new UserException("Već postoji preporučena kategorija sa istom kombinacijom DijeloviId i BicikliId.");
             }
             entity.BicikliId = request.BicikliId;
             entity.DijeloviId = request.DijeloviId;
@@ -93,6 +95,7 @@ namespace BikeHub.Services
             entity.BrojPreporuka=0;
             base.BeforeInsert(request, entity);
         }
+
         public override void BeforeUpdate(RecommendedKategorijaUpdateR request, Database.RecommendedKategorija entity)
         {
             if (request.BicikliId.HasValue)
@@ -100,13 +103,13 @@ namespace BikeHub.Services
                 var bicikl = _context.Bicikls.Find(request.BicikliId);
                 if (bicikl==null)
                 {
-                    throw new Exception("Bicikl sa datim ID-om ne postoji");
+                    throw new UserException("Bicikl sa datim ID-om ne postoji");
                 }
                 var existingRecommendation = _context.RecommendedKategorijas
                 .FirstOrDefault(r => r.DijeloviId == request.DijeloviId && r.BicikliId == request.BicikliId);
                 if (existingRecommendation != null)
                 {
-                    throw new Exception("Već postoji preporučena kategorija sa istom kombinacijom DijeloviId i BicikliId.");
+                    throw new UserException("Već postoji preporučena kategorija sa istom kombinacijom DijeloviId i BicikliId.");
                 }
                 entity.BicikliId = request.BicikliId.Value;
             }
@@ -115,13 +118,13 @@ namespace BikeHub.Services
                 var dio = _context.Dijelovis.Find(request.DijeloviId);
                 if (dio == null)
                 {
-                    throw new Exception("Dio sa datim ID-om ne postoji");
+                    throw new UserException("Dio sa datim ID-om ne postoji");
                 }
                 var existingRecommendation = _context.RecommendedKategorijas
                 .FirstOrDefault(r => r.DijeloviId == request.DijeloviId && r.BicikliId == request.BicikliId);
                 if (existingRecommendation != null)
                 {
-                    throw new Exception("Već postoji preporučena kategorija sa istom kombinacijom DijeloviId i BicikliId.");
+                    throw new UserException("Već postoji preporučena kategorija sa istom kombinacijom DijeloviId i BicikliId.");
                 }
                 entity.DijeloviId = request.DijeloviId.Value;
             }
@@ -131,6 +134,7 @@ namespace BikeHub.Services
             }
             base.BeforeUpdate(request, entity);
         }
+
         public override Model.RecommendedKategorijaFM.RecommendedKategorija Insert(RecommendedKategorijaInsertR request)
         {
             var entity = new Database.RecommendedKategorija();
@@ -138,28 +142,35 @@ namespace BikeHub.Services
             var state = _basePrvaGrupaState.CreateState("kreiran");
             return state.Insert(request);
         }
+
         public override Model.RecommendedKategorijaFM.RecommendedKategorija Update(int id, RecommendedKategorijaUpdateR request)
         {
             var set = Context.Set<Database.RecommendedKategorija>();
             var entity = set.Find(id);
             if (entity == null)
             {
-                throw new Exception("Entitet sa datim ID-om ne postoji");
+                throw new UserException("Entitet sa datim ID-om ne postoji");
             }
             BeforeUpdate(request, entity);
             var state = _basePrvaGrupaState.CreateState(entity.Status);
             return state.Update(id, request);
         }
+
         public override void SoftDelete(int id)
         {
             var entity = GetById(id);
             if (entity == null)
             {
-                throw new Exception("Entity not found.");
+                throw new UserException("Entity not found.");
             }
 
             var state = _basePrvaGrupaState.CreateState(entity.Status);
             state.Delete(id);
+        }
+
+        public override void Zavrsavanje(int id)
+        {
+            throw new UserException("Za ovaj entitet nije moguce izvrsiti ovu naredbu");
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using BikeHub.Model.KorisnikFM;
+﻿using BikeHub.Model;
+using BikeHub.Model.KorisnikFM;
 using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
 using MapsterMapper;
@@ -16,11 +17,11 @@ namespace BikeHub.Services
         KorisniciInsertR, KorisniciUpdateR>, IKorisnikService
     {
         public BasePrvaGrupaState<Model.KorisnikFM.Korisnik, Database.Korisnik,
-        KorisniciInsertR, KorisniciUpdateR> _basePrvaGrupaState;
+        KorisniciInsertRHS, KorisniciUpdateR> _basePrvaGrupaState;
         private BikeHubDbContext _context;
 
         public KorisnikService(BikeHubDbContext context, IMapper mapper, BasePrvaGrupaState<Model.KorisnikFM.Korisnik, Database.Korisnik,
-        KorisniciInsertR, KorisniciUpdateR> basePrvaGrupaState) : base(context, mapper)
+        KorisniciInsertRHS, KorisniciUpdateR> basePrvaGrupaState) : base(context, mapper)
         {
             _context = context;
             _basePrvaGrupaState = basePrvaGrupaState;
@@ -56,7 +57,7 @@ namespace BikeHub.Services
         {
             if (request.Lozinka != request.LozinkaPotvrda)
             {
-                throw new Exception("Lozinka i LozinkaPotvrda moraju biti iste");
+                throw new UserException("Lozinka i LozinkaPotvrda moraju biti iste");
             }
             entity.LozinkaSalt = GenerateSalt();
             entity.LozinkaHash = GenerateHash(entity.LozinkaSalt, request.Lozinka);
@@ -89,13 +90,13 @@ namespace BikeHub.Services
             var korisnik = _context.Korisniks.FirstOrDefault(x=>x.Username==request.Username);
             if(korisnik != null)
             {
-                throw new Exception("Username je zauzet");
+                throw new UserException("Username je zauzet");
             }
             if (request.Lozinka != null)
             {
                 if (request.Lozinka != request.LozinkaPotvrda)
                 {
-                    throw new Exception("Lozinka i LozinkaPotvrda moraju biti iste");
+                    throw new UserException("Lozinka i LozinkaPotvrda moraju biti iste");
                 }
 
                 entity.LozinkaSalt = GenerateSalt();
@@ -106,10 +107,11 @@ namespace BikeHub.Services
 
         public override Model.KorisnikFM.Korisnik Insert(KorisniciInsertR request)
         {
-            var entity = new Database.Korisnik();
+            var entity = Mapper.Map<Database.Korisnik>(request);
             BeforeInsert(request, entity);
             var state = _basePrvaGrupaState.CreateState("kreiran");
-            return state.Insert(request);
+            var noviRequest = Mapper.Map<KorisniciInsertRHS>(entity);
+            return state.Insert(noviRequest);
         }
 
         public override Model.KorisnikFM.Korisnik Update(int id, KorisniciUpdateR request)
@@ -118,7 +120,7 @@ namespace BikeHub.Services
             var entity = set.Find(id);
             if (entity == null)
             {
-                throw new Exception("Entitet sa datim ID-om ne postoji");
+                throw new UserException("Entitet sa datim ID-om ne postoji");
             }
             BeforeUpdate(request, entity);
             var state = _basePrvaGrupaState.CreateState(entity.Status);
@@ -129,7 +131,7 @@ namespace BikeHub.Services
             var entity = GetById(id);
             if (entity == null)
             {
-                throw new Exception("Entity not found.");
+                throw new UserException("Entity not found.");
             }
             var korisnikInfo = _context.KorisnikInfos.FirstOrDefault(x => x.KorisnikId == id);
             if (korisnikInfo != null)
@@ -154,6 +156,30 @@ namespace BikeHub.Services
             Context.SaveChanges();
             return Mapper.Map<Model.KorisnikFM.Korisnik>(entity);
             throw new NotImplementedException();
+        }
+
+        public override void Zavrsavanje(int id)
+        {
+            throw new UserException("Za ovaj entitet nije moguce izvrsiti ovu naredbu");
+        }
+
+        public Model.KorisnikFM.Korisnik Login(string username, string password)
+        {
+            var entity = Context.Korisniks.FirstOrDefault(x => x.Username == username);
+
+            if (entity == null)
+            {
+                return null;
+            }
+
+            var hash = GenerateHash(entity.LozinkaSalt, password);
+
+            if (hash != entity.LozinkaHash)
+            {
+                return null;
+            }
+
+            return this.Mapper.Map<Model.KorisnikFM.Korisnik>(entity);
         }
     }
 }

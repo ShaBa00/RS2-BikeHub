@@ -12,6 +12,8 @@ namespace BikeHub.Services
         TModel Insert(TInsert request);
         TModel Update(int id, TUpdate request);
         void SoftDelete(int id);
+        void Aktivacija(int id, bool aktivacija);
+        void Zavrsavanje(int id);
     }
 }
 

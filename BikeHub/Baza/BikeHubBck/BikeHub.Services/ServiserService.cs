@@ -1,4 +1,5 @@
-﻿using BikeHub.Model.ServisFM;
+﻿using BikeHub.Model;
+using BikeHub.Model.ServisFM;
 using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
 using MapsterMapper;
@@ -41,33 +42,35 @@ namespace BikeHub.Services
             }
             return NoviQuery;
         }
+
         public override void BeforeInsert(ServiserInsertR request, Database.Serviser entity)
         {
             if (request?.KorisnikId == null)
             {
-                throw new Exception("KorisnikId ne smije biti null.");
+                throw new UserException("KorisnikId ne smije biti null.");
             }
             var korisnik = _context.Korisniks.Find(request.KorisnikId);
             if (korisnik == null)
             {
-                throw new Exception("Korisnik sa datim ID-om ne postoji.");
+                throw new UserException("Korisnik sa datim ID-om ne postoji.");
             }
             if (request.Cijena <= 0)
             {
-                throw new Exception("Cijena mora biti veća od 0.");
+                throw new UserException("Cijena mora biti veća od 0.");
             }
             entity.BrojServisa = 0;
             entity.KorisnikId = request.KorisnikId;
             entity.Cijena = request.Cijena;
             base.BeforeInsert(request, entity);
         }
+
         public override void BeforeUpdate(ServiserUpdateR request, Database.Serviser entity)
         {
             if (request.Cijena.HasValue)
             {
                 if (request.Cijena <= 0)
                 {
-                    throw new Exception("Cijena mora biti veća od 0.");
+                    throw new UserException("Cijena mora biti veća od 0.");
                 }
                 entity.Cijena = request.Cijena.Value;
             }
@@ -75,12 +78,13 @@ namespace BikeHub.Services
             {
                 if (request.BrojServisa < 0)
                 {
-                    throw new Exception("Broj servisa ne može biti negativan.");
+                    throw new UserException("Broj servisa ne može biti negativan.");
                 }
                 entity.BrojServisa = request.BrojServisa.Value;
             }
             base.BeforeUpdate(request, entity);
         }
+
         public override Model.ServisFM.Serviser Insert(ServiserInsertR request)
         {
             var entity = new Database.Serviser();
@@ -88,28 +92,35 @@ namespace BikeHub.Services
             var state = _basePrvaGrupaState.CreateState("kreiran");
             return state.Insert(request);
         }
+
         public override Model.ServisFM.Serviser Update(int id, ServiserUpdateR request)
         {
             var set = Context.Set<Database.Serviser>();
             var entity = set.Find(id);
             if (entity == null)
             {
-                throw new Exception("Entitet sa datim ID-om ne postoji");
+                throw new UserException("Entitet sa datim ID-om ne postoji");
             }
             BeforeUpdate(request, entity);
             var state = _basePrvaGrupaState.CreateState(entity.Status);
             return state.Update(id, request);
         }
+
         public override void SoftDelete(int id)
         {
             var entity = GetById(id);
             if (entity == null)
             {
-                throw new Exception("Entity not found.");
+                throw new UserException("Entity not found.");
             }
 
             var state = _basePrvaGrupaState.CreateState(entity.Status);
             state.Delete(id);
+        }
+
+        public override void Zavrsavanje(int id)
+        {
+            throw new UserException("Za ovaj entitet nije moguce izvrsiti ovu naredbu");
         }
     }
 }

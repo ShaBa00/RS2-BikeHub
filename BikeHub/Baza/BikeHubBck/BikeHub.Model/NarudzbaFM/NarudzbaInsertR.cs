@@ -7,7 +7,5 @@ namespace BikeHub.Model.NarudzbaFM
     public class NarudzbaInsertR
     {
         public int KorisnikId { get; set; }
-
-        public string Status { get; set; } = null!;
     }
 }

@@ -1,4 +1,5 @@
-﻿using BikeHub.Model.SlikeFM;
+﻿using BikeHub.Model;
+using BikeHub.Model.SlikeFM;
 using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
 using MapsterMapper;
@@ -41,16 +42,16 @@ namespace BikeHub.Services
         {
             if (request?.BiciklId == null)
             {
-                throw new Exception("BiciklId ne smije biti null.");
+                throw new UserException("BiciklId ne smije biti null.");
             }
             var bicikl = _context.Bicikls.Find(request.BiciklId);
             if (bicikl == null)
             {
-                throw new Exception("Bicikl sa datim ID-om ne postoji.");
+                throw new UserException("Bicikl sa datim ID-om ne postoji.");
             }
             if (request?.Slika == null || request.Slika.Length == 0)
             {
-                throw new Exception("Slika ne smije biti prazna.");
+                throw new UserException("Slika ne smije biti prazna.");
             }
             entity.BiciklId = request.BiciklId;
             entity.Slika = request.Slika;
@@ -63,14 +64,14 @@ namespace BikeHub.Services
                 var bicikl = _context.Bicikls.Find(request.BiciklId.Value);
                 if (bicikl == null)
                 {
-                    throw new Exception("Bicikl sa datim ID-om ne postoji.");
+                    throw new UserException("Bicikl sa datim ID-om ne postoji.");
                 }
                 entity.BiciklId = request.BiciklId.Value;
             }
-            if (request.Slika != null && request.Slika.Length > 0)
-            {
-                entity.Slika = request.Slika;
-            }
+            //if (request.Slika != null && request.Slika.Length > 0)
+            //{
+            //    entity.Slika = request.Slika;
+            //}
             base.BeforeUpdate(request, entity);
         }
         public override Model.SlikeFM.SlikeBicikli Insert(SlikeBicikliInsertR request)
@@ -86,7 +87,7 @@ namespace BikeHub.Services
             var entity = set.Find(id);
             if (entity == null)
             {
-                throw new Exception("Entitet sa datim ID-om ne postoji");
+                throw new UserException("Entitet sa datim ID-om ne postoji");
             }
             BeforeUpdate(request, entity);
             var state = _basePrvaGrupaState.CreateState(entity.Status);
@@ -97,12 +98,17 @@ namespace BikeHub.Services
             var entity = GetById(id);
             if (entity == null)
             {
-                throw new Exception("Entity not found.");
+                throw new UserException("Entity not found.");
             }
 
             var state = _basePrvaGrupaState.CreateState(entity.Status);
             state.Delete(id);
         }
-    
+
+        public override void Zavrsavanje(int id)
+        {
+            throw new UserException("Za ovaj entitet nije moguce izvrsiti ovu naredbu");
+        }
+
     }
 }

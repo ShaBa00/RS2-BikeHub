@@ -1,4 +1,6 @@
-﻿using BikeHub.Model.PromocijaFM;
+﻿using BikeHub.Model;
+using BikeHub.Model.PromocijaFM;
+using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
 using MapsterMapper;
 using System;
@@ -13,8 +15,15 @@ namespace BikeHub.Services
         Database.PromocijaBicikli, Model.PromocijaFM.PromocijaBicikliInsertR, Model.PromocijaFM.PromocijaBicikliUpdateR>, IPromocijaBicikliService
     {
         private BikeHubDbContext _context;
-        public PromocijaBicikliService(BikeHubDbContext context, IMapper mapper) 
-        : base(context, mapper){ _context = context; }
+        public BaseDrugaGrupaState<Model.PromocijaFM.PromocijaBicikli, Database.PromocijaBicikli,
+            Model.PromocijaFM.PromocijaBicikliInsertR, Model.PromocijaFM.PromocijaBicikliUpdateR> _baseDrugaGrupaState;
+        public PromocijaBicikliService(BikeHubDbContext context, IMapper mapper, BaseDrugaGrupaState<Model.PromocijaFM.PromocijaBicikli, Database.PromocijaBicikli,
+            Model.PromocijaFM.PromocijaBicikliInsertR, Model.PromocijaFM.PromocijaBicikliUpdateR> baseDrugaGrupaState) 
+        : base(context, mapper)
+        {
+            _context = context;
+            _baseDrugaGrupaState = baseDrugaGrupaState;
+        }
         public override IQueryable<Database.PromocijaBicikli> AddFilter(PromocijaBicikliSearchObject search, IQueryable<Database.PromocijaBicikli> query)
         {
             var NoviQuery = base.AddFilter(search, query);
@@ -28,38 +37,35 @@ namespace BikeHub.Services
             }
             return NoviQuery;
         }
+
         public override void BeforeInsert(PromocijaBicikliInsertR request, Database.PromocijaBicikli entity)
         {
             var bicikl = _context.Bicikls.FirstOrDefault(x => x.BiciklId == request.BiciklId);
             if (bicikl == null)
             {
-                throw new Exception("Bicikl sa datim ID-om ne postoji.");
+                throw new UserException("Bicikl sa datim ID-om ne postoji.");
             }
             if (request.DatumPocetka == default(DateTime))
             {
-                throw new Exception("Datum početka mora biti unesen.");
+                throw new UserException("Datum početka mora biti unesen.");
             }
 
             if (request.DatumZavrsetka == default(DateTime))
             {
-                throw new Exception("Datum završetka mora biti unesen.");
+                throw new UserException("Datum završetka mora biti unesen.");
             }
             if (request.DatumPocetka > request.DatumZavrsetka)
             {
-                throw new Exception("Datum početka ne smije biti veći od datuma završetka.");
-            }
-            if (string.IsNullOrWhiteSpace(request.Status))
-            {
-                throw new Exception("Status ne smije biti prazan.");
+                throw new UserException("Datum početka ne smije biti veći od datuma završetka.");
             }
             entity.BiciklId = request.BiciklId;
             entity.DatumPocetka = request.DatumPocetka;
             entity.DatumZavrsetka = request.DatumZavrsetka;
-            entity.Status = request.Status;
             var brojDana = (request.DatumZavrsetka - request.DatumPocetka).Days + 1;
             entity.CijenaPromocije = brojDana * 5;
             base.BeforeInsert(request, entity);
         }
+
         public override void BeforeUpdate(PromocijaBicikliUpdateR request, Database.PromocijaBicikli entity)
         {
             if (request.BiciklId.HasValue)
@@ -67,7 +73,7 @@ namespace BikeHub.Services
                 var bicikl = _context.Bicikls.FirstOrDefault(x => x.BiciklId == request.BiciklId.Value);
                 if (bicikl == null)
                 {
-                    throw new Exception("Bicikl sa datim ID-om ne postoji.");
+                    throw new UserException("Bicikl sa datim ID-om ne postoji.");
                 }
                 entity.BiciklId = request.BiciklId.Value;
             }
@@ -75,7 +81,7 @@ namespace BikeHub.Services
             {
                 if (request.DatumPocetka.Value > request.DatumZavrsetka.Value)
                 {
-                    throw new Exception("Datum početka ne može biti veći od datuma završetka.");
+                    throw new UserException("Datum početka ne može biti veći od datuma završetka.");
                 }
 
                 entity.DatumPocetka = request.DatumPocetka.Value;
@@ -87,7 +93,7 @@ namespace BikeHub.Services
             {
                 if (request.DatumPocetka.Value > entity.DatumZavrsetka)
                 {
-                    throw new Exception("Datum početka ne može biti veći od trenutnog datuma završetka.");
+                    throw new UserException("Datum početka ne može biti veći od trenutnog datuma završetka.");
                 }
 
                 entity.DatumPocetka = request.DatumPocetka.Value;
@@ -98,18 +104,59 @@ namespace BikeHub.Services
             {
                 if (entity.DatumPocetka > request.DatumZavrsetka.Value)
                 {
-                    throw new Exception("Datum završetka ne može biti manji od trenutnog datuma početka.");
+                    throw new UserException("Datum završetka ne može biti manji od trenutnog datuma početka.");
                 }
 
                 entity.DatumZavrsetka = request.DatumZavrsetka.Value;
                 var brojDana = (request.DatumZavrsetka.Value - entity.DatumPocetka).Days + 1;
                 entity.CijenaPromocije = brojDana * 5;
             }
-            if (!string.IsNullOrWhiteSpace(request.Status))
-            {
-                entity.Status = request.Status;
-            }
             base.BeforeUpdate(request, entity);
+        }
+
+        public override Model.PromocijaFM.PromocijaBicikli Insert(PromocijaBicikliInsertR request)
+        {
+            var entity = new Database.PromocijaBicikli();
+            BeforeInsert(request, entity);
+            var state = _baseDrugaGrupaState.CreateState("kreiran");
+            return state.Insert(request);
+        }
+
+        public override Model.PromocijaFM.PromocijaBicikli Update(int id, PromocijaBicikliUpdateR request)
+        {
+            var set = Context.Set<Database.PromocijaBicikli>();
+            var entity = set.Find(id);
+            if (entity == null)
+            {
+                throw new UserException("Entitet sa datim ID-om ne postoji");
+            }
+            BeforeUpdate(request, entity);
+            var state = _baseDrugaGrupaState.CreateState(entity.Status);
+            return state.Update(id, request);
+        }
+
+        public override void SoftDelete(int id)
+        {
+            var entity = GetById(id);
+            if (entity == null)
+            {
+                throw new UserException("Entity not found.");
+            }
+
+            var state = _baseDrugaGrupaState.CreateState(entity.Status);
+            state.Delete(id);
+        }
+
+        public override void Zavrsavanje(int id)
+        {
+            var entity = GetById(id);
+            if (entity == null)
+            {
+                throw new UserException("Entity not found.");
+            }
+
+            var state = _baseDrugaGrupaState.CreateState(entity.Status);
+            state.MarkAsFinished(id);
         }
     }
 }

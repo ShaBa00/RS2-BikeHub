@@ -1,4 +1,5 @@
-﻿using BikeHub.Model.Ostalo;
+﻿using BikeHub.Model;
+using BikeHub.Model.Ostalo;
 using BikeHub.Services.Database;
 using MapsterMapper;
 using System;
@@ -55,10 +56,46 @@ namespace BikeHub.Services
             var entity = set.Find(id);
             if (entity == null)
             {
-                throw new Exception($"{typeof(TDbEntity).Name} not found.");
+                throw new UserException($"{typeof(TDbEntity).Name} not found.");
             }
             var property = entity.GetType().GetProperty("Status");
             property.SetValue(entity, "obrisan");
+
+            Context.SaveChanges();
+        }
+        public virtual void Aktivacija(int id, bool aktivacija)
+        {
+            var set = Context.Set<TDbEntity>();
+            var entity = set.Find(id);
+            if (entity == null)
+            {
+                throw new UserException($"{typeof(TDbEntity).Name} not found.");
+            }
+
+            var property = entity.GetType().GetProperty("Status");
+            if (aktivacija)
+            {
+                property.SetValue(entity, "aktivan");
+            }
+            else
+            {
+                property.SetValue(entity, "vracen");
+            }
+
+            Context.SaveChanges();
+        }
+        public virtual void Zavrsavanje(int id)
+        {
+            var set = Context.Set<TDbEntity>();
+            var entity = set.Find(id);
+            if (entity == null)
+            {
+                throw new UserException($"{typeof(TDbEntity).Name} not found.");
+            }
+
+            var property = entity.GetType().GetProperty("Status");
+            property.SetValue(entity, "zavrseno");
+
 
             Context.SaveChanges();
         }

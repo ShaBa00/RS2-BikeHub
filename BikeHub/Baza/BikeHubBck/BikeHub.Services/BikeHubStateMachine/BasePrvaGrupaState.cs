@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using BikeHub.Model;
 using BikeHub.Services.Database;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,33 +26,32 @@ namespace BikeHub.Services.BikeHubStateMachine
         }
         public virtual TModel Insert(TInsert request)
         {
-            throw new Exception("Method not allowed");
+            throw new UserException("Method not allowed");
         }
 
         public virtual TModel Update(int id, TUpdate request)
         {
-            throw new Exception("Method not allowed");
+            throw new UserException("Method not allowed");
         }
 
         public virtual TModel Activate(int id)
         {
-            throw new Exception("Method not allowed");
-        }
-
-        public virtual TModel MarkAsFinished(int id)
-        {
-            throw new Exception("Method not allowed");
+            throw new UserException("Method not allowed");
         }
 
         public virtual TModel Delete(int id)
         {
-            throw new Exception("Method not allowed");
+            throw new UserException("Method not allowed");
         }
 
         public virtual TModel Return(int id)
         {
-            throw new Exception("Method not allowed");
+            throw new UserException("Method not allowed");
         }
+        //public virtual List<string> AllowedActions(TDbEntity entity)
+        //{
+        //    throw new Exception("Metoda nije dozvoljena");
+        //}
         public BasePrvaGrupaState<TModel, TDbEntity , TInsert, TUpdate> CreateState(string stateName)
         {
             switch (stateName)

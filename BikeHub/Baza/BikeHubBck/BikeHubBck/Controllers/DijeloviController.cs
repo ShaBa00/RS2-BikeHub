@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using BikeHub.Model.DijeloviFM;
 using MapsterMapper;
+using BikeHub.Model;
+using Microsoft.AspNetCore.Authorization;
 namespace BikeHubBck.Controllers
 {
     [ApiController]
@@ -11,5 +13,10 @@ namespace BikeHubBck.Controllers
         public DijeloviController(IDijeloviService service)
         :base(service){        }
 
+        [AllowAnonymous]
+        public override PagedResult<Dijelovi> GetList([FromQuery] DijeloviSearchObject searchObject)
+        {
+            return base.GetList(searchObject);
+        }
     }
 }

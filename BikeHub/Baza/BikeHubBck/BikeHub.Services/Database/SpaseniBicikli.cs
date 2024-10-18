@@ -13,5 +13,9 @@ public partial class SpaseniBicikli
 
     public string? Status { get; set; }
 
+    public int? KorisnikId { get; set; }
+
     public virtual Bicikl Bicikl { get; set; } = null!;
+
+    public virtual Korisnik? Korisnik { get; set; }
 }

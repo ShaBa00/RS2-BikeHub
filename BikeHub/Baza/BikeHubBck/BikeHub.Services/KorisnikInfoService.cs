@@ -1,4 +1,5 @@
-﻿using BikeHub.Model.KorisnikFM;
+﻿using BikeHub.Model;
+using BikeHub.Model.KorisnikFM;
 using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
 using MapsterMapper;
@@ -54,34 +55,34 @@ namespace BikeHub.Services
         {
             if (request.KorisnikId == 0)
             {
-                throw new Exception("KorisnikId ne smije biti prazan ili nula.");
+                throw new UserException("KorisnikId ne smije biti prazan ili nula.");
             }
             var korisnik = _context.Korisniks.FirstOrDefault(x => x.KorisnikId == request.KorisnikId);
             if (korisnik == null)
             {
-                throw new Exception("Korisnik sa datim ID-om ne postoji.");
+                throw new UserException("Korisnik sa datim ID-om ne postoji.");
             }
             if (korisnik.Status == "obrisan")
             {
-                throw new Exception("Za obrisanog korisnika nije moguće dodati zapis.");
+                throw new UserException("Za obrisanog korisnika nije moguće dodati zapis.");
             }
             var korisnikInfo = _context.KorisnikInfos.FirstOrDefault(x => x.KorisnikId == request.KorisnikId);
             if (korisnikInfo != null)
             {
                 if (korisnikInfo.Status != "obrisan")
                 {
-                    throw new Exception("Informacije za korisnika sa ovim ID-om su već dodate. " +
+                    throw new UserException("Informacije za korisnika sa ovim ID-om su već dodate. " +
                                         "Potrebno je izvršiti izmjenu ili obrisati postojeće podatke.");
                 }
             }
             if (string.IsNullOrWhiteSpace(request.ImePrezime))
             {
-                throw new Exception("ImePrezime ne smije biti prazno.");
+                throw new UserException("ImePrezime ne smije biti prazno.");
             }
 
             if (string.IsNullOrWhiteSpace(request.Telefon))
             {
-                throw new Exception("Telefon ne smije biti prazan.");
+                throw new UserException("Telefon ne smije biti prazan.");
             }
             entity.KorisnikId = request.KorisnikId;
             entity.ImePrezime = request.ImePrezime;
@@ -104,7 +105,7 @@ namespace BikeHub.Services
             {
                 if (request.BrojNarudbi < 0)
                 {
-                    throw new Exception("Broj narudbi ne smije biti negativan.");
+                    throw new UserException("Broj narudbi ne smije biti negativan.");
                 }
                 entity.BrojNarudbi = (int)request.BrojNarudbi;
             }
@@ -112,7 +113,7 @@ namespace BikeHub.Services
             {
                 if (request.BrojServisa < 0)
                 {
-                    throw new Exception("Broj servisa ne smije biti negativan.");
+                    throw new UserException("Broj servisa ne smije biti negativan.");
                 }
                 entity.BrojServisa = (int)request.BrojServisa;
             }
@@ -131,7 +132,7 @@ namespace BikeHub.Services
             var entity = set.Find(id);
             if (entity == null)
             {
-                throw new Exception("Entitet sa datim ID-om ne postoji");
+                throw new UserException("Entitet sa datim ID-om ne postoji");
             }
             BeforeUpdate(request, entity);
             var state = _basePrvaGrupaState.CreateState(entity.Status);
@@ -142,11 +143,16 @@ namespace BikeHub.Services
             var entity = GetById(id);
             if (entity == null)
             {
-                throw new Exception("Entity not found.");
+                throw new UserException("Entity not found.");
             }
 
             var state = _basePrvaGrupaState.CreateState(entity.Status);
             state.Delete(id);
+        }
+
+        public override void Zavrsavanje(int id)
+        {
+            throw new UserException("Za ovaj entitet nije moguce izvrsiti ovu naredbu");
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using BikeHub.Model.SpaseniFM;
+﻿using BikeHub.Model;
+using BikeHub.Model.SpaseniFM;
 using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
 using MapsterMapper;
@@ -32,6 +33,10 @@ namespace BikeHub.Services
             {
                 NoviQuery = NoviQuery.Where(x => x.DijeloviId == search.DijeloviId);
             }
+            if (search?.KorisnikId != null)
+            {
+                NoviQuery = NoviQuery.Where(x => x.KorisnikId == search.KorisnikId);
+            }
             if (search?.DatumSpasavanja != null)
             {
                 NoviQuery = NoviQuery.Where(x => x.DatumSpasavanja.Date == search.DatumSpasavanja.Value.Date);
@@ -43,18 +48,29 @@ namespace BikeHub.Services
             }
             return NoviQuery;
         }
+
         public override void BeforeInsert(SpaseniDijeloviInsertR request, Database.SpaseniDijelovi entity)
         {
             if (request.DijeloviId <= 0)
             {
                 throw new Exception("DijeloviId ne smije biti veći od nule.");
             }
+            if (request.KorisnikId <= 0)
+            {
+                throw new UserException("KorisnikId ne smije biti veći od nule.");
+            }
             var dio = _context.Dijelovis.Find(request.DijeloviId);
             if (dio == null)
             {
-                throw new Exception("Dio sa datim ID-om ne postoji.");
+                throw new UserException("Dio sa datim ID-om ne postoji.");
             }
             entity.DijeloviId = request.DijeloviId;
+            var korisnik = _context.Korisniks.Find(request.KorisnikId);
+            if (korisnik == null)
+            {
+                throw new UserException("Korisnik sa datim ID-om ne postoji.");
+            }
+            entity.KorisnikId = request.KorisnikId;
             if (request.DatumSpasavanja == default(DateTime))
             {
                 entity.DatumSpasavanja = DateTime.Now;
@@ -65,6 +81,7 @@ namespace BikeHub.Services
             }
             base.BeforeInsert(request, entity);
         }
+
         public override void BeforeUpdate(SpaseniDijeloviUpdateR request, Database.SpaseniDijelovi entity)
         {
             if (request.DijeloviId.HasValue)
@@ -72,9 +89,18 @@ namespace BikeHub.Services
                 var dio = _context.Dijelovis.Find(request.DijeloviId);
                 if (dio == null)
                 {
-                    throw new Exception("Dio sa datim ID-om ne postoji.");
+                    throw new UserException("Dio sa datim ID-om ne postoji.");
                 }
                 entity.DijeloviId = request.DijeloviId.Value;
+            }
+            if (request.KorisnikId.HasValue)
+            {
+                var korisnik = _context.Korisniks.Find(request.KorisnikId);
+                if (korisnik == null)
+                {
+                    throw new UserException("Korisnik sa datim ID-om ne postoji.");
+                }
+                entity.KorisnikId = request.KorisnikId.Value;
             }
             if (request.DatumSpasavanja.HasValue)
             {
@@ -82,6 +108,7 @@ namespace BikeHub.Services
             }
             base.BeforeUpdate(request, entity);
         }
+
         public override Model.SpaseniFM.SpaseniDijelovi Insert(SpaseniDijeloviInsertR request)
         {
             var entity = new Database.SpaseniDijelovi();
@@ -89,28 +116,35 @@ namespace BikeHub.Services
             var state = _basePrvaGrupaState.CreateState("kreiran");
             return state.Insert(request);
         }
+
         public override Model.SpaseniFM.SpaseniDijelovi Update(int id, SpaseniDijeloviUpdateR request)
         {
             var set = Context.Set<Database.SpaseniDijelovi>();
             var entity = set.Find(id);
             if (entity == null)
             {
-                throw new Exception("Entitet sa datim ID-om ne postoji");
+                throw new UserException("Entitet sa datim ID-om ne postoji");
             }
             BeforeUpdate(request, entity);
             var state = _basePrvaGrupaState.CreateState(entity.Status);
             return state.Update(id, request);
         }
+
         public override void SoftDelete(int id)
         {
             var entity = GetById(id);
             if (entity == null)
             {
-                throw new Exception("Entity not found.");
+                throw new UserException("Entity not found.");
             }
 
             var state = _basePrvaGrupaState.CreateState(entity.Status);
             state.Delete(id);
+        }
+
+        public override void Zavrsavanje(int id)
+        {
+            throw new UserException("Za ovaj entitet nije moguce izvrsiti ovu naredbu");
         }
     }
 }

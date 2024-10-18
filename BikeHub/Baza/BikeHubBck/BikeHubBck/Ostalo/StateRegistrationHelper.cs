@@ -13,5 +13,15 @@ namespace BikeHubBck.Ostalo
             services.AddTransient<ObrisanPrvaGrupaState<TModel, TDbEntity, TInsert, TUpdate>>();
             services.AddTransient<VracenPrvaGrupaState<TModel, TDbEntity, TInsert, TUpdate>>();
         }
+        public static void DrugiRegisterStates<TModel, TDbEntity, TInsert, TUpdate>(IServiceCollection services) where TModel : class where TDbEntity : class
+        {
+            services.AddTransient<BaseDrugaGrupaState<TModel, TDbEntity, TInsert, TUpdate>>();
+            services.AddTransient<KreiranDrugaGrupaState<TModel, TDbEntity, TInsert, TUpdate>>();
+            services.AddTransient<IzmijenjenDrugaGrupaState<TModel, TDbEntity, TInsert, TUpdate>>();
+            services.AddTransient<AktivanDrugaGrupaState<TModel, TDbEntity, TInsert, TUpdate>>();
+            services.AddTransient<ObrisanDrugaGrupaState<TModel, TDbEntity, TInsert, TUpdate>>();
+            services.AddTransient<VracenDrugaGrupaState<TModel, TDbEntity, TInsert, TUpdate>>();
+            services.AddTransient<ZavrsenoDrugaGrupaState<TModel, TDbEntity, TInsert, TUpdate>>();
+        }
     }
 }

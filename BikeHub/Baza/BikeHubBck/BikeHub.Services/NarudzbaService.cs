@@ -1,5 +1,6 @@
-﻿using BikeHub.Model.AdresaFM;
+﻿using BikeHub.Model;
 using BikeHub.Model.NarudzbaFM;
+using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
@@ -15,8 +16,15 @@ namespace BikeHub.Services
                                                     Model.NarudzbaFM.NarudzbaInsertR, Model.NarudzbaFM.NarudzbaUpdateR>, INarudzbaService
     {
         private BikeHubDbContext _context;
-        public NarudzbaService(BikeHubDbContext context, IMapper mapper) 
-        : base(context, mapper){ _context = context; }
+        public BaseDrugaGrupaState<Model.NarudzbaFM.Narudzba, Database.Narudzba,
+            Model.NarudzbaFM.NarudzbaInsertR, Model.NarudzbaFM.NarudzbaUpdateR> _baseDrugaGrupaState;
+        public NarudzbaService(BikeHubDbContext context, IMapper mapper, BaseDrugaGrupaState<Model.NarudzbaFM.Narudzba, Database.Narudzba,
+            Model.NarudzbaFM.NarudzbaInsertR, Model.NarudzbaFM.NarudzbaUpdateR> baseDrugaGrupaState) 
+        : base(context, mapper)
+        {
+            _context = context;
+            _baseDrugaGrupaState = baseDrugaGrupaState;
+        }
 
         public override IQueryable<Database.Narudzba> AddFilter(NarudzbaSearchObject search, IQueryable<Database.Narudzba> query)
         {
@@ -39,33 +47,75 @@ namespace BikeHub.Services
             }
             return NoviQuery;
         }
+
         public override void BeforeInsert(NarudzbaInsertR request, Database.Narudzba entity)
         {
             if (request.KorisnikId == 0)
             {
-                throw new Exception("KorisnikId ne smije biti prazan ili nula.");
+                throw new UserException("KorisnikId ne smije biti prazan ili nula.");
             }
             var korisnik = _context.Korisniks.FirstOrDefault(x => x.KorisnikId == request.KorisnikId);
             if (korisnik == null)
             {
-                throw new Exception("Korisnik sa datim ID-om ne postoji.");
-            }
-            if (string.IsNullOrWhiteSpace(request.Status))
-            {
-                throw new Exception("Status ne smije biti prazan.");
+                throw new UserException("Korisnik sa datim ID-om ne postoji.");
             }
             entity.KorisnikId = request.KorisnikId;
             entity.DatumNarudzbe = DateTime.Now;
-            entity.Status = request.Status;
             base.BeforeInsert(request, entity);
         }
-        public override void BeforeUpdate(NarudzbaUpdateR request, Database.Narudzba entity)
+
+        //public override void BeforeUpdate(NarudzbaUpdateR request, Database.Narudzba entity)
+        //{
+        //    if (!string.IsNullOrWhiteSpace(request.Status))
+        //    {
+        //        entity.Status = request.Status;
+        //    }
+        //    base.BeforeUpdate(request, entity);
+        //}
+
+        public override Model.NarudzbaFM.Narudzba Insert(NarudzbaInsertR request)
         {
-            if (!string.IsNullOrWhiteSpace(request.Status))
+            var entity = new Database.Narudzba();
+            BeforeInsert(request, entity);
+            var state = _baseDrugaGrupaState.CreateState("kreiran");
+            return state.Insert(request);
+        }
+
+        public override Model.NarudzbaFM.Narudzba Update(int id, NarudzbaUpdateR request)
+        {
+            var set = Context.Set<Database.Narudzba>();
+            var entity = set.Find(id);
+            if (entity == null)
             {
-                entity.Status = request.Status;
+                throw new UserException("Entitet sa datim ID-om ne postoji");
             }
-            base.BeforeUpdate(request, entity);
+            //BeforeUpdate(request, entity);
+            var state = _baseDrugaGrupaState.CreateState(entity.Status);
+            return state.Update(id, request);
+        }
+
+        public override void SoftDelete(int id)
+        {
+            var entity = GetById(id);
+            if (entity == null)
+            {
+                throw new UserException("Entity not found.");
+            }
+
+            var state = _baseDrugaGrupaState.CreateState(entity.Status);
+            state.Delete(id);
+        }
+
+        public override void Zavrsavanje(int id)
+        {
+            var entity = GetById(id);
+            if (entity == null)
+            {
+                throw new UserException("Entity not found.");
+            }
+
+            var state = _baseDrugaGrupaState.CreateState(entity.Status);
+            state.MarkAsFinished(id);
         }
     }
 }
