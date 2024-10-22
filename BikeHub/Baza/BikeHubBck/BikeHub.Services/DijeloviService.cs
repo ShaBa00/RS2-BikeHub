@@ -30,6 +30,10 @@ namespace BikeHub.Services
             {
                 NoviQuery = NoviQuery.Where(x => x.Naziv.StartsWith(search.Naziv));
             }
+            if (search?.KorisnikId != null)
+            {
+                NoviQuery = NoviQuery.Where(x => x.KorisnikId == search.KorisnikId);
+            }
             if (!string.IsNullOrWhiteSpace(search?.Status))
             {
                 NoviQuery = NoviQuery.Where(x => x.Status.StartsWith(search.Status));
@@ -65,6 +69,12 @@ namespace BikeHub.Services
                 throw new UserException("Cijena dijela mora biti veća od nule");
             }
             entity.Cijena = request.Cijena;
+            var Korisnik = _context.Korisniks.Find(request.KorisnikId);
+            if (Korisnik == null)
+            {
+                throw new UserException("Korisnik s tim Id-om ne postoji");
+            }
+            entity.KorisnikId = request.KorisnikId;
             if (request.Kolicina <= 0)
             {
                 throw new UserException("Kolicina dijela mora biti veća od nule");
@@ -93,6 +103,14 @@ namespace BikeHub.Services
             if (!string.IsNullOrWhiteSpace(request.Naziv))
             {
                 entity.Naziv = request.Naziv;
+            }
+            if (request.KorisnikId > 0)
+            {
+                var Korisnik = _context.Korisniks.Find(request.KorisnikId);
+                if (Korisnik != null)
+                {
+                    entity.KorisnikId = request.KorisnikId;
+                }
             }
             if (request.Cijena.HasValue)
             {

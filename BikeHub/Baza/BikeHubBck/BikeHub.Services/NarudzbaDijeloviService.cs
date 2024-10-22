@@ -18,9 +18,9 @@ namespace BikeHub.Services
     {
         private BikeHubDbContext _context;
         public BaseDrugaGrupaState<Model.NarudzbaFM.NarudzbaDijelovi, Database.NarudzbaDijelovi,
-            Model.NarudzbaFM.NarudzbaDijeloviInsertR, Model.NarudzbaFM.NarudzbaDijeloviUpdateR> _baseDrugaGrupaState;
+            Database.NarudzbaDijelovi, Model.NarudzbaFM.NarudzbaDijeloviUpdateR> _baseDrugaGrupaState;
         public NarudzbaDijeloviService(BikeHubDbContext context, IMapper mapper, BaseDrugaGrupaState<Model.NarudzbaFM.NarudzbaDijelovi, Database.NarudzbaDijelovi,
-            Model.NarudzbaFM.NarudzbaDijeloviInsertR, Model.NarudzbaFM.NarudzbaDijeloviUpdateR> baseDrugaGrupaState) 
+            Database.NarudzbaDijelovi, Model.NarudzbaFM.NarudzbaDijeloviUpdateR> baseDrugaGrupaState) 
         : base(context, mapper)
         {
             _context = context;
@@ -70,13 +70,13 @@ namespace BikeHub.Services
                 throw new UserException($"Na stanju nema dovoljno dijelova. Broj dijelova na stanju je {dio.Kolicina}.");
             }
             dio.Kolicina -= request.Kolicina;
-            _context.Dijelovis.Update(dio);
-            _context.SaveChanges();
-
             entity.NarudzbaId = request.NarudzbaId;
             entity.DijeloviId = request.DijeloviId;
             entity.Kolicina = request.Kolicina;
             entity.Cijena = dio.Cijena * request.Kolicina;
+
+            _context.Dijelovis.Update(dio);
+            _context.SaveChanges();
             base.BeforeInsert(request, entity);
         }
 
@@ -153,7 +153,7 @@ namespace BikeHub.Services
             var entity = new Database.NarudzbaDijelovi();
             BeforeInsert(request, entity);
             var state = _baseDrugaGrupaState.CreateState("kreiran");
-            return state.Insert(request);
+            return state.Insert(entity);
         }
 
         public override Model.NarudzbaFM.NarudzbaDijelovi Update(int id, NarudzbaDijeloviUpdateR request)

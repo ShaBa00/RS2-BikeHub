@@ -12,6 +12,7 @@ namespace BikeHub.Model.KorisnikFM
         public string? LozinkaSalt { get; set; }
 
         public string? LozinkaHash { get; set; }
+        public bool? IsAdmin { get; set; }
         public string Email { get; set; }
         public virtual ICollection<KorisnikInfo> KorisnikInfos { get; set; } = new List<KorisnikInfo>();
         public string Status { get; set; }

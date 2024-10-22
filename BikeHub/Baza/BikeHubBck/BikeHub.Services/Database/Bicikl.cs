@@ -23,7 +23,11 @@ public partial class Bicikl
 
     public int Kolicina { get; set; }
 
+    public int? KorisnikId { get; set; }
+
     public virtual Kategorija? Kategorija { get; set; }
+
+    public virtual Korisnik? Korisnik { get; set; }
 
     public virtual ICollection<NarudzbaBicikli> NarudzbaBiciklis { get; set; } = new List<NarudzbaBicikli>();
 

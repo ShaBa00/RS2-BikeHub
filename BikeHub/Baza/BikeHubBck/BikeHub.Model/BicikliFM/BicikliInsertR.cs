@@ -11,16 +11,12 @@ namespace BikeHub.Model.BicikliFM
     public class BicikliInsertR
     {
         public string Naziv { get; set; } = null!;
-
         public decimal Cijena { get; set; }
-
         public string VelicinaRama { get; set; }
-
         public string VelicinaTocka { get; set; }
-
         public int BrojBrzina { get; set; }
         public int KategorijaId { get; set; }
-
         public int Kolicina { get; set; }
+        public int? KorisnikId { get; set; }
     }
 }

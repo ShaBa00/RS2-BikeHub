@@ -103,6 +103,10 @@ public partial class BikeHubDbContext : DbContext
             entity.HasOne(d => d.Kategorija).WithMany(p => p.Bicikls)
                 .HasForeignKey(d => d.KategorijaId)
                 .HasConstraintName("FK_Bicikl_Kategorija");
+
+            entity.HasOne(d => d.Korisnik).WithMany(p => p.Bicikls)
+                .HasForeignKey(d => d.KorisnikId)
+                .HasConstraintName("FK_Bicikl_Korisnik");
         });
 
         modelBuilder.Entity<Dijelovi>(entity =>
@@ -122,6 +126,10 @@ public partial class BikeHubDbContext : DbContext
             entity.HasOne(d => d.Kategorija).WithMany(p => p.Dijelovis)
                 .HasForeignKey(d => d.KategorijaId)
                 .HasConstraintName("FK_Dijelovi_Kategorija");
+
+            entity.HasOne(d => d.Korisnik).WithMany(p => p.Dijelovis)
+                .HasForeignKey(d => d.KorisnikId)
+                .HasConstraintName("FK_Dijelovi_Korisnik");
         });
 
         modelBuilder.Entity<Kategorija>(entity =>

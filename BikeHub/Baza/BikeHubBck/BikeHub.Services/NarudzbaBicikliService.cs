@@ -17,9 +17,9 @@ namespace BikeHub.Services
     {
         private BikeHubDbContext _context;
         public BaseDrugaGrupaState<Model.NarudzbaFM.NarudzbaBicikli, Database.NarudzbaBicikli,
-            Model.NarudzbaFM.NarudzbaBicikliInsertR, Model.NarudzbaFM.NarudzbaBicikliUpdateR> _baseDrugaGrupaState;
+           Database.NarudzbaBicikli, Model.NarudzbaFM.NarudzbaBicikliUpdateR> _baseDrugaGrupaState;
         public NarudzbaBicikliService(BikeHubDbContext context, IMapper mapper, BaseDrugaGrupaState<Model.NarudzbaFM.NarudzbaBicikli, Database.NarudzbaBicikli,
-            Model.NarudzbaFM.NarudzbaBicikliInsertR, Model.NarudzbaFM.NarudzbaBicikliUpdateR> baseDrugaGrupaState) 
+           Database.NarudzbaBicikli, Model.NarudzbaFM.NarudzbaBicikliUpdateR> baseDrugaGrupaState) 
         : base(context, mapper)
         {
             _context = context;
@@ -162,7 +162,7 @@ namespace BikeHub.Services
             var entity = new Database.NarudzbaBicikli();
             BeforeInsert(request, entity);
             var state = _baseDrugaGrupaState.CreateState("kreiran");
-            return state.Insert(request);
+            return state.Insert(entity);
         }
 
         public override Model.NarudzbaFM.NarudzbaBicikli Update(int id, NarudzbaBicikliUpdateR request)

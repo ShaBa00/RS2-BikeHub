@@ -42,6 +42,10 @@ namespace BikeHub.Services
             {
                 NoviQuery = NoviQuery.Where(x => x.Kolicina == search.Kolicina);
             }
+            if (search?.KorisnikId != null)
+            {
+                NoviQuery = NoviQuery.Where(x => x.KorisnikId == search.KorisnikId);
+            }
             if (!string.IsNullOrWhiteSpace(search?.VelicinaRama))
             {
                 NoviQuery = NoviQuery.Where(x => x.VelicinaRama == search.VelicinaRama);
@@ -63,6 +67,7 @@ namespace BikeHub.Services
             }
             return NoviQuery;
         }
+
         public override void BeforeInsert(BicikliInsertR request, Bicikl entity)
         {
             if (string.IsNullOrWhiteSpace(request.Naziv))
@@ -70,6 +75,12 @@ namespace BikeHub.Services
                 throw new UserException("Naziv bicikla ne smije biti prazan");
             }
             entity.Naziv = request.Naziv;
+            var Korisnik = _context.Korisniks.Find(request.KorisnikId);
+            if (Korisnik == null)
+            {
+                throw new UserException("Korisnik s tim Id-om ne postoji");
+            }
+            entity.KorisnikId = request.KorisnikId;
             if (request.Cijena <= 0)
             {
                 throw new UserException("Cijena bicikla mora biti veća od nule");
@@ -107,12 +118,21 @@ namespace BikeHub.Services
             entity.KategorijaId = request.KategorijaId;
             base.BeforeInsert(request, entity);
         }
+
         public override void BeforeUpdate(BicikliUpdateR request, Bicikl entity)
         {
             if (!string.IsNullOrWhiteSpace(request.Naziv))
             {
                 entity.Naziv = request.Naziv;
             }
+            if (request.KorisnikId>0)
+            {
+                var Korisnik = _context.Korisniks.Find(request.KorisnikId);
+                if (Korisnik != null)
+                {
+                    entity.KorisnikId = request.KorisnikId;
+                }
+            }            
             if (request.Cijena.HasValue)
             {
                 if (request.Cijena <= 0)
@@ -164,6 +184,7 @@ namespace BikeHub.Services
             var state = _basePrvaGrupaState.CreateState("kreiran");
             return state.Insert(request);
         }
+
         public override Bicikli Update(int id, BicikliUpdateR request)
         {
             var set = Context.Set<Database.Bicikl>();
@@ -176,6 +197,7 @@ namespace BikeHub.Services
             var state = _basePrvaGrupaState.CreateState(entity.Status);
             return state.Update(id, request);
         }
+
         public override void SoftDelete(int id)
         {
             var entity = GetById(id);

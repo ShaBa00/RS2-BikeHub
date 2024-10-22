@@ -19,7 +19,11 @@ public partial class Dijelovi
 
     public int Kolicina { get; set; }
 
+    public int? KorisnikId { get; set; }
+
     public virtual Kategorija? Kategorija { get; set; }
+
+    public virtual Korisnik? Korisnik { get; set; }
 
     public virtual ICollection<NarudzbaDijelovi> NarudzbaDijelovis { get; set; } = new List<NarudzbaDijelovi>();
 

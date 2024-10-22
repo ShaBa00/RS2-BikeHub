@@ -23,7 +23,9 @@ namespace BikeHubBck.Controllers
         {
             return _service.GetPaged(searchObject);
         }
+
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public virtual TModel GetById(int id)
         {
             return _service.GetById(id);

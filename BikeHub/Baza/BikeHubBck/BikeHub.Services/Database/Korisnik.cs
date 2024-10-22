@@ -21,6 +21,10 @@ public partial class Korisnik
 
     public virtual ICollection<Adresa> Adresas { get; set; } = new List<Adresa>();
 
+    public virtual ICollection<Bicikl> Bicikls { get; set; } = new List<Bicikl>();
+
+    public virtual ICollection<Dijelovi> Dijelovis { get; set; } = new List<Dijelovi>();
+
     public virtual ICollection<KorisnikInfo> KorisnikInfos { get; set; } = new List<KorisnikInfo>();
 
     public virtual ICollection<Narudzba> Narudzbas { get; set; } = new List<Narudzba>();
