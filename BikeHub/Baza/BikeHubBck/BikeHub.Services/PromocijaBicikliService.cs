@@ -16,9 +16,9 @@ namespace BikeHub.Services
     {
         private BikeHubDbContext _context;
         public BaseDrugaGrupaState<Model.PromocijaFM.PromocijaBicikli, Database.PromocijaBicikli,
-            Model.PromocijaFM.PromocijaBicikliInsertR, Model.PromocijaFM.PromocijaBicikliUpdateR> _baseDrugaGrupaState;
+            Database.PromocijaBicikli, Model.PromocijaFM.PromocijaBicikliUpdateR> _baseDrugaGrupaState;
         public PromocijaBicikliService(BikeHubDbContext context, IMapper mapper, BaseDrugaGrupaState<Model.PromocijaFM.PromocijaBicikli, Database.PromocijaBicikli,
-            Model.PromocijaFM.PromocijaBicikliInsertR, Model.PromocijaFM.PromocijaBicikliUpdateR> baseDrugaGrupaState) 
+            Database.PromocijaBicikli, Model.PromocijaFM.PromocijaBicikliUpdateR> baseDrugaGrupaState) 
         : base(context, mapper)
         {
             _context = context;
@@ -64,6 +64,14 @@ namespace BikeHub.Services
             var brojDana = (request.DatumZavrsetka - request.DatumPocetka).Days + 1;
             entity.CijenaPromocije = brojDana * 5;
             base.BeforeInsert(request, entity);
+        }
+
+        public override Model.PromocijaFM.PromocijaBicikli Insert(PromocijaBicikliInsertR request)
+        {
+            var entity = new Database.PromocijaBicikli();
+            BeforeInsert(request, entity);
+            var state = _baseDrugaGrupaState.CreateState("kreiran");
+            return state.Insert(entity);
         }
 
         public override void BeforeUpdate(PromocijaBicikliUpdateR request, Database.PromocijaBicikli entity)
@@ -112,14 +120,6 @@ namespace BikeHub.Services
                 entity.CijenaPromocije = brojDana * 5;
             }
             base.BeforeUpdate(request, entity);
-        }
-
-        public override Model.PromocijaFM.PromocijaBicikli Insert(PromocijaBicikliInsertR request)
-        {
-            var entity = new Database.PromocijaBicikli();
-            BeforeInsert(request, entity);
-            var state = _baseDrugaGrupaState.CreateState("kreiran");
-            return state.Insert(request);
         }
 
         public override Model.PromocijaFM.PromocijaBicikli Update(int id, PromocijaBicikliUpdateR request)

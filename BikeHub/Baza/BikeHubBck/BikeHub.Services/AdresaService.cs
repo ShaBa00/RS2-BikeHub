@@ -71,23 +71,30 @@ namespace BikeHub.Services
             {
                 throw new UserException("Nova adresa se ne može dodati jer već postoji stara adresa za istog korisnika. Potrebno je ažurirati postojeću adresu.");
             }
-            entity.KorisnikId = request.KorisnikId;
             if (string.IsNullOrWhiteSpace(request.Grad))
             {
                 throw new UserException("Grad ne smije biti prazan");
             }
-            entity.Grad = request.Grad;
             if (string.IsNullOrWhiteSpace(request.PostanskiBroj))
             {
                 throw new UserException("Poštanski broj ne smije biti prazan");
             }
-            entity.PostanskiBroj = request.PostanskiBroj;
             if (string.IsNullOrWhiteSpace(request.Ulica))
             {
                 throw new UserException("Ulica ne smije biti prazna");
             }
+            entity.KorisnikId = request.KorisnikId;
+            entity.Grad = request.Grad;
+            entity.PostanskiBroj = request.PostanskiBroj;
             entity.Ulica = request.Ulica;
             base.BeforeInsert(request, entity);
+        }
+        public override Model.AdresaFM.Adresa Insert(AdresaInsertR request)
+        {
+            var entity = new Database.Adresa();
+            BeforeInsert(request, entity);
+            var state = _basePrvaGrupaState.CreateState("kreiran");
+            return state.Insert(request);
         }
 
         public override void BeforeUpdate(AdresaUpdateR request, Database.Adresa entity)
@@ -107,13 +114,6 @@ namespace BikeHub.Services
             base.BeforeUpdate(request, entity);
         }
 
-        public override Model.AdresaFM.Adresa Insert(AdresaInsertR request)
-        {
-            var entity = new Database.Adresa();
-            BeforeInsert(request, entity);
-            var state = _basePrvaGrupaState.CreateState("kreiran");
-            return state.Insert(request);
-        }
         public override Model.AdresaFM.Adresa Update(int id, AdresaUpdateR request)
         {
             var set = Context.Set<Database.Adresa>();

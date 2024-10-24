@@ -15,5 +15,6 @@ namespace BikeHub.Model.ServisFM
         public int? BrojServisa { get; set; }
 
         public string? Status { get; set; }
+        public decimal? UkupnaOcjena { get; set; }
     }
 }

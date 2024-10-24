@@ -63,23 +63,19 @@ namespace BikeHub.Services
             {
                 throw new UserException("Naziv dijela ne smije biti prazan");
             }
-            entity.Naziv = request.Naziv;
             if (request.Cijena <= 0)
             {
                 throw new UserException("Cijena dijela mora biti veća od nule");
             }
-            entity.Cijena = request.Cijena;
             var Korisnik = _context.Korisniks.Find(request.KorisnikId);
             if (Korisnik == null)
             {
                 throw new UserException("Korisnik s tim Id-om ne postoji");
             }
-            entity.KorisnikId = request.KorisnikId;
             if (request.Kolicina <= 0)
             {
                 throw new UserException("Kolicina dijela mora biti veća od nule");
             }
-            entity.Kolicina = request.Kolicina;
             if (request.KategorijaId <= 0)
             {
                 throw new UserException("Kategorija mora biti odabrana");
@@ -89,13 +85,25 @@ namespace BikeHub.Services
             {
                 throw new UserException("Kategorija sa datim ID-om ne postoji");
             }
-            entity.KategorijaId = request.KategorijaId;
             if (string.IsNullOrWhiteSpace(request.Opis))
             {
                 throw new UserException("Opis dijela ne smije biti prazan");
             }
+            entity.Naziv = request.Naziv;
+            entity.Cijena = request.Cijena;
             entity.Opis = request.Opis;
+            entity.KategorijaId = request.KategorijaId;
+            entity.Kolicina = request.Kolicina;
+            entity.KorisnikId = request.KorisnikId;
             base.BeforeInsert(request, entity);
+        }
+
+        public override Model.DijeloviFM.Dijelovi Insert(DijeloviInsertR request)
+        {
+            var entity = new Database.Dijelovi();
+            BeforeInsert(request, entity);
+            var state = _basePrvaGrupaState.CreateState("kreiran");
+            return state.Insert(request);
         }
 
         public override void BeforeUpdate(DijeloviUpdateR request, Database.Dijelovi entity)
@@ -139,13 +147,7 @@ namespace BikeHub.Services
             }
             base.BeforeUpdate(request, entity);
         }
-        public override Model.DijeloviFM.Dijelovi Insert(DijeloviInsertR request)
-        {
-            var entity = new Database.Dijelovi();
-            BeforeInsert(request, entity);
-            var state = _basePrvaGrupaState.CreateState("kreiran");
-            return state.Insert(request);
-        }
+
         public override Model.DijeloviFM.Dijelovi Update(int id, DijeloviUpdateR request)
         {
             var set = Context.Set<Database.Dijelovi>();
@@ -158,6 +160,7 @@ namespace BikeHub.Services
             var state = _basePrvaGrupaState.CreateState(entity.Status);
             return state.Update(id, request);
         }
+        
         public override void SoftDelete(int id)
         {
             var entity = GetById(id);

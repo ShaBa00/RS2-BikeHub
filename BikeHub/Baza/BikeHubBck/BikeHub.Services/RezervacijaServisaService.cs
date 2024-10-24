@@ -19,12 +19,13 @@ namespace BikeHub.Services
     Model.ServisFM.RezervacijaServisaInsertR, Model.ServisFM.RezervacijaServisaUpdateR> _baseDrugaGrupaState;
 
         public RezervacijaServisaService(BikeHubDbContext context, IMapper mapper, BaseDrugaGrupaState<Model.ServisFM.RezervacijaServisa, Database.RezervacijaServisa,
-    Model.ServisFM.RezervacijaServisaInsertR, Model.ServisFM.RezervacijaServisaUpdateR> baseDrugaGrupaState)
-        : base(context, mapper)
-        {
-            _context = context;
-            _baseDrugaGrupaState = baseDrugaGrupaState;
-        }
+            Model.ServisFM.RezervacijaServisaInsertR, Model.ServisFM.RezervacijaServisaUpdateR> baseDrugaGrupaState)
+            : base(context, mapper)
+            {
+                _context = context;
+                _baseDrugaGrupaState = baseDrugaGrupaState;
+            }
+
         public override IQueryable<Database.RezervacijaServisa> AddFilter(RezervacijaServisaSearchObject search, IQueryable<Database.RezervacijaServisa> query)
         {
             var NoviQuery = base.AddFilter(search, query);
@@ -71,12 +72,30 @@ namespace BikeHub.Services
             {
                 throw new UserException("Datum kreiranja ne smije biti veći od datuma rezervacije.");
             }
-            entity.Ocjena = 0;
+            if (request.DatumRezervacije.Date <= DateTime.Now.Date)
+            {
+                throw new UserException("Datum rezervacije mora biti u budućnosti.");
+            }
+            var existingReservation = _context.RezervacijaServisas
+                .Where(r => r.ServiserId == request.ServiserId && r.DatumRezervacije.Date == request.DatumRezervacije.Date)
+                .FirstOrDefault();
+            if (existingReservation != null)
+            {
+                throw new UserException($"Serviser već ima rezervaciju za {request.DatumRezervacije.Date.ToShortDateString()}.");
+            }
             entity.KorisnikId = request.KorisnikId;
             entity.ServiserId = request.ServiserId;
             entity.DatumKreiranja = request.DatumKreiranja;
             entity.DatumRezervacije = request.DatumRezervacije;
             base.BeforeInsert(request, entity);
+        }
+
+        public override Model.ServisFM.RezervacijaServisa Insert(RezervacijaServisaInsertR request)
+        {
+            var entity = new Database.RezervacijaServisa();
+            BeforeInsert(request, entity);
+            var state = _baseDrugaGrupaState.CreateState("kreiran");
+            return state.Insert(request);
         }
 
         public override void BeforeUpdate(RezervacijaServisaUpdateR request, Database.RezervacijaServisa entity)
@@ -106,14 +125,6 @@ namespace BikeHub.Services
                 entity.Ocjena = request.Ocjena;
             }
             base.BeforeUpdate(request, entity);
-        }
-
-        public override Model.ServisFM.RezervacijaServisa Insert(RezervacijaServisaInsertR request)
-        {
-            var entity = new Database.RezervacijaServisa();
-            BeforeInsert(request, entity);
-            var state = _baseDrugaGrupaState.CreateState("kreiran");
-            return state.Insert(request);
         }
 
         public override Model.ServisFM.RezervacijaServisa Update(int id, RezervacijaServisaUpdateR request)

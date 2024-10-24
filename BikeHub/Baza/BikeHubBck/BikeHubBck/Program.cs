@@ -46,6 +46,7 @@ builder.Services.AddTransient<IRecommendedKategorijaService, RecommendedKategori
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<FunctionHelper>();
 
+builder.Services.AddHostedService<DailyServiceUpdate>();
 
 
 StateRegistrationHelper.RegisterStates<BikeHub.Model.AdresaFM.Adresa, BikeHub.Services.Database.Adresa, AdresaInsertR, AdresaUpdateR>(builder.Services);
@@ -61,11 +62,11 @@ StateRegistrationHelper.RegisterStates<BikeHub.Model.SpaseniFM.SpaseniBicikli, B
 StateRegistrationHelper.RegisterStates<BikeHub.Model.SpaseniFM.SpaseniDijelovi, BikeHub.Services.Database.SpaseniDijelovi, SpaseniDijeloviInsertR, SpaseniDijeloviUpdateR>(builder.Services);
 
 StateRegistrationHelper.DrugiRegisterStates<BikeHub.Model.ServisFM.RezervacijaServisa, BikeHub.Services.Database.RezervacijaServisa, RezervacijaServisaInsertR, RezervacijaServisaUpdateR>(builder.Services);
-StateRegistrationHelper.DrugiRegisterStates<BikeHub.Model.NarudzbaFM.Narudzba, BikeHub.Services.Database.Narudzba, NarudzbaInsertR, NarudzbaUpdateR>(builder.Services);
+StateRegistrationHelper.DrugiRegisterStates<BikeHub.Model.NarudzbaFM.Narudzba, BikeHub.Services.Database.Narudzba, BikeHub.Services.Database.Narudzba, NarudzbaUpdateR>(builder.Services);
 StateRegistrationHelper.DrugiRegisterStates<BikeHub.Model.NarudzbaFM.NarudzbaDijelovi, BikeHub.Services.Database.NarudzbaDijelovi, BikeHub.Services.Database.NarudzbaDijelovi, NarudzbaDijeloviUpdateR>(builder.Services);
 StateRegistrationHelper.DrugiRegisterStates<BikeHub.Model.NarudzbaFM.NarudzbaBicikli, BikeHub.Services.Database.NarudzbaBicikli, BikeHub.Services.Database.NarudzbaBicikli, NarudzbaBicikliUpdateR>(builder.Services);
-StateRegistrationHelper.DrugiRegisterStates<BikeHub.Model.PromocijaFM.PromocijaBicikli, BikeHub.Services.Database.PromocijaBicikli, PromocijaBicikliInsertR, PromocijaBicikliUpdateR>(builder.Services);
-StateRegistrationHelper.DrugiRegisterStates<BikeHub.Model.PromocijaFM.PromocijaDijelovi, BikeHub.Services.Database.PromocijaDijelovi, PromocijaDijeloviInsertR, PromocijaDijeloviUpdateR>(builder.Services);
+StateRegistrationHelper.DrugiRegisterStates<BikeHub.Model.PromocijaFM.PromocijaBicikli, BikeHub.Services.Database.PromocijaBicikli, BikeHub.Services.Database.PromocijaBicikli, PromocijaBicikliUpdateR>(builder.Services);
+StateRegistrationHelper.DrugiRegisterStates<BikeHub.Model.PromocijaFM.PromocijaDijelovi, BikeHub.Services.Database.PromocijaDijelovi, BikeHub.Services.Database.PromocijaDijelovi, PromocijaDijeloviUpdateR>(builder.Services);
 
 builder.Services.AddControllers(x =>
 {

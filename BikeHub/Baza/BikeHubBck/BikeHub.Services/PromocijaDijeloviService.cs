@@ -16,14 +16,15 @@ namespace BikeHub.Services
     {
         private BikeHubDbContext _context;
         public BaseDrugaGrupaState<Model.PromocijaFM.PromocijaDijelovi, Database.PromocijaDijelovi,
-            Model.PromocijaFM.PromocijaDijeloviInsertR, Model.PromocijaFM.PromocijaDijeloviUpdateR> _baseDrugaGrupaState;
+            Database.PromocijaDijelovi, Model.PromocijaFM.PromocijaDijeloviUpdateR> _baseDrugaGrupaState;
         public PromocijaDijeloviService(BikeHubDbContext context, IMapper mapper, BaseDrugaGrupaState<Model.PromocijaFM.PromocijaDijelovi, Database.PromocijaDijelovi,
-            Model.PromocijaFM.PromocijaDijeloviInsertR, Model.PromocijaFM.PromocijaDijeloviUpdateR> baseDrugaGrupaState) 
+            Database.PromocijaDijelovi, Model.PromocijaFM.PromocijaDijeloviUpdateR> baseDrugaGrupaState) 
         : base(context, mapper)
         {
             _context = context;
             _baseDrugaGrupaState = baseDrugaGrupaState;
         }
+
         public override IQueryable<Database.PromocijaDijelovi> AddFilter(PromocijaDijeloviSearchObject search, IQueryable<Database.PromocijaDijelovi> query)
         {
             var NoviQuery = base.AddFilter(search, query);
@@ -64,6 +65,14 @@ namespace BikeHub.Services
             var brojDana = (request.DatumZavrsetka - request.DatumPocetka).Days + 1;
             entity.CijenaPromocije = brojDana * 5;
             base.BeforeInsert(request, entity); 
+        }
+
+        public override Model.PromocijaFM.PromocijaDijelovi Insert(PromocijaDijeloviInsertR request)
+        {
+            var entity = new Database.PromocijaDijelovi();
+            BeforeInsert(request, entity);
+            var state = _baseDrugaGrupaState.CreateState("kreiran");
+            return state.Insert(entity);
         }
 
         public override void BeforeUpdate(PromocijaDijeloviUpdateR request, Database.PromocijaDijelovi entity)
@@ -112,14 +121,6 @@ namespace BikeHub.Services
                 entity.CijenaPromocije = brojDana * 5;
             }
             base.BeforeUpdate(request, entity);
-        }
-
-        public override Model.PromocijaFM.PromocijaDijelovi Insert(PromocijaDijeloviInsertR request)
-        {
-            var entity = new Database.PromocijaDijelovi();
-            BeforeInsert(request, entity);
-            var state = _baseDrugaGrupaState.CreateState("kreiran");
-            return state.Insert(request);
         }
 
         public override Model.PromocijaFM.PromocijaDijelovi Update(int id, PromocijaDijeloviUpdateR request)

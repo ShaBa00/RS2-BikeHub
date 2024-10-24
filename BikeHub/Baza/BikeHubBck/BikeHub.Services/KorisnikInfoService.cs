@@ -51,6 +51,7 @@ namespace BikeHub.Services
             }
             return NoviQuery;
         }
+       
         public override void BeforeInsert(KorisnikInfoInsertR request, Database.KorisnikInfo entity)
         {
             if (request.KorisnikId == 0)
@@ -87,10 +88,17 @@ namespace BikeHub.Services
             entity.KorisnikId = request.KorisnikId;
             entity.ImePrezime = request.ImePrezime;
             entity.Telefon = request.Telefon;
-            entity.BrojNarudbi = 0;
-            entity.BrojServisa = 0;
             base.BeforeInsert(request, entity);
         }
+
+        public override Model.KorisnikFM.KorisnikInfo Insert(KorisnikInfoInsertR request)
+        {
+            var entity = new Database.KorisnikInfo();
+            BeforeInsert(request, entity);
+            var state = _basePrvaGrupaState.CreateState("kreiran");
+            return state.Insert(request);
+        }
+        
         public override void BeforeUpdate(KorisnikInfoUpdateR request, Database.KorisnikInfo entity)
         {
             if (!string.IsNullOrWhiteSpace(request.ImePrezime))
@@ -101,31 +109,9 @@ namespace BikeHub.Services
             {
                 entity.Telefon = request.Telefon;
             }
-            if (request.BrojNarudbi != null)
-            {
-                if (request.BrojNarudbi < 0)
-                {
-                    throw new UserException("Broj narudbi ne smije biti negativan.");
-                }
-                entity.BrojNarudbi = (int)request.BrojNarudbi;
-            }
-            if (request.BrojServisa != null)
-            {
-                if (request.BrojServisa < 0)
-                {
-                    throw new UserException("Broj servisa ne smije biti negativan.");
-                }
-                entity.BrojServisa = (int)request.BrojServisa;
-            }
             base.BeforeUpdate(request, entity);
         }
-        public override Model.KorisnikFM.KorisnikInfo Insert(KorisnikInfoInsertR request)
-        {
-            var entity = new Database.KorisnikInfo();
-            BeforeInsert(request, entity);
-            var state = _basePrvaGrupaState.CreateState("kreiran");
-            return state.Insert(request);
-        }
+        
         public override Model.KorisnikFM.KorisnikInfo Update(int id, KorisnikInfoUpdateR request)
         {
             var set = Context.Set<Database.KorisnikInfo>();
@@ -138,6 +124,7 @@ namespace BikeHub.Services
             var state = _basePrvaGrupaState.CreateState(entity.Status);
             return state.Update(id, request);
         }
+        
         public override void SoftDelete(int id)
         {
             var entity = GetById(id);

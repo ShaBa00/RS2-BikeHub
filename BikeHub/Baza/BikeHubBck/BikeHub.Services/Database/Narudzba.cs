@@ -13,6 +13,8 @@ public partial class Narudzba
 
     public string Status { get; set; } = null!;
 
+    public decimal? UkupnaCijena { get; set; }
+
     public virtual Korisnik Korisnik { get; set; } = null!;
 
     public virtual ICollection<NarudzbaBicikli> NarudzbaBiciklis { get; set; } = new List<NarudzbaBicikli>();

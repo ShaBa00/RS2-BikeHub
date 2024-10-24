@@ -53,6 +53,14 @@ namespace BikeHub.Services
             base.BeforeInsert(request, entity);
         }
 
+        public override Model.KategorijaFM.Kategorija Insert(KategorijaInsertR request)
+        {
+            var entity = new Database.Kategorija();
+            BeforeInsert(request, entity);
+            var state = _basePrvaGrupaState.CreateState("kreiran");
+            return state.Insert(request);
+        }
+
         public override void BeforeUpdate(KategorijaUpdateR request, Database.Kategorija entity)
         {
             if (!string.IsNullOrWhiteSpace(request.Naziv))
@@ -67,14 +75,6 @@ namespace BikeHub.Services
             base.BeforeUpdate(request, entity);
         }
 
-        public override Model.KategorijaFM.Kategorija Insert(KategorijaInsertR request)
-        {
-            var entity = new Database.Kategorija();
-            BeforeInsert(request, entity);
-            var state = _basePrvaGrupaState.CreateState("kreiran");
-            return state.Insert(request);
-        }
-
         public override Model.KategorijaFM.Kategorija Update(int id, KategorijaUpdateR request)
         {
             var set = Context.Set<Database.Kategorija>();
@@ -87,6 +87,7 @@ namespace BikeHub.Services
             var state = _basePrvaGrupaState.CreateState(entity.Status);
             return state.Update(id, request);
         }
+
         public override void SoftDelete(int id)
         {
             var entity = GetById(id);

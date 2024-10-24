@@ -44,7 +44,7 @@ namespace BikeHubBck.Controllers
             return Ok();
         }
         [HttpPut("zavrsi/{id}")]
-        public  IActionResult Zavrsavanje(int id)
+        public virtual  IActionResult Zavrsavanje(int id)
         {
             if (!IsUserAdmin())
             {

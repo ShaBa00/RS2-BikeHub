@@ -25,6 +25,7 @@ namespace BikeHub.Services
             _context = context;
             _basePrvaGrupaState = basePrvaGrupaState;
         }
+
         public override IQueryable<Database.Serviser> AddFilter(ServiserSearchObject search, IQueryable<Database.Serviser> query)
         {
             var NoviQuery = base.AddFilter(search, query);
@@ -35,6 +36,10 @@ namespace BikeHub.Services
             if (search?.Cijena != null)
             {
                 NoviQuery = NoviQuery.Where(x => x.Cijena == search.Cijena);
+            }
+            if (search?.UkupnaOcjena != null)
+            {
+                NoviQuery = NoviQuery.Where(x => x.UkupnaOcjena == search.UkupnaOcjena);
             }
             if (search?.BrojServisa != null)
             {
@@ -58,10 +63,17 @@ namespace BikeHub.Services
             {
                 throw new UserException("Cijena mora biti veća od 0.");
             }
-            entity.BrojServisa = 0;
             entity.KorisnikId = request.KorisnikId;
             entity.Cijena = request.Cijena;
             base.BeforeInsert(request, entity);
+        }
+
+        public override Model.ServisFM.Serviser Insert(ServiserInsertR request)
+        {
+            var entity = new Database.Serviser();
+            BeforeInsert(request, entity);
+            var state = _basePrvaGrupaState.CreateState("kreiran");
+            return state.Insert(request);
         }
 
         public override void BeforeUpdate(ServiserUpdateR request, Database.Serviser entity)
@@ -83,14 +95,6 @@ namespace BikeHub.Services
                 entity.BrojServisa = request.BrojServisa.Value;
             }
             base.BeforeUpdate(request, entity);
-        }
-
-        public override Model.ServisFM.Serviser Insert(ServiserInsertR request)
-        {
-            var entity = new Database.Serviser();
-            BeforeInsert(request, entity);
-            var state = _basePrvaGrupaState.CreateState("kreiran");
-            return state.Insert(request);
         }
 
         public override Model.ServisFM.Serviser Update(int id, ServiserUpdateR request)

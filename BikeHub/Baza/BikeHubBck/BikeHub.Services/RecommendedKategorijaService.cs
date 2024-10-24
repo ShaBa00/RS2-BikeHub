@@ -82,8 +82,6 @@ namespace BikeHub.Services
             {
                 throw new UserException("Već postoji preporučena kategorija sa istom kombinacijom DijeloviId i BicikliId.");
             }
-            entity.BicikliId = request.BicikliId;
-            entity.DijeloviId = request.DijeloviId;
             if(request?.DatumKreiranja==null)
             {
                 entity.DatumKreiranja = DateTime.Now;
@@ -92,8 +90,17 @@ namespace BikeHub.Services
             {
                 entity.DatumKreiranja = request.DatumKreiranja;
             }
-            entity.BrojPreporuka=0;
+            entity.BicikliId = request.BicikliId;
+            entity.DijeloviId = request.DijeloviId;
             base.BeforeInsert(request, entity);
+        }
+
+        public override Model.RecommendedKategorijaFM.RecommendedKategorija Insert(RecommendedKategorijaInsertR request)
+        {
+            var entity = new Database.RecommendedKategorija();
+            BeforeInsert(request, entity);
+            var state = _basePrvaGrupaState.CreateState("kreiran");
+            return state.Insert(request);
         }
 
         public override void BeforeUpdate(RecommendedKategorijaUpdateR request, Database.RecommendedKategorija entity)
@@ -133,14 +140,6 @@ namespace BikeHub.Services
                 entity.BrojPreporuka = request.BrojPreporuka.Value;
             }
             base.BeforeUpdate(request, entity);
-        }
-
-        public override Model.RecommendedKategorijaFM.RecommendedKategorija Insert(RecommendedKategorijaInsertR request)
-        {
-            var entity = new Database.RecommendedKategorija();
-            BeforeInsert(request, entity);
-            var state = _basePrvaGrupaState.CreateState("kreiran");
-            return state.Insert(request);
         }
 
         public override Model.RecommendedKategorijaFM.RecommendedKategorija Update(int id, RecommendedKategorijaUpdateR request)

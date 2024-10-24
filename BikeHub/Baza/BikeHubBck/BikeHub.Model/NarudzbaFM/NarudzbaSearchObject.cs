@@ -10,6 +10,7 @@ namespace BikeHub.Model.NarudzbaFM
         public DateTime? DatumNarudzbe { get; set; }
         public string? Status { get; set; } = null!;
         public bool? NarudzbaBicikliIncluded { get; set; }
+        public decimal? UkupnaCijena { get; set; }
         public bool? NarudzbaDijeloviIncluded { get; set; }
     }
 }

@@ -74,38 +74,31 @@ namespace BikeHub.Services
             {
                 throw new UserException("Naziv bicikla ne smije biti prazan");
             }
-            entity.Naziv = request.Naziv;
             var Korisnik = _context.Korisniks.Find(request.KorisnikId);
             if (Korisnik == null)
             {
                 throw new UserException("Korisnik s tim Id-om ne postoji");
             }
-            entity.KorisnikId = request.KorisnikId;
             if (request.Cijena <= 0)
             {
                 throw new UserException("Cijena bicikla mora biti veća od nule");
             }
-            entity.Cijena = request.Cijena;
             if (string.IsNullOrWhiteSpace(request.VelicinaRama))
             {
                 throw new UserException("Veličina rama ne smije biti prazna");
             }
-            entity.VelicinaRama = request.VelicinaRama;
             if (string.IsNullOrWhiteSpace(request.VelicinaTocka))
             {
                 throw new UserException("Veličina točka ne smije biti prazna");
             }
-            entity.VelicinaTocka = request.VelicinaTocka;
             if (request.BrojBrzina <= 0)
             {
                 throw new UserException("Broj brzina mora biti veći od nule");
             }
-            entity.BrojBrzina = request.BrojBrzina;
             if (request.Kolicina <= 0)
             {
                 throw new UserException("Kolicina mora biti veći od nule");
             }
-            entity.Kolicina = request.Kolicina;
             if (request.KategorijaId <= 0)
             {
                 throw new UserException("Kategorija mora biti odabrana");
@@ -115,8 +108,23 @@ namespace BikeHub.Services
             {
                 throw new UserException("Kategorija sa datim ID-om ne postoji");
             }
+            entity.Naziv = request.Naziv;
+            entity.Cijena = request.Cijena;
+            entity.VelicinaRama = request.VelicinaRama;
+            entity.VelicinaTocka = request.VelicinaTocka;
+            entity.BrojBrzina = request.BrojBrzina;
             entity.KategorijaId = request.KategorijaId;
+            entity.Kolicina = request.Kolicina;
+            entity.KorisnikId = request.KorisnikId;
             base.BeforeInsert(request, entity);
+        }
+
+        public override Bicikli Insert(BicikliInsertR request)
+        {
+            var entity = new Database.Bicikl();
+            BeforeInsert(request, entity);
+            var state = _basePrvaGrupaState.CreateState("kreiran");
+            return state.Insert(request);
         }
 
         public override void BeforeUpdate(BicikliUpdateR request, Bicikl entity)
@@ -175,14 +183,6 @@ namespace BikeHub.Services
                 entity.KategorijaId = request.KategorijaId.Value;
             }
             base.BeforeUpdate(request, entity);
-        }
-
-        public override Bicikli Insert(BicikliInsertR request)
-        {
-            var entity = new Database.Bicikl();
-            BeforeInsert(request, entity);
-            var state = _basePrvaGrupaState.CreateState("kreiran");
-            return state.Insert(request);
         }
 
         public override Bicikli Update(int id, BicikliUpdateR request)

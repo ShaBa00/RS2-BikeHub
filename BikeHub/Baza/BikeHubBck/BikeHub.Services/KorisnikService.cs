@@ -4,6 +4,7 @@ using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,16 +54,6 @@ namespace BikeHub.Services
             return NoviQuery;
         }
 
-        public override void BeforeInsert(KorisniciInsertR request, Database.Korisnik entity)
-        {
-            if (request.Lozinka != request.LozinkaPotvrda)
-            {
-                throw new UserException("Lozinka i LozinkaPotvrda moraju biti iste");
-            }
-            entity.LozinkaSalt = GenerateSalt();
-            entity.LozinkaHash = GenerateHash(entity.LozinkaSalt, request.Lozinka);
-            base.BeforeInsert(request, entity);
-        }
         public static string GenerateSalt()
         {
             var byteArray = RNGCryptoServiceProvider.GetBytes(16);
@@ -85,12 +76,50 @@ namespace BikeHub.Services
             return Convert.ToBase64String(inArray);
         }
 
+        public override void BeforeInsert(KorisniciInsertR request, Database.Korisnik entity)
+        {
+            if (request.Lozinka != request.LozinkaPotvrda)
+            {
+                throw new UserException("Lozinka i LozinkaPotvrda moraju biti iste");
+            }
+            if (request.Username.IsNullOrEmpty())
+            {
+                throw new UserException("Username mora biti unesen");
+            }
+            if (request.Email.IsNullOrEmpty())
+            {
+                throw new UserException("Email mora biti unesen");
+            }
+            entity.Username = request.Username;
+            entity.Email = request.Username;
+            entity.LozinkaSalt = GenerateSalt();
+            entity.LozinkaHash = GenerateHash(entity.LozinkaSalt, request.Lozinka);
+            base.BeforeInsert(request, entity);
+        }
+
+        public override Model.KorisnikFM.Korisnik Insert(KorisniciInsertR request)
+        {
+            var entity = Mapper.Map<Database.Korisnik>(request);
+            BeforeInsert(request, entity);
+            var state = _basePrvaGrupaState.CreateState("kreiran");
+            var noviRequest = Mapper.Map<KorisniciInsertRHS>(entity);
+            return state.Insert(noviRequest);
+        }
+
         public override void BeforeUpdate(KorisniciUpdateR request, Database.Korisnik entity)
         {
             var korisnik = _context.Korisniks.FirstOrDefault(x=>x.Username==request.Username);
             if(korisnik != null)
             {
                 throw new UserException("Username je zauzet");
+            }
+            if (!request.Username.IsNullOrEmpty())
+            {
+                entity.Username = request.Username;
+            }
+            if (!request.Email.IsNullOrEmpty())
+            {
+                entity.Email = request.Email;
             }
             if (request.Lozinka != null)
             {
@@ -105,15 +134,6 @@ namespace BikeHub.Services
             base.BeforeUpdate(request, entity);
         }
 
-        public override Model.KorisnikFM.Korisnik Insert(KorisniciInsertR request)
-        {
-            var entity = Mapper.Map<Database.Korisnik>(request);
-            BeforeInsert(request, entity);
-            var state = _basePrvaGrupaState.CreateState("kreiran");
-            var noviRequest = Mapper.Map<KorisniciInsertRHS>(entity);
-            return state.Insert(noviRequest);
-        }
-
         public override Model.KorisnikFM.Korisnik Update(int id, KorisniciUpdateR request)
         {
             var set = Context.Set<Database.Korisnik>();
@@ -126,6 +146,7 @@ namespace BikeHub.Services
             var state = _basePrvaGrupaState.CreateState(entity.Status);
             return state.Update(id, request);
         }
+
         public override void SoftDelete(int id)
         {
             var entity = GetById(id);
@@ -142,7 +163,6 @@ namespace BikeHub.Services
             var state = _basePrvaGrupaState.CreateState(entity.Status);
             state.Delete(id);
         }
-
 
         public Model.KorisnikFM.Korisnik Promjeni(int id, KorisniciUpdateR request)
         {

@@ -99,5 +99,32 @@ namespace BikeHubBck.Controllers
             }
              return base.SoftDelete(id);
         }
+        public override IActionResult Zavrsavanje(int id)
+        {
+            var currentUsername = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var promocija = _context.PromocijaBiciklis.Find(id);
+            if (promocija == null) return NotFound();
+
+            var bicikl = _context.Bicikls.Find(promocija.BiciklId);
+            if (bicikl == null) return NotFound();
+            if (promocija.DatumZavrsetka < DateTime.Now)
+            {
+                promocija.Status = "zavrseno";
+                _context.SaveChanges();
+                return Ok("Promocija automatski završena jer je datum završetka istekao.");
+            }
+            if (currentUsername != null)
+            {
+                var currentUser = _context.Korisniks.FirstOrDefault(x => x.Username == currentUsername);
+
+                if (currentUser != null && (currentUser.IsAdmin == true || bicikl.KorisnikId == currentUser.KorisnikId))
+                {
+                    promocija.Status = "zavrseno";
+                    _context.SaveChanges();
+                    return Ok("Promocija uspješno završena.");
+                }
+            }
+            return Unauthorized("Nemate dozvolu za završavanje ove promocije.");
+        }
     }
 }

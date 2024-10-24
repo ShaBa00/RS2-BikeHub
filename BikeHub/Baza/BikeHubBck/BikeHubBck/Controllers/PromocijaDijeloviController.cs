@@ -5,6 +5,7 @@ using BikeHub.Services.Database;
 using BikeHubBck.Ostalo;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using System.Security.Claims;
 
 namespace BikeHubBck.Controllers
@@ -96,6 +97,34 @@ namespace BikeHubBck.Controllers
                 }
             }
             return base.SoftDelete(id);
+        }
+
+        public override IActionResult Zavrsavanje(int id)
+        {
+            var currentUsername = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var promocija = _context.PromocijaDijelovis.Find(id);
+            if (promocija == null) return NotFound();
+
+            var dio = _context.Dijelovis.Find(promocija.DijeloviId);
+            if (dio == null) return NotFound();
+            if (promocija.DatumZavrsetka < DateTime.Now)
+            {
+                promocija.Status = "zavrseno";
+                _context.SaveChanges();
+                return Ok("Promocija automatski završena jer je datum završetka istekao.");
+            }
+            if (currentUsername != null)
+            {
+                var currentUser = _context.Korisniks.FirstOrDefault(x => x.Username == currentUsername);
+
+                if (currentUser != null && (currentUser.IsAdmin == true || dio.KorisnikId == currentUser.KorisnikId))
+                {
+                    promocija.Status = "zavrseno";
+                    _context.SaveChanges();
+                    return Ok("Promocija uspješno završena.");
+                }
+            }
+            return Unauthorized("Nemate dozvolu za završavanje ove promocije.");
         }
     }
 }

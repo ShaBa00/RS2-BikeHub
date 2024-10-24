@@ -15,6 +15,8 @@ public partial class Serviser
 
     public string? Status { get; set; }
 
+    public decimal? UkupnaOcjena { get; set; }
+
     public virtual Korisnik Korisnik { get; set; } = null!;
 
     public virtual ICollection<RezervacijaServisa> RezervacijaServisas { get; set; } = new List<RezervacijaServisa>();

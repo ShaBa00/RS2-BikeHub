@@ -61,5 +61,26 @@ namespace BikeHubBck.Controllers
             }
             return base.SoftDelete(id); 
         }
+        public override IActionResult Zavrsavanje(int id)
+        {
+            var narudzba = _context.Narudzbas.Find(id);
+            var currentUsername = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (currentUsername != null && narudzba != null)
+            {
+                if (_functionHelper.IsUserAdmin(currentUsername))
+                {
+                    _service.Zavrsavanje(id);
+                    return Ok();
+                }
+                if (!_functionHelper.IsCurrentUser(currentUsername, narudzba.KorisnikId))
+                {
+                    throw new UserException("Ne možete završiti narudžbu za drugog korisnika.");
+                }
+                _service.Zavrsavanje(id);
+                return Ok();
+            }
+            return NotFound("Narudžba nije pronađena.");
+        }
     }
 }

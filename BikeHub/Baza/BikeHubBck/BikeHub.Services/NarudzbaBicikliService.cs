@@ -44,6 +44,27 @@ namespace BikeHub.Services
             return NoviQuery;
         }
 
+        private void UpdateUkupnaCijenaNarudzbe(int narudzbaId, decimal novaCijena)
+        {
+            var narudzbaBicikliCijene = _context.NarudzbaBiciklis
+                .Where(nb => nb.NarudzbaId == narudzbaId)
+                .Select(nb => nb.Cijena)
+                .ToList();
+            var narudzbaDijeloviCijene = _context.NarudzbaDijelovis
+                .Where(nd => nd.NarudzbaId == narudzbaId)
+                .Select(nd => nd.Cijena)
+                .ToList();
+            var ukupnaCijenaPostojecih = narudzbaBicikliCijene.Sum() + narudzbaDijeloviCijene.Sum();
+            var ukupnaCijena = ukupnaCijenaPostojecih + novaCijena;
+            var narudzba = _context.Narudzbas.FirstOrDefault(n => n.NarudzbaId == narudzbaId);
+            if (narudzba != null)
+            {
+                narudzba.UkupnaCijena = ukupnaCijena;
+                _context.Narudzbas.Update(narudzba);
+                _context.SaveChanges();
+            }
+        }
+
         public override void BeforeInsert(NarudzbaBicikliInsertR request, Database.NarudzbaBicikli entity)
         {   
             if (request.NarudzbaId <= 0)
@@ -83,7 +104,16 @@ namespace BikeHub.Services
             entity.BiciklId = request.BiciklId;
             entity.Kolicina = request.Kolicina;
             entity.Cijena = bicikl.Cijena*request.Kolicina;
+            UpdateUkupnaCijenaNarudzbe(entity.NarudzbaId, entity.Cijena);
             base.BeforeInsert(request, entity);
+        }
+
+        public override Model.NarudzbaFM.NarudzbaBicikli Insert(NarudzbaBicikliInsertR request)
+        {
+            var entity = new Database.NarudzbaBicikli();
+            BeforeInsert(request, entity);
+            var state = _baseDrugaGrupaState.CreateState("kreiran");
+            return state.Insert(entity);
         }
 
         public override void BeforeUpdate(NarudzbaBicikliUpdateR request, Database.NarudzbaBicikli entity)
@@ -113,7 +143,10 @@ namespace BikeHub.Services
                     noviBicikl.Kolicina -= novaKolicina;
                     _context.Bicikls.Update(noviBicikl);
                     entity.Kolicina = novaKolicina;
+                    var staraVrijednost = _context.NarudzbaBiciklis.Find(entity.NarudzbaBicikliId).Cijena;
                     entity.Cijena = noviBicikl.Cijena * novaKolicina;
+                    var razlika = entity.Cijena - staraVrijednost;
+                    UpdateUkupnaCijenaNarudzbe(entity.NarudzbaId, razlika);
                 }
                 entity.BiciklId = request.BiciklId.Value;
                 _context.SaveChanges();
@@ -143,7 +176,10 @@ namespace BikeHub.Services
                 _context.SaveChanges();
 
                 entity.Kolicina = novaKolicina;
+                var staraVrijednost = _context.NarudzbaBiciklis.Find(entity.NarudzbaBicikliId).Cijena;
                 entity.Cijena = bicikl.Cijena * novaKolicina;
+                var Nrazlika = entity.Cijena - staraVrijednost;
+                UpdateUkupnaCijenaNarudzbe(entity.NarudzbaId, Nrazlika);
             }
             if (request.NarudzbaId.HasValue)
             {
@@ -155,14 +191,6 @@ namespace BikeHub.Services
                 entity.NarudzbaId = request.NarudzbaId.Value;
             }
             base.BeforeUpdate(request, entity);
-        }
-
-        public override Model.NarudzbaFM.NarudzbaBicikli Insert(NarudzbaBicikliInsertR request)
-        {
-            var entity = new Database.NarudzbaBicikli();
-            BeforeInsert(request, entity);
-            var state = _baseDrugaGrupaState.CreateState("kreiran");
-            return state.Insert(entity);
         }
 
         public override Model.NarudzbaFM.NarudzbaBicikli Update(int id, NarudzbaBicikliUpdateR request)

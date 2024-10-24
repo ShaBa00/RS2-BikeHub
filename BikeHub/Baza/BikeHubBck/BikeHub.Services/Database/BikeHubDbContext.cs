@@ -202,6 +202,7 @@ public partial class BikeHubDbContext : DbContext
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+            entity.Property(e => e.UkupnaCijena).HasColumnType("decimal(10, 2)");
 
             entity.HasOne(d => d.Korisnik).WithMany(p => p.Narudzbas)
                 .HasForeignKey(d => d.KorisnikId)
@@ -353,6 +354,7 @@ public partial class BikeHubDbContext : DbContext
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
                 .HasDefaultValueSql("('Aktivan')");
+            entity.Property(e => e.UkupnaOcjena).HasColumnType("decimal(3, 1)");
 
             entity.HasOne(d => d.Korisnik).WithMany(p => p.Servisers)
                 .HasForeignKey(d => d.KorisnikId)

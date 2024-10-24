@@ -64,13 +64,11 @@ namespace BikeHub.Services
             {
                 throw new UserException("Bicikl sa datim ID-om ne postoji.");
             }
-            entity.BiciklId = request.BiciklId;
             var korisnik = _context.Korisniks.Find(request.KorisnikId);
             if (korisnik == null)
             {
                 throw new UserException("Korisnik sa datim ID-om ne postoji.");
             }
-            entity.KorisnikId=request.KorisnikId;
             if (request.DatumSpasavanja == default(DateTime))
             {
                 entity.DatumSpasavanja = DateTime.Now;
@@ -79,7 +77,23 @@ namespace BikeHub.Services
             {
                 entity.DatumSpasavanja = request.DatumSpasavanja;
             }
+            bool biciklVećSačuvan = _context.SpaseniBiciklis
+             .Any(sb => sb.BiciklId == request.BiciklId && sb.KorisnikId == request.KorisnikId);
+            if (biciklVećSačuvan)
+            {
+                throw new UserException("Korisnik je već sačuvao ovo biciklo.");
+            }
+            entity.BiciklId = request.BiciklId;
+            entity.KorisnikId = request.KorisnikId;
             base.BeforeInsert(request, entity);
+        }
+
+        public override Model.SpaseniFM.SpaseniBicikli Insert(SpaseniBicikliInsertR request)
+        {
+            var entity = new Database.SpaseniBicikli();
+            BeforeInsert(request, entity);
+            var state = _basePrvaGrupaState.CreateState("kreiran");
+            return state.Insert(request);
         }
 
         public override void BeforeUpdate(SpaseniBicikliUpdateR request, Database.SpaseniBicikli entity)
@@ -107,14 +121,6 @@ namespace BikeHub.Services
                 entity.DatumSpasavanja = request.DatumSpasavanja.Value;
             }
             base.BeforeUpdate(request, entity);
-        }
-
-        public override Model.SpaseniFM.SpaseniBicikli Insert(SpaseniBicikliInsertR request)
-        {
-            var entity = new Database.SpaseniBicikli();
-            BeforeInsert(request, entity);
-            var state = _basePrvaGrupaState.CreateState("kreiran");
-            return state.Insert(request);
         }
 
         public override Model.SpaseniFM.SpaseniBicikli Update(int id, SpaseniBicikliUpdateR request)
