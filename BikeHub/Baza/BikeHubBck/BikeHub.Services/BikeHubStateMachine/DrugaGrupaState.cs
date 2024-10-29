@@ -18,7 +18,7 @@ namespace BikeHub.Services.BikeHubStateMachine
         {
             var set = Context.Set<TDbEntity>();
             var entity = Mapper.Map<TDbEntity>(request);
-            entity.GetType().GetProperty("Status").SetValue(entity, "kreiran"); // Kreiran prelazi u Izmijenjen
+            entity.GetType().GetProperty("Status").SetValue(entity, "kreiran"); 
             set.Add(entity);
             Context.SaveChanges();
 

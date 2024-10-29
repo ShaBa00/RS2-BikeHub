@@ -24,6 +24,7 @@ namespace BikeHubBck.Controllers
         {
             return base.GetList(searchObject);
         }
+
         [AllowAnonymous]
         public override BikeHub.Model.KorisnikFM.Korisnik GetById(int id)
         {
@@ -42,6 +43,7 @@ namespace BikeHubBck.Controllers
             }
             return base.Update(id, request);
         }
+
         public override IActionResult SoftDelete(int id)
         {
             var currentUsername = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -58,6 +60,13 @@ namespace BikeHubBck.Controllers
                 }
             }
             return base.SoftDelete(id);
+        }
+
+        [HttpPost("login")]
+        [AllowAnonymous]
+        public BikeHub.Model.KorisnikFM.Korisnik Login(string username, string password)
+        {
+            return (_service as IKorisnikService).Login(username, password);
         }
     }
 }

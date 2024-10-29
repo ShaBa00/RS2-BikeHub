@@ -16,16 +16,21 @@ namespace BikeHub.Services
     {
         private BikeHubDbContext _context;
 
-        public BasePrvaGrupaState<Model.SlikeFM.SlikeBicikli, Database.SlikeBicikli, Model.SlikeFM.SlikeBicikliInsertR,
-                                Model.SlikeFM.SlikeBicikliUpdateR> _basePrvaGrupaState;
-        public SlikeBicikliService(BikeHubDbContext context, IMapper mapper, BasePrvaGrupaState<Model.SlikeFM.SlikeBicikli, Database.SlikeBicikli, Model.SlikeFM.SlikeBicikliInsertR,
-                                Model.SlikeFM.SlikeBicikliUpdateR> basePrvaGrupaState) 
+        public BasePrvaGrupaState<Model.SlikeFM.SlikeBicikli, Database.SlikeBicikli,
+            Model.SlikeFM.SlikeBicikli,Model.SlikeFM.SlikeBicikli> _basePrvaGrupaState;
+
+
+        public SlikeBicikliService(BikeHubDbContext context, IMapper mapper,
+            BasePrvaGrupaState<Model.SlikeFM.SlikeBicikli, Database.SlikeBicikli,
+                Model.SlikeFM.SlikeBicikli,Model.SlikeFM.SlikeBicikli> basePrvaGrupaState) 
         : base(context, mapper)
         {
             _context = context;
             _basePrvaGrupaState = basePrvaGrupaState;
         }
-        public override IQueryable<Database.SlikeBicikli> AddFilter(SlikeBicikliSearchObject search, IQueryable<Database.SlikeBicikli> query)
+
+        public override IQueryable<Database.SlikeBicikli> AddFilter(SlikeBicikliSearchObject search, 
+            IQueryable<Database.SlikeBicikli> query)
         {
             var NoviQuery = base.AddFilter(search, query);
             if (search?.BiciklId != null)
@@ -38,49 +43,66 @@ namespace BikeHub.Services
             }
             return NoviQuery;
         }
+
         public override void BeforeInsert(SlikeBicikliInsertR request, Database.SlikeBicikli entity)
         {
             if (request?.BiciklId == null)
             {
                 throw new UserException("BiciklId ne smije biti null.");
             }
+    
             var bicikl = _context.Bicikls.Find(request.BiciklId);
             if (bicikl == null)
             {
                 throw new UserException("Bicikl sa datim ID-om ne postoji.");
             }
+
             if (request?.Slika == null || request.Slika.Length == 0)
             {
                 throw new UserException("Slika ne smije biti prazna.");
             }
+
+            using (var memoryStream = new MemoryStream())
+            {
+                request.Slika.CopyTo(memoryStream);
+                entity.Slika = memoryStream.ToArray(); 
+            }
+
             entity.BiciklId = request.BiciklId;
-            entity.Slika = request.Slika;
             base.BeforeInsert(request, entity);
         }
+
+        public override Model.SlikeFM.SlikeBicikli Insert(SlikeBicikliInsertR request)
+        {
+            var entity = new Database.SlikeBicikli();
+            BeforeInsert(request, entity);
+            var novo = Mapper.Map<Model.SlikeFM.SlikeBicikli>(entity);
+            var state = _basePrvaGrupaState.CreateState("kreiran");
+            return state.Insert(novo);
+        }
+
         public override void BeforeUpdate(SlikeBicikliUpdateR request, Database.SlikeBicikli entity)
         {
             if (request.BiciklId.HasValue)
             {
-                var bicikl = _context.Bicikls.Find(request.BiciklId.Value);
-                if (bicikl == null)
+                var biciklExists = _context.Bicikls.Any(b => b.BiciklId == request.BiciklId.Value);
+                if (!biciklExists)
                 {
                     throw new UserException("Bicikl sa datim ID-om ne postoji.");
                 }
                 entity.BiciklId = request.BiciklId.Value;
             }
-            //if (request.Slika != null && request.Slika.Length > 0)
-            //{
-            //    entity.Slika = request.Slika;
-            //}
+            if (request.Slika != null)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    request.Slika.CopyTo(memoryStream);
+                    entity.Slika = memoryStream.ToArray();
+                }
+            }
             base.BeforeUpdate(request, entity);
         }
-        public override Model.SlikeFM.SlikeBicikli Insert(SlikeBicikliInsertR request)
-        {
-            var entity = new Database.SlikeBicikli();
-            BeforeInsert(request, entity);
-            var state = _basePrvaGrupaState.CreateState("kreiran");
-            return state.Insert(request);
-        }
+
         public override Model.SlikeFM.SlikeBicikli Update(int id, SlikeBicikliUpdateR request)
         {
             var set = Context.Set<Database.SlikeBicikli>();
@@ -90,9 +112,11 @@ namespace BikeHub.Services
                 throw new UserException("Entitet sa datim ID-om ne postoji");
             }
             BeforeUpdate(request, entity);
+            var novo = Mapper.Map<Model.SlikeFM.SlikeBicikli>(entity);
             var state = _basePrvaGrupaState.CreateState(entity.Status);
-            return state.Update(id, request);
+            return state.Update(id, novo);
         }
+
         public override void SoftDelete(int id)
         {
             var entity = GetById(id);

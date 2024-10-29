@@ -3,6 +3,7 @@ using BikeHub.Model.BicikliFM;
 using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
 using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,13 +20,23 @@ namespace BikeHub.Services
         public BasePrvaGrupaState<Model.BicikliFM.Bicikli, Database.Bicikl,
         Model.BicikliFM.BicikliInsertR, Model.BicikliFM.BicikliUpdateR> _basePrvaGrupaState;
 
-        public BicikliService(BikeHubDbContext context, IMapper mapper, BasePrvaGrupaState<Model.BicikliFM.Bicikli, Database.Bicikl,
-        Model.BicikliFM.BicikliInsertR, Model.BicikliFM.BicikliUpdateR> basePrvaGrupaState)
-        :base(context,mapper){ _context = context; _basePrvaGrupaState = basePrvaGrupaState; }
+        private readonly SlikeBicikliService _slikeBicikliService;
 
-        public override IQueryable<Bicikl> AddFilter(BicikliSearchObject search, IQueryable<Bicikl> query)
+       public BicikliService(BikeHubDbContext context, IMapper mapper,
+           BasePrvaGrupaState<Model.BicikliFM.Bicikli, Database.Bicikl,
+         Model.BicikliFM.BicikliInsertR, Model.BicikliFM.BicikliUpdateR> basePrvaGrupaState,
+           ISlikeBicikliService slikeBicikliService)
+         : base(context, mapper)
+        {
+            _context = context; 
+            _basePrvaGrupaState = basePrvaGrupaState; 
+            _slikeBicikliService = (SlikeBicikliService)slikeBicikliService;
+        }
+
+        public override IQueryable<Database.Bicikl> AddFilter(BicikliSearchObject search, IQueryable<Database.Bicikl> query)
         {
             var NoviQuery = base.AddFilter(search, query);
+
             if (!string.IsNullOrWhiteSpace(search?.Naziv))
             {
                 NoviQuery = NoviQuery.Where(x => x.Naziv.StartsWith(search.Naziv));
@@ -50,23 +61,24 @@ namespace BikeHub.Services
             {
                 NoviQuery = NoviQuery.Where(x => x.VelicinaRama == search.VelicinaRama);
             }
-
             if (!string.IsNullOrWhiteSpace(search?.VelicinaTocka))
             {
                 NoviQuery = NoviQuery.Where(x => x.VelicinaTocka == search.VelicinaTocka);
             }
-
             if (search?.BrojBrzina != null)
             {
                 NoviQuery = NoviQuery.Where(x => x.BrojBrzina == search.BrojBrzina);
             }
-
             if (search?.KategorijaId != null)
             {
                 NoviQuery = NoviQuery.Where(x => x.KategorijaId == search.KategorijaId);
             }
+
+            NoviQuery = NoviQuery.Include(x => x.SlikeBiciklis);
+
             return NoviQuery;
         }
+
 
         public override void BeforeInsert(BicikliInsertR request, Bicikl entity)
         {
@@ -205,9 +217,29 @@ namespace BikeHub.Services
             {
                 throw new UserException("Entitet sa datim ID-om ne postoji.");
             }
-
+            var slikeBicikli = _context.SlikeBiciklis.Where(x => x.BiciklId == entity.BiciklId).ToList();
+            foreach(var slika in slikeBicikli)
+            {
+                _slikeBicikliService.SoftDelete(slika.SlikeBicikliId);
+            }
             var state = _basePrvaGrupaState.CreateState(entity.Status);
             state.Delete(id);
+        }
+
+        public override void Aktivacija(int id, bool aktivacija)
+        {
+            var entity = GetById(id);
+            if (entity == null)
+            {
+                throw new UserException("Entity not found.");
+            }
+            var slikeBicikli = _context.SlikeBiciklis.Where(x => x.BiciklId == entity.BiciklId).ToList();
+            foreach (var slika in slikeBicikli)
+            {
+                _slikeBicikliService.Aktivacija(slika.SlikeBicikliId,aktivacija);
+            }
+            var state = _basePrvaGrupaState.CreateState(entity.Status);
+            base.Aktivacija(id, aktivacija);
         }
 
         public override void Zavrsavanje(int id)

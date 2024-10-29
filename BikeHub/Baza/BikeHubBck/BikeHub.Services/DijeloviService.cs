@@ -20,9 +20,17 @@ namespace BikeHub.Services
         public BasePrvaGrupaState<Model.DijeloviFM.Dijelovi,Database.Dijelovi, Model.DijeloviFM.DijeloviInsertR,
             Model.DijeloviFM.DijeloviUpdateR> _basePrvaGrupaState;
 
-        public DijeloviService(BikeHubDbContext context, IMapper mapper, BasePrvaGrupaState<Model.DijeloviFM.Dijelovi, Database.Dijelovi, Model.DijeloviFM.DijeloviInsertR,
-            Model.DijeloviFM.DijeloviUpdateR> basePrvaGrupaState)
-        : base(context, mapper){ _context = context; _basePrvaGrupaState = basePrvaGrupaState; }
+        private readonly SlikeDijeloviService _slikeDijeloviService;
+
+        public DijeloviService(BikeHubDbContext context, IMapper mapper, BasePrvaGrupaState<Model.DijeloviFM.Dijelovi,
+            Database.Dijelovi, Model.DijeloviFM.DijeloviInsertR,
+            Model.DijeloviFM.DijeloviUpdateR> basePrvaGrupaState, ISlikeDijeloviService slikeDijeloviService)
+        : base(context, mapper)
+        {
+            _context = context;
+            _basePrvaGrupaState = basePrvaGrupaState;
+            _slikeDijeloviService = (SlikeDijeloviService)slikeDijeloviService;
+        }
         public override IQueryable<Database.Dijelovi> AddFilter(DijeloviSearchObject search, IQueryable<Database.Dijelovi> query)
         {
             var NoviQuery = base.AddFilter(search, query);
@@ -168,9 +176,29 @@ namespace BikeHub.Services
             {
                 throw new UserException("Entity not found.");
             }
-
+            var slikeDijelovi = _context.SlikeDijelovis.Where(x => x.DijeloviId == entity.DijeloviId).ToList();
+            foreach (var slika in slikeDijelovi)
+            {
+                _slikeDijeloviService.SoftDelete(slika.SlikeDijeloviId);
+            }
             var state = _basePrvaGrupaState.CreateState(entity.Status);
             state.Delete(id);
+        }
+
+        public override void Aktivacija(int id, bool aktivacija)
+        {
+            var entity = GetById(id);
+            if (entity == null)
+            {
+                throw new UserException("Entity not found.");
+            }
+            var slikeDijelovi = _context.SlikeDijelovis.Where(x => x.DijeloviId == entity.DijeloviId).ToList();
+            foreach (var slika in slikeDijelovi)
+            {
+                _slikeDijeloviService.Aktivacija(slika.SlikeDijeloviId, aktivacija);
+            }
+            var state = _basePrvaGrupaState.CreateState(entity.Status);
+            base.Aktivacija(id, aktivacija);
         }
 
         public override void Zavrsavanje(int id)

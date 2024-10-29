@@ -101,5 +101,29 @@ namespace BikeHubBck.Ostalo
             }
             return false;
         }
+        public bool CurrentUserSlikaBicikl(string currentUsername, int slikaBiciklId)
+        {
+            if(slikaBiciklId!=0 && currentUsername != null)
+            {
+                var slikaBicikl=_context.SlikeBiciklis.Find(slikaBiciklId);
+                if(slikaBicikl != null)
+                {
+                    return CurrentUserBicikl(currentUsername, slikaBicikl.BiciklId);
+                }
+            }
+            return false;
+        }
+        public bool CurrentUserSlikaDijelovi(string currentUsername, int slikaDijelovilId)
+        {
+            if (slikaDijelovilId != 0 && currentUsername != null)
+            {
+                var slikaDijelovi = _context.SlikeDijelovis.Find(slikaDijelovilId);
+                if (slikaDijelovi != null)
+                {
+                    return CurrentUserDijelovi(currentUsername, slikaDijelovi.DijeloviId);
+                }
+            }
+            return false;
+        }
     }
 }

@@ -7,7 +7,8 @@ using BikeHub.Model.SlikeFM;
 
 namespace BikeHub.Services
 {
-    public interface ISlikeDijeloviService : ICRUDService<SlikeDijelovi, SlikeDijeloviSearchObject, SlikeDijeloviInsertR, SlikeDijeloviUpdateR>
+    public interface ISlikeDijeloviService : ICRUDService<Model.SlikeFM.SlikeDijelovi, Model.SlikeFM.SlikeDijeloviSearchObject,
+                                                            Model.SlikeFM.SlikeDijeloviInsertR, Model.SlikeFM.SlikeDijeloviUpdateR>
     {
     }
 }

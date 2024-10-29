@@ -57,9 +57,10 @@ StateRegistrationHelper.RegisterStates<BikeHub.Model.KorisnikFM.Korisnik, BikeHu
 StateRegistrationHelper.RegisterStates<BikeHub.Model.KorisnikFM.KorisnikInfo, BikeHub.Services.Database.KorisnikInfo, KorisnikInfoInsertR, KorisnikInfoUpdateR>(builder.Services);
 StateRegistrationHelper.RegisterStates<BikeHub.Model.RecommendedKategorijaFM.RecommendedKategorija, BikeHub.Services.Database.RecommendedKategorija, RecommendedKategorijaInsertR, RecommendedKategorijaUpdateR>(builder.Services);
 StateRegistrationHelper.RegisterStates<BikeHub.Model.ServisFM.Serviser, BikeHub.Services.Database.Serviser, ServiserInsertR, ServiserUpdateR>(builder.Services);
-StateRegistrationHelper.RegisterStates<BikeHub.Model.SlikeFM.SlikeBicikli, BikeHub.Services.Database.SlikeBicikli, SlikeBicikliInsertR, SlikeBicikliUpdateR>(builder.Services);
 StateRegistrationHelper.RegisterStates<BikeHub.Model.SpaseniFM.SpaseniBicikli, BikeHub.Services.Database.SpaseniBicikli, SpaseniBicikliInsertR, SpaseniBicikliUpdateR>(builder.Services);
 StateRegistrationHelper.RegisterStates<BikeHub.Model.SpaseniFM.SpaseniDijelovi, BikeHub.Services.Database.SpaseniDijelovi, SpaseniDijeloviInsertR, SpaseniDijeloviUpdateR>(builder.Services);
+StateRegistrationHelper.RegisterStates<BikeHub.Model.SlikeFM.SlikeBicikli, BikeHub.Services.Database.SlikeBicikli, BikeHub.Model.SlikeFM.SlikeBicikli, BikeHub.Model.SlikeFM.SlikeBicikli>(builder.Services);
+StateRegistrationHelper.RegisterStates<BikeHub.Model.SlikeFM.SlikeDijelovi, BikeHub.Services.Database.SlikeDijelovi, BikeHub.Model.SlikeFM.SlikeDijelovi, BikeHub.Model.SlikeFM.SlikeDijelovi>(builder.Services);
 
 StateRegistrationHelper.DrugiRegisterStates<BikeHub.Model.ServisFM.RezervacijaServisa, BikeHub.Services.Database.RezervacijaServisa, RezervacijaServisaInsertR, RezervacijaServisaUpdateR>(builder.Services);
 StateRegistrationHelper.DrugiRegisterStates<BikeHub.Model.NarudzbaFM.Narudzba, BikeHub.Services.Database.Narudzba, BikeHub.Services.Database.Narudzba, NarudzbaUpdateR>(builder.Services);
@@ -112,6 +113,16 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     options.SupportedUICultures = supportedCultures;
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
+});
 builder.Services.AddMapster();
 builder.Services.AddAuthentication("BasicAuthentication")
     .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
