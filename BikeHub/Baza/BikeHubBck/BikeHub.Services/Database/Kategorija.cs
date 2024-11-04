@@ -11,6 +11,8 @@ public partial class Kategorija
 
     public string Status { get; set; } = null!;
 
+    public bool? IsBikeKategorija { get; set; }
+
     public virtual ICollection<Bicikl> Bicikls { get; set; } = new List<Bicikl>();
 
     public virtual ICollection<Dijelovi> Dijelovis { get; set; } = new List<Dijelovi>();

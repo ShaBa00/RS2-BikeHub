@@ -1,5 +1,6 @@
 ﻿using BikeHub.Model;
 using BikeHub.Model.AdresaFM;
+using BikeHub.Model.Ostalo;
 using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
 using MapsterMapper;
@@ -152,6 +153,26 @@ namespace BikeHub.Services
         //    var state = _basePrvaGrupaState.CreateState(entity.Status);
         //    state.Activate(id);
         //}
+
+        public List<GradKorisniciDto> GetGradove()
+        {
+            var gradoviGrupe = _context.Adresas
+                .GroupBy(a => a.Grad)
+                .Select(g => new GradKorisniciDto
+                {
+                    Grad = g.Key,
+                    KorisnikIds = g.Select(a => a.KorisnikId).ToList()
+                })
+                .ToList();
+
+            int index = 1;
+            foreach (var grad in gradoviGrupe)
+            {
+                grad.GradId = index++;
+            }
+
+            return gradoviGrupe;
+        }
 
     }
 }

@@ -8,9 +8,7 @@ namespace BikeHub.Model.KorisnikFM
     {
         public int KorisnikId { get; set; }
         public string Username { get; set; }
-
         public string? LozinkaSalt { get; set; }
-
         public string? LozinkaHash { get; set; }
         public bool? IsAdmin { get; set; }
         public string Email { get; set; }

@@ -54,6 +54,18 @@ namespace BikeHub.Services
             return NoviQuery;
         }
 
+        public override Model.KorisnikFM.Korisnik GetById(int id)
+        {
+            var result = Context.Set<Database.Korisnik>()
+                    .Include(b => b.KorisnikInfos)
+                    .FirstOrDefault(b => b.KorisnikId == id);
+            if (result == null)
+            {
+                return null;
+            }
+            return Mapper.Map<Model.KorisnikFM.Korisnik>(result);
+        }
+
         public static string GenerateSalt()
         {
             var byteArray = RNGCryptoServiceProvider.GetBytes(16);

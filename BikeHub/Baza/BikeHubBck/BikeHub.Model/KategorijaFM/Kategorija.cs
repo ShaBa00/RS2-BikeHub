@@ -11,5 +11,6 @@ namespace BikeHub.Model.KategorijaFM
         public string? Naziv { get; set; } = null!;
 
         public string? Status { get; set; } = null!;
+        public bool? IsBikeKategorija { get; set; }
     }
 }

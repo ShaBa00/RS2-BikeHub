@@ -11,6 +11,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  table_calendar: ^3.0.0
+  flutter_xlider: ^3.4.0
   cupertino_icons: ^1.0.6
   http: ^1.2.2
   provider: ^6.0.0

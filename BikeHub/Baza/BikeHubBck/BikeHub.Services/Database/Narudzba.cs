@@ -5,7 +5,7 @@ namespace BikeHub.Services.Database;
 
 public partial class Narudzba
 {
-    public int NarudzbaId { get; set; }//
+    public int NarudzbaId { get; set; }
 
     public int KorisnikId { get; set; }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BikeHub.Model.SlikeFM;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -14,5 +15,7 @@ namespace BikeHub.Model.DijeloviFM
         public int? KategorijaId { get; set; }
         public int? Kolicina { get; set; }
         public int? KorisnikId { get; set; }
+
+        public virtual ICollection<SlikeDijelovi>? SlikeDijelovis { get; set; } = new List<SlikeDijelovi>();
     }
 }

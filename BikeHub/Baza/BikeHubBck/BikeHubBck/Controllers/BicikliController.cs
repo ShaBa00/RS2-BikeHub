@@ -17,8 +17,12 @@ namespace BikeHubBck.Controllers
     {
         private BikeHubDbContext _context;
         private readonly FunctionHelper _functionHelper;
+
+        private readonly BicikliService _bicikliService;
         public BicikliController(IBicikliService service, BikeHubDbContext context, FunctionHelper functionHelper)
-        : base(service, context) { _functionHelper = functionHelper; _context = context; }
+        : base(service, context) { _functionHelper = functionHelper;
+            _context = context;
+            _bicikliService = (BicikliService)service; }
 
         [AllowAnonymous]
         public override PagedResult<Bicikli> GetList([FromQuery] BicikliSearchObject searchObject)
@@ -75,6 +79,14 @@ namespace BikeHubBck.Controllers
                 }
             }
             return base.SoftDelete(id);
+        }
+
+        [HttpGet("promoted-items")]
+        [AllowAnonymous]
+        public IActionResult GetPromotedItems()
+        {
+            var result = _bicikliService.GetPromotedItems();
+            return Ok(result);
         }
     }
 }

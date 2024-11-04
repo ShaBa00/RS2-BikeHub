@@ -1,4 +1,5 @@
 ﻿using BikeHub.Model;
+using BikeHub.Model.Ostalo;
 using BikeHub.Model.ServisFM;
 using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
@@ -15,6 +16,7 @@ namespace BikeHub.Services
                                                     , Model.ServisFM.ServiserInsertR, Model.ServisFM.ServiserUpdateR>, IServiserService
     {
         private BikeHubDbContext _context;
+        private readonly IMapper _mapper;
         public BasePrvaGrupaState<Model.ServisFM.Serviser, Database.Serviser, Model.ServisFM.ServiserInsertR,
                         Model.ServisFM.ServiserUpdateR> _basePrvaGrupaState;
 
@@ -24,6 +26,7 @@ namespace BikeHub.Services
         {
             _context = context;
             _basePrvaGrupaState = basePrvaGrupaState;
+            _mapper = mapper;
         }
 
         public override IQueryable<Database.Serviser> AddFilter(ServiserSearchObject search, IQueryable<Database.Serviser> query)
@@ -33,9 +36,9 @@ namespace BikeHub.Services
             {
                 NoviQuery = NoviQuery.Where(x => x.Status.StartsWith(search.Status));
             }
-            if (search?.Cijena != null)
+            if (search?.PocetnaCijena != null && search?.KrajnjaCijena != null)
             {
-                NoviQuery = NoviQuery.Where(x => x.Cijena == search.Cijena);
+                NoviQuery = NoviQuery.Where(x => x.Cijena >= search.PocetnaCijena && x.Cijena <= search.KrajnjaCijena);
             }
             if (search?.UkupnaOcjena != null)
             {
@@ -126,5 +129,61 @@ namespace BikeHub.Services
         {
             throw new UserException("Za ovaj entitet nije moguce izvrsiti ovu naredbu");
         }
+
+        public PagedResult<Model.Ostalo.ServiserDto> GetServiserDTOList(Model.ServisFM.ServiserSearchObjectDTO searchObject)
+        {
+            var query = from s in _context.Servisers
+                        join k in _context.Korisniks on s.KorisnikId equals k.KorisnikId
+                        join a in _context.Adresas on k.KorisnikId equals a.KorisnikId
+                        select new Model.Ostalo.ServiserDto
+                        {
+                            ServiserId = s.ServiserId,
+                            KorisnikId = s.KorisnikId,
+                            Cijena = s.Cijena.Value,
+                            BrojServisa = s.BrojServisa.Value,
+                            Status = s.Status,
+                            UkupnaOcjena = s.UkupnaOcjena.Value,
+                            Username = k.Username,
+                            Grad = a.Grad
+                        };
+
+            // Filtriranje
+            if (searchObject.ServiserId != null)
+                query = query.Where(x => x.ServiserId == searchObject.ServiserId);
+
+            if (!string.IsNullOrWhiteSpace(searchObject?.Status))
+                query = query.Where(x => x.Status == searchObject.Status);
+
+            if (!string.IsNullOrWhiteSpace(searchObject?.Username))
+                query = query.Where(x => x.Username == searchObject.Username);
+
+            if (searchObject.PocetnaCijena != null && searchObject.KrajnjaCijena != null)
+                query = query.Where(x => x.Cijena >= searchObject.PocetnaCijena && x.Cijena <= searchObject.KrajnjaCijena);
+
+            if (searchObject.PocetniBrojServisa != null && searchObject.KrajnjiBrojServisa != null)
+                query = query.Where(x => x.BrojServisa >= searchObject.PocetniBrojServisa && x.BrojServisa <= searchObject.KrajnjiBrojServisa);
+
+            if (searchObject.PocetnaOcjena != null && searchObject.KrajnjaOcjena != null)
+                query = query.Where(x => x.UkupnaOcjena >= searchObject.PocetnaOcjena && x.UkupnaOcjena <= searchObject.KrajnjaOcjena);
+
+            // Paginacija ručno
+            var totalCount = query.Count();
+
+            // Provera da li su Page i PageSize postavljeni, sa podrazumevanim vrednostima ako nisu
+            var page = Math.Max(searchObject.Page ?? 1, 1);  // Osiguraj da je page >= 1
+            var pageSize = searchObject.PageSize ?? 10;
+
+            var resultsList = query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return new PagedResult<Model.Ostalo.ServiserDto>
+            {
+                Count = totalCount,
+                ResultsList = resultsList
+            };
+        }
+
     }
 }

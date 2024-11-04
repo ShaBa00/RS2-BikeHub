@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:bikehub_desktop/services/bicikl_service.dart';
+import 'package:bikehub_desktop/services/bicikli/bicikl_service.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 
 class PocetniProzorP2 extends StatelessWidget {
-  const PocetniProzorP2({super.key, required bool showBicikli});
+  final bool showBicikli; // Dodajemo showBicikli kao atribut
+
+  const PocetniProzorP2({super.key, required this.showBicikli});
 
   @override
   Widget build(BuildContext context) {
@@ -12,36 +14,35 @@ class PocetniProzorP2 extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Bicikli'),
+        title: const Text('Promotivni Artikli'), 
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: biciklService.getBicikli(),
+        future: biciklService.getPromotedItems(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Greška: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('Nema dostupnih bicikala'));
+            return const Center(child: Text('Nema dostupnih artikala'));
           } else {
             return GridView.builder(
-              padding: const EdgeInsets.all(8.0), // Veći razmak između kocki
+              padding: const EdgeInsets.all(8.0),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4, // 4 bicikla po redu
-                childAspectRatio: 0.7, // Manja visina proizvoda
-                mainAxisSpacing: 12.0, // Veći razmak vertikalno
-                crossAxisSpacing: 12.0, // Veći razmak horizontalno
+                crossAxisCount: 4,
+                childAspectRatio: 0.7,
+                mainAxisSpacing: 12.0,
+                crossAxisSpacing: 12.0,
               ),
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
-                final bicikl = snapshot.data![index];
-                final naziv = bicikl['naziv'] ?? 'Nepoznato';
-                final cijena = bicikl['cijena'] ?? 0;
+                final item = snapshot.data![index];
+                final naziv = item['naziv'] ?? 'Nepoznato';
+                final cijena = item['cijena'] ?? 0;
 
-                // Dekodiranje slike iz Base64
                 Uint8List? imageBytes;
-                if (bicikl['slikeBiciklis'] != null && bicikl['slikeBiciklis'].isNotEmpty) {
-                  final base64Image = bicikl['slikeBiciklis'][0]['slika'];
+                if (item['slike'] != null && item['slike'].isNotEmpty) {
+                  final base64Image = item['slike'][0]['slika'];
                   imageBytes = base64Decode(base64Image);
                 }
 

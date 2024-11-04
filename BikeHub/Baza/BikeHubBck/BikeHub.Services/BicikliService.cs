@@ -45,9 +45,9 @@ namespace BikeHub.Services
             {
                 NoviQuery = NoviQuery.Where(x => x.Status.StartsWith(search.Status));
             }
-            if (search?.Cijena != null)
+            if (search?.PocetnaCijena != null && search?.KrajnjaCijena != null)
             {
-                NoviQuery = NoviQuery.Where(x => x.Cijena == search.Cijena);
+                NoviQuery = NoviQuery.Where(x => x.Cijena >= search.PocetnaCijena && x.Cijena <= search.KrajnjaCijena);
             }
             if (search?.Kolicina != null)
             {
@@ -79,6 +79,17 @@ namespace BikeHub.Services
             return NoviQuery;
         }
 
+        public override Bicikli GetById(int id)
+        {
+            var result = Context.Set<Database.Bicikl>()
+                                .Include(b => b.SlikeBiciklis) 
+                                .FirstOrDefault(b => b.BiciklId == id);
+            if (result == null)
+            {
+                return null;
+            }
+            return Mapper.Map<Model.BicikliFM.Bicikli>(result);
+        }
 
         public override void BeforeInsert(BicikliInsertR request, Bicikl entity)
         {
@@ -119,6 +130,10 @@ namespace BikeHub.Services
             if (kategorija == null)
             {
                 throw new UserException("Kategorija sa datim ID-om ne postoji");
+            }
+            if (kategorija.IsBikeKategorija == false)
+            {
+                throw new UserException("Ova Kategorija je namjenjena za dijelove");
             }
             entity.Naziv = request.Naziv;
             entity.Cijena = request.Cijena;
@@ -192,6 +207,10 @@ namespace BikeHub.Services
                 {
                     throw new UserException("Kategorija sa datim ID-om ne postoji");
                 }
+                if (kategorija.IsBikeKategorija == false)
+                {
+                    throw new UserException("Ova Kategorija je namjenjena za dijelove");
+                }
                 entity.KategorijaId = request.KategorijaId.Value;
             }
             base.BeforeUpdate(request, entity);
@@ -245,6 +264,41 @@ namespace BikeHub.Services
         public override void Zavrsavanje(int id)
         {
             throw new UserException("Za ovaj entitet nije moguce izvrsiti ovu naredbu");
+        }
+
+        public List<object> GetPromotedItems()
+        {
+            var promotedBicikli = _context.Bicikls
+                .Where(b => b.PromocijaBiciklis.Any(pb => pb.Status == "aktivan"))
+                .Select(b => new
+                {
+                    b.BiciklId,
+                    b.Naziv,
+                    b.Cijena,
+                    b.Status,
+                    Slike = b.SlikeBiciklis.Select(s => new
+                    {
+                        s.SlikeBicikliId,
+                        s.Slika 
+                    }).ToList()
+                }).ToList();
+
+            var promotedDijelovi = _context.Dijelovis
+                .Where(d => d.PromocijaDijelovis.Any(pd => pd.Status == "aktivan"))
+                .Select(d => new
+                {
+                    d.DijeloviId,
+                    d.Naziv,
+                    d.Cijena,
+                    d.Status,
+                    Slike = d.SlikeDijelovis.Select(s => new
+                    {
+                        s.SlikeDijeloviId,
+                        s.Slika 
+                    }).ToList()
+                }).ToList();
+
+            return promotedBicikli.Cast<object>().Concat(promotedDijelovi.Cast<object>()).ToList();
         }
     }
 }

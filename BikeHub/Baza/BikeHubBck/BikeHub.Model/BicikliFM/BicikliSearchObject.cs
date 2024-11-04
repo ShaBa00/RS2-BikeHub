@@ -9,7 +9,8 @@ namespace BikeHub.Model.BicikliFM
     {
         public string? Naziv { get; set; } = null!;
 
-        public decimal? Cijena { get; set; }
+        public decimal? PocetnaCijena { get; set; }
+        public decimal? KrajnjaCijena { get; set; }
 
         public string? VelicinaRama { get; set; }
 

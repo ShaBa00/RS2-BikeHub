@@ -4,6 +4,7 @@ using BikeHub.Model.KorisnikFM;
 using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
 using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,9 +47,9 @@ namespace BikeHub.Services
             {
                 NoviQuery = NoviQuery.Where(x => x.Status.StartsWith(search.Status));
             }
-            if (search?.Cijena != null)
+            if (search?.PocetnaCijena != null && search?.KrajnjaCijena != null)
             {
-                NoviQuery = NoviQuery.Where(x => x.Cijena == search.Cijena);
+                NoviQuery = NoviQuery.Where(x => x.Cijena >= search.PocetnaCijena && x.Cijena <= search.KrajnjaCijena);
             }
             if (search?.Kolicina != null)
             {
@@ -62,9 +63,21 @@ namespace BikeHub.Services
             {
                 NoviQuery = NoviQuery.Where(x => x.KategorijaId == search.KategorijaId);
             }
+            NoviQuery = NoviQuery.Include(x => x.SlikeDijelovis);
             return NoviQuery;
         }
 
+        public override Model.DijeloviFM.Dijelovi GetById(int id)
+        {
+            var result = Context.Set<Database.Dijelovi>()
+                    .Include(b => b.SlikeDijelovis)
+                    .FirstOrDefault(b => b.DijeloviId == id);
+            if (result == null)
+            {
+                return null;
+            }
+            return Mapper.Map<Model.DijeloviFM.Dijelovi>(result);
+        }
         public override void BeforeInsert(DijeloviInsertR request, Database.Dijelovi entity)
         {
             if (string.IsNullOrWhiteSpace(request.Naziv))
@@ -92,6 +105,10 @@ namespace BikeHub.Services
             if (kategorija == null)
             {
                 throw new UserException("Kategorija sa datim ID-om ne postoji");
+            }
+            if (kategorija.IsBikeKategorija == true)
+            {
+                throw new UserException("Ova Kategorija je namjenjena za bicikle");
             }
             if (string.IsNullOrWhiteSpace(request.Opis))
             {
@@ -146,6 +163,10 @@ namespace BikeHub.Services
                 if (kategorija == null)
                 {
                     throw new UserException("Kategorija sa datim ID-om ne postoji");
+                }
+                if (kategorija.IsBikeKategorija == true)
+                {
+                    throw new UserException("Ova Kategorija je namjenjena za bicikle");
                 }
                 entity.KategorijaId = request.KategorijaId.Value;
             }

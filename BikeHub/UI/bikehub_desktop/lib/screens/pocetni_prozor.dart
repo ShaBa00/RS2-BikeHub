@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '1p_parts/pocetni_prozor_p1.dart';
 import '1p_parts/pocetni_prozor_p2.dart';
+//import 'bicikl_prozor.dart';
+//import 'dijelovi_prozor.dart';
+//import 'servis_prozor.dart';
 
 class PocetniProzor extends StatefulWidget {
   const PocetniProzor({super.key});

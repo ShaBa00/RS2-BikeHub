@@ -8,5 +8,7 @@ namespace BikeHub.Model.KategorijaFM
     public class KategorijaInsertR
     {
         public string Naziv { get; set; } = null!;
+        public bool IsBikeKategorija { get; set; }
+
     }
 }

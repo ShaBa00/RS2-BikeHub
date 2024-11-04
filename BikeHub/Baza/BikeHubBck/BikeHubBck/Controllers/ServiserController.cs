@@ -15,8 +15,14 @@ namespace BikeHubBck.Controllers
     {
         private BikeHubDbContext _context;
         private readonly FunctionHelper _functionHelper;
+        private readonly ServiserService _serviserService;
         public ServiserController(IServiserService service, BikeHubDbContext context, FunctionHelper functionHelper) 
-        : base(service, context) { _functionHelper = functionHelper; _context = context; }
+        : base(service, context) 
+        {
+            _functionHelper = functionHelper;
+            _context = context;
+            _serviserService =  (ServiserService) service;
+        }
 
         [AllowAnonymous]
         public override PagedResult<BikeHub.Model.ServisFM.Serviser> GetList([FromQuery] ServiserSearchObject searchObject)
@@ -70,6 +76,14 @@ namespace BikeHubBck.Controllers
                 }
             }
             return base.SoftDelete(id);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("GetServiserDTOList")]
+        public ActionResult<PagedResult<BikeHub.Model.Ostalo.ServiserDto>> GetServiserDTOList([FromQuery] ServiserSearchObjectDTO searchObject)
+        {
+            var result = _serviserService.GetServiserDTOList(searchObject);
+            return Ok(result);
         }
     }
 }

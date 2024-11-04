@@ -35,6 +35,10 @@ namespace BikeHub.Services
             {
                 NoviQuery = NoviQuery.Where(x => x.Status.StartsWith(search.Status));
             }
+            if (search.IsBikeKategorija != null)
+            {
+                NoviQuery = NoviQuery.Where(x => x.IsBikeKategorija==search.IsBikeKategorija);
+            }
             return NoviQuery;
         }
 
@@ -48,6 +52,10 @@ namespace BikeHub.Services
             if(naziv != null)
             {
                 throw new UserException("Kategorija s ovim nazivom vec postoji");
+            }
+            if (request.IsBikeKategorija == null)
+            {
+                throw new UserException("Potrebno je dodati i vrijednost IsBikeKategorija");
             }
             entity.Naziv = request.Naziv;
             base.BeforeInsert(request, entity);
@@ -71,6 +79,10 @@ namespace BikeHub.Services
                     throw new UserException("Kategorija s ovim nazivom vec postoji");
                 }
                 entity.Naziv = request.Naziv;
+            }
+            if (request.IsBikeKategorija != null)
+            {
+                entity.IsBikeKategorija = request.IsBikeKategorija;
             }
             base.BeforeUpdate(request, entity);
         }

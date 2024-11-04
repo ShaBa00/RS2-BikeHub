@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../bicikli/bicikl_prozor.dart';
+import '../dijelovi/dijelovi_prozor.dart';
+import '../serviser/servis_prozor.dart';
 
 class PocetniProzorP1 extends StatelessWidget {
   const PocetniProzorP1({super.key, required void Function() onToggleDisplay, required bool showBicikli});
@@ -55,46 +58,22 @@ class PocetniProzorP1 extends StatelessWidget {
             ),
           ),
         ),
-        Expanded(
+Expanded(
           flex: 7,
           child: Container(
             color: const Color.fromARGB(255, 92, 225, 230),
-            child: Column(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Flexible(
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.3,
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Pretraži...',
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide.none,
-                        ),
-                        isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-                      ),
-                      style: const TextStyle(fontSize: 14),
-                      cursorHeight: 20,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildResponsiveButton(context, 'Bicikl'),
-                    const SizedBox(width: 10), // Smanjen razmak između dugmadi
-                    _buildResponsiveButton(context, 'Dijelovi'),
-                  ],
-                ),
+                _buildResponsiveButton(context, 'Bicikl'),
+                const SizedBox(width: 10), 
+                _buildResponsiveButton(context, 'Dijelovi'),
+                const SizedBox(width: 10), 
+                _buildResponsiveButton(context, 'Serviseri'),
               ],
             ),
           ),
-        ),
+        )
       ],
     );
   }
@@ -108,44 +87,63 @@ class PocetniProzorP1 extends StatelessWidget {
     ];
   }
 
-IconButton _buildIconButton(BuildContext context, IconData icon) {
-  return IconButton(
-    icon: Icon(icon),
-    color: Colors.white,
-    onPressed: () {},
-    iconSize: MediaQuery.of(context).size.width * 0.018,
-    padding: EdgeInsets.zero,
-    splashRadius: MediaQuery.of(context).size.width * 0.004,
-    splashColor: Colors.white.withOpacity(0.2),
-    constraints: BoxConstraints(
-      minWidth: MediaQuery.of(context).size.width * 0.0265,
-      minHeight: MediaQuery.of(context).size.width * 0.0265,
-    ),
-    style: IconButton.styleFrom(
-      backgroundColor: icon == Icons.home
-          ? const Color.fromARGB(255, 7, 181, 255)
-          : const Color.fromARGB(255, 9, 72, 138), 
+  IconButton _buildIconButton(BuildContext context, IconData icon) {
+    return IconButton(
+      icon: Icon(icon),
+      color: Colors.white,
+      onPressed: () {},
+      iconSize: MediaQuery.of(context).size.width * 0.018,
+      padding: EdgeInsets.zero,
+      splashRadius: MediaQuery.of(context).size.width * 0.004,
+      splashColor: Colors.white.withOpacity(0.2),
+      constraints: BoxConstraints(
+        minWidth: MediaQuery.of(context).size.width * 0.0265,
+        minHeight: MediaQuery.of(context).size.width * 0.0265,
+      ),
+      style: IconButton.styleFrom(
+        backgroundColor: icon == Icons.home
+            ? const Color.fromARGB(255, 7, 181, 255)
+            : const Color.fromARGB(255, 9, 72, 138), 
+      ),
+    );
+  }
+
+Widget _buildResponsiveButton(BuildContext context, String label) {
+  return SizedBox(
+    width: MediaQuery.of(context).size.width * 0.09, 
+    height: MediaQuery.of(context).size.height * 0.035,
+    child: ElevatedButton(
+      onPressed: () {
+        // Navigacija na osnovu oznake dugmeta
+        if (label == 'Bicikl') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const BiciklProzor()),
+          );
+        } else if (label == 'Dijelovi') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const DijeloviProzor()),
+          );
+        } else if (label == 'Serviseri') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ServiserProzor()),
+          );
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color.fromARGB(255, 9, 72, 138),
+      ),
+      child: Text(label, style: const TextStyle(color: Colors.white)),
     ),
   );
 }
 
-  Widget _buildResponsiveButton(BuildContext context, String label) {
+  Widget _buildResponsiveButton2(BuildContext context, String label) {
     return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.09, 
+      width: MediaQuery.of(context).size.width * 0.066,
       height: MediaQuery.of(context).size.height * 0.035,
-      child: ElevatedButton(
-        onPressed: () {},
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color.fromARGB(255, 9, 72, 138),
-        ),
-        child: Text(label, style: const TextStyle(color: Colors.white)),
-      ),
-    );
-  }
-    Widget _buildResponsiveButton2(BuildContext context, String label) {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.066, // Smanjena širina dugmadi
-      height: MediaQuery.of(context).size.height * 0.035, // Visina dugmadi kao procenat visine ekrana
       child: ElevatedButton(
         onPressed: () {},
         style: ElevatedButton.styleFrom(

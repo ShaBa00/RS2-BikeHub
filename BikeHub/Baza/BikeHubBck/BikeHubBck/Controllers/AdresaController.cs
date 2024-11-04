@@ -13,8 +13,13 @@ namespace BikeHubBck.Controllers
     public class AdresaController : BaseCRUDController<BikeHub.Model.AdresaFM.Adresa, AdresaSearchObject,AdresaInsertR,AdresaUpdateR>
     {
         private BikeHubDbContext _context;
+        private readonly AdresaService _adresaService;
         public AdresaController(IAdresaService service , BikeHubDbContext context) 
-        : base(service,context){ _context = context;   }
+        : base(service,context)
+        { 
+            _context = context;
+            _adresaService = (AdresaService)service;
+        }
 
         [AllowAnonymous]
         public override PagedResult<BikeHub.Model.AdresaFM.Adresa> GetList([FromQuery] AdresaSearchObject searchObject)
@@ -81,6 +86,14 @@ namespace BikeHubBck.Controllers
                 }
             }
             return base.SoftDelete(id);
+        }
+
+        [HttpGet("gradovi")]
+        [AllowAnonymous]
+        public IActionResult GetGradove()
+        {
+            var result = _adresaService.GetGradove();
+            return Ok(result);
         }
     }
 }

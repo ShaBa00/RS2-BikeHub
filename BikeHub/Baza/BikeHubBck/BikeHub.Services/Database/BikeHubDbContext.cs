@@ -138,6 +138,7 @@ public partial class BikeHubDbContext : DbContext
 
             entity.ToTable("Kategorija");
 
+            entity.Property(e => e.IsBikeKategorija).HasDefaultValueSql("((0))");
             entity.Property(e => e.Naziv).HasMaxLength(100);
             entity.Property(e => e.Status).HasMaxLength(50);
         });

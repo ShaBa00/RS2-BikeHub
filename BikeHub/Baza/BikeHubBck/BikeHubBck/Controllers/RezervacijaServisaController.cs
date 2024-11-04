@@ -3,6 +3,7 @@ using BikeHub.Model.ServisFM;
 using BikeHub.Services;
 using BikeHub.Services.Database;
 using BikeHubBck.Ostalo;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -117,9 +118,19 @@ namespace BikeHubBck.Controllers
             return Unauthorized("Korisnik nije prijavljen.");
         }
 
+
+        [AllowAnonymous]
         [HttpGet("slobodni-dani")]
         public IActionResult GetSlobodniDani(int serviserId, int mjesec, int godina)
         {
+            if (mjesec == 0)
+            {
+                mjesec = 1;
+            }
+            if (godina == 0)
+            {
+                godina = 2024;
+            }
             var serviser = _context.Servisers.FirstOrDefault(s => s.ServiserId == serviserId);
             if (serviser == null)
             {

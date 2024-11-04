@@ -51,8 +51,7 @@ namespace BikeHub.Services
         {
             return query;
         }
-
-        public TModel GetById(int id)
+        public virtual TModel GetById(int id)
         {
             var result = Context.Set<TDbEntity>().Find(id);
             if( result == null)
