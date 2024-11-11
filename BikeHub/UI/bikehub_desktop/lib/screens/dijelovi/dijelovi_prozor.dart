@@ -126,7 +126,7 @@ class _DijeloviProzorState extends State<DijeloviProzor> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ValueListenableBuilder<List<Map<String, dynamic>>>(
-                      valueListenable: kategorijaServis.lista_ucitanih_kategorija,
+                      valueListenable: kategorijaServis.lista_ucitanih_d_kategorija,
                       builder: (context, kategorije, _) {
                         return InputDecorator(
                           decoration: const InputDecoration(

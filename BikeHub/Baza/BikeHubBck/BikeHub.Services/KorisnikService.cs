@@ -28,6 +28,25 @@ namespace BikeHub.Services
             _basePrvaGrupaState = basePrvaGrupaState;
         }
 
+        public Model.KorisnikFM.Korisnik Login(string username, string password)
+        {
+            var entity = Context.Korisniks.FirstOrDefault(x => x.Username == username);
+
+            if (entity == null)
+            {
+                return null;
+            }
+
+            var hash = GenerateHash(entity.LozinkaSalt, password);
+
+            if (hash != entity.LozinkaHash)
+            {
+                return null;
+            }
+
+            return this.Mapper.Map<Model.KorisnikFM.Korisnik>(entity);
+        }
+
         public override IQueryable<Database.Korisnik> AddFilter(KorisniciSearchObject search, IQueryable<Database.Korisnik> query)
         {
             var NoviQuery = base.AddFilter(search, query);
@@ -57,13 +76,31 @@ namespace BikeHub.Services
         public override Model.KorisnikFM.Korisnik GetById(int id)
         {
             var result = Context.Set<Database.Korisnik>()
-                    .Include(b => b.KorisnikInfos)
-                    .FirstOrDefault(b => b.KorisnikId == id);
+                .Include(b => b.KorisnikInfos)
+                .Include(b => b.Bicikls)//.Where(b=>b.Status== "aktivan")
+                .Include(b => b.Dijelovis)//.Where(b => b.Status == "aktivan")
+                .Include(b => b.Servisers)//.Where(b => b.Status == "aktivan")
+                .FirstOrDefault(b => b.KorisnikId == id);
+
             if (result == null)
             {
                 return null;
             }
-            return Mapper.Map<Model.KorisnikFM.Korisnik>(result);
+            int brojBicikala = result.Bicikls.Where(b => b.Status=="aktivan").ToList().Count;
+            int brojDijelova = result.Dijelovis.Where(b => b.Status == "aktivan").ToList().Count;
+            int brojProizvoda = brojBicikala + brojDijelova;
+            int ukupnaKolicinaBicikala = result.Bicikls.Where(b => b.Status == "aktivan").ToList().Sum(b => b.Kolicina);
+            int ukupnaKolicinaDijelova = result.Dijelovis.Where(b => b.Status == "aktivan").ToList().Sum(d => d.Kolicina);
+            int ukupnaKolicina = ukupnaKolicinaBicikala + ukupnaKolicinaDijelova;
+
+            // Provjera da li je korisnik serviser
+            bool jeServiser = result.Servisers.Where(b => b.Status == "aktivan").ToList().Any();
+            var mappedKorisnik = Mapper.Map<Model.KorisnikFM.Korisnik>(result);
+            mappedKorisnik.brojProizvoda = brojProizvoda;
+            mappedKorisnik.UkupnaKolicina = ukupnaKolicina;
+            mappedKorisnik.JeServiser = jeServiser;
+
+            return mappedKorisnik;
         }
 
         public static string GenerateSalt()
@@ -195,23 +232,6 @@ namespace BikeHub.Services
             throw new UserException("Za ovaj entitet nije moguce izvrsiti ovu naredbu");
         }
 
-        public Model.KorisnikFM.Korisnik Login(string username, string password)
-        {
-            var entity = Context.Korisniks.FirstOrDefault(x => x.Username == username);
 
-            if (entity == null)
-            {
-                return null;
-            }
-
-            var hash = GenerateHash(entity.LozinkaSalt, password);
-
-            if (hash != entity.LozinkaHash)
-            {
-                return null;
-            }
-
-            return this.Mapper.Map<Model.KorisnikFM.Korisnik>(entity);
-        }
     }
 }

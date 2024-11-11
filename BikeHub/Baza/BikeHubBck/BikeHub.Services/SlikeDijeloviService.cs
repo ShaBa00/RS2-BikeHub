@@ -58,12 +58,7 @@ namespace BikeHub.Services
                 throw new UserException("Slika ne smije biti prazna.");
             }
 
-            using (var memoryStream = new MemoryStream())
-            {
-                request.Slika.CopyTo(memoryStream);
-                entity.Slika = memoryStream.ToArray();
-            }
-
+            entity.Slika = request.Slika;
             entity.DijeloviId = request.DijeloviId;
             base.BeforeInsert(request, entity);
         }
@@ -90,11 +85,7 @@ namespace BikeHub.Services
             }
             if (request.Slika != null)
             {
-                using (var memoryStream = new MemoryStream())
-                {
-                    request.Slika.CopyTo(memoryStream);
-                    entity.Slika = memoryStream.ToArray();
-                }
+                entity.Slika = request.Slika;
             }
             base.BeforeUpdate(request, entity);
         }

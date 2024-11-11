@@ -53,7 +53,7 @@ namespace BikeHub.Services
         {
             if (request.DijeloviId <= 0)
             {
-                throw new Exception("DijeloviId ne smije biti veći od nule.");
+                throw new Exception("DijeloviId mora biti veći od nule.");
             }
             if (request.KorisnikId <= 0)
             {

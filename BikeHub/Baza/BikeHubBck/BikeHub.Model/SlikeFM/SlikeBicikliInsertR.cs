@@ -9,7 +9,7 @@ namespace BikeHub.Model.SlikeFM
     {
         public int BiciklId { get; set; }
 
-        public IFormFile Slika { get; set; }
+        public byte[]? Slika { get; set; }
 
     }
 }

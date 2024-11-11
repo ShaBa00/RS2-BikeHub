@@ -273,6 +273,7 @@ namespace BikeHub.Services
                 .Select(b => new
                 {
                     b.BiciklId,
+                    b.KorisnikId,
                     b.Naziv,
                     b.Cijena,
                     b.Status,
@@ -288,6 +289,7 @@ namespace BikeHub.Services
                 .Select(d => new
                 {
                     d.DijeloviId,
+                    d.KorisnikId,
                     d.Naziv,
                     d.Cijena,
                     d.Status,

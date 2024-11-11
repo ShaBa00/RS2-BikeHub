@@ -14,5 +14,10 @@ namespace BikeHub.Model.KorisnikFM
         public string Email { get; set; }
         public virtual ICollection<KorisnikInfo> KorisnikInfos { get; set; } = new List<KorisnikInfo>();
         public string Status { get; set; }
+
+        // Novi propertiji
+        public int? brojProizvoda { get; set; }
+        public int? UkupnaKolicina { get; set; }
+        public bool? JeServiser { get; set; }
     }
 }

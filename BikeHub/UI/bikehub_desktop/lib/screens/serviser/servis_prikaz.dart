@@ -25,7 +25,8 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
   int selectedMonth = DateTime.now().month;
   int selectedYear = DateTime.now().year;
   List<int> slobodniDani = [];
-  int? selectedDay;
+  String? odabraniDatum="YYYY-MM-DD";
+  DateTime newfocusedDay = DateTime.now();
   final ServiserService _serviserService = ServiserService();
   final Logger logger = Logger();
   Map<String, dynamic>? serviserDetalji;
@@ -37,6 +38,8 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
     fetchSlobodniDani(selectedMonth, selectedYear);
   }
   Future<void> fetchSlobodniDani(int month, int year) async {
+    selectedMonth=month;
+    selectedYear=year;
     try {
       final days = await RezervacijaServisaService().getSlobodniDani(
         serviserId: widget.serviserId,
@@ -51,13 +54,7 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
       logger.e('Greška prilikom učitavanja slobodnih dana: $e');
     }
   }
-  void onMonthChanged(DateTime focusedDay) {
-    setState(() {
-      selectedMonth = focusedDay.month;
-      selectedYear = focusedDay.year;
-      fetchSlobodniDani(selectedMonth, selectedYear);
-    });
-  }
+
 
   Future<void> _fetchServiserDetalji() async {
     try {
@@ -80,9 +77,9 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
   @override
   Widget build(BuildContext context) {
     // ignore: unused_local_variable
-    final daysInMonth = DateTime(selectedYear, selectedMonth + 1, 0).day;
+    //final daysInMonth = DateTime(selectedYear, selectedMonth + 1, 0).day;
     // ignore: unused_local_variable
-    final startDay = DateTime(selectedYear, selectedMonth, 1).weekday;
+    //final startDay = DateTime(selectedYear, selectedMonth, 1).weekday;
     
     return Container(
       decoration: const BoxDecoration(
@@ -106,24 +103,19 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
           children: [
             // Lijevi dio
             Expanded(
-              flex: 25, // 35% širine
+              flex: 25,
               child: Container(
-                color: Colors.transparent, // Providan za prikaz pozadine
+                color: Colors.transparent, 
                 padding: const EdgeInsets.all(16.0),
                 child: serviserDetalji != null
                     ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildDetailContainer('Username', serviserDetalji!['username']),
-                          const SizedBox(height: 20.0), 
-                          _buildDetailContainer('Grad', serviserDetalji!['grad']),
-                          const SizedBox(height: 20.0),
-                          _buildDetailContainer('Broj servisa', serviserDetalji!['brojServisa']),
-                          const SizedBox(height: 20.0),
-                          _buildDetailContainer('Ukupna ocjena', serviserDetalji!['ukupnaOcjena']),
-                          const SizedBox(height: 20.0),
-                          _buildDetailContainer('Cijena', serviserDetalji!['cijena']),
+                          _buildDetailContainer('Username', serviserDetalji?['username'] ?? 'Username nije pronađen'),
+                          _buildDetailContainer('Grad', serviserDetalji?['grad'] ?? 'Grad nije pronađen'),
+                          _buildDetailContainer('Broj servisa', serviserDetalji?['brojServisa']?.toString() ?? 'Broj servisa nije pronađen'),
+                          _buildDetailContainer('Ukupna ocjena', serviserDetalji?['ukupnaOcjena']?.toString() ?? 'Ocjena nije pronađena'),
+                          _buildDetailContainer('Cijena', serviserDetalji?['cijena']?.toString() ?? 'Cijena nije pronađena'),
                         ],
                       )
                     : const Center(child: CircularProgressIndicator()),
@@ -131,21 +123,123 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
             ),
             // Desni dio - placeholder
             Expanded(
-              flex: 75, // 75% širine
+              flex: 75,
               child: Container(
-                color: Colors.transparent, 
-                child: Center(
-                  child: TableCalendar(
-                    firstDay: DateTime.utc(2020, 1, 1),
-                    lastDay: DateTime.utc(2030, 12, 31),
-                    focusedDay: DateTime.now(),
-                    onDaySelected: (selectedDay, focusedDay) {
-                    },
-                    calendarFormat: CalendarFormat.month,
-                    availableCalendarFormats: const {
-                      CalendarFormat.month: 'Month',
-                    },
-                  ),
+                color: Colors.transparent,
+                child: Column(
+                  children: [
+                    // Gornji dio - kalendar
+                    Expanded(
+                      flex: 50,
+                      child: SizedBox(                        
+                      height: MediaQuery.of(context).size.height * 0.3,
+                      width: MediaQuery.of(context).size.width * 0.7, 
+                      child: TableCalendar(
+                          shouldFillViewport: true,
+                          firstDay: DateTime.utc(2020, 1, 1),
+                          lastDay: DateTime.utc(2030, 12, 31),
+                          focusedDay: newfocusedDay,
+                          selectedDayPredicate: (day) => isSameDay(day, newfocusedDay),
+                          calendarFormat: CalendarFormat.month,
+                          availableCalendarFormats: const {
+                            CalendarFormat.month: 'Month',
+                          },
+                          onDaySelected: (selectedDate, focusedDate) {
+                            setState(() {
+                              newfocusedDay = selectedDate;
+                              odabraniDatum = "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}";
+                            });
+                          },
+                          onPageChanged: (focusedDate) {
+                            setState(() {
+                              newfocusedDay = focusedDate;
+                              selectedMonth = focusedDate.month;
+                              selectedYear = focusedDate.year;
+                            });
+                            fetchSlobodniDani(selectedMonth, selectedYear);
+                          },
+                          calendarBuilders: CalendarBuilders(
+                            defaultBuilder: (context, day, focusedDay) {
+                              bool isSlobodanDan = slobodniDani.contains(day.day);
+                              return Container(
+                                margin: const EdgeInsets.all(4.0),
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: isSlobodanDan ? Colors.green : Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Text(
+                                  '${day.day}',
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              );
+                            },
+                            selectedBuilder: (context, day, focusedDay) {
+                              bool isSlobodanDan = slobodniDani.contains(day.day);
+                              return Container(
+                                margin: const EdgeInsets.all(4.0),
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: isSlobodanDan ? Colors.green[700] : Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Text(
+                                  '${day.day}',
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Donji dio - prikaz odabranog datuma i dugme "Rezervisi"
+                    Expanded(
+                      flex: 50,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                              Container(
+                                padding: const EdgeInsets.all(8.0),
+                                width: MediaQuery.of(context).size.width * 0.2 ,
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.1), 
+                                  border: Border(
+                                    left: BorderSide(color: Colors.blue.shade900, width: 2.0),
+                                    bottom: BorderSide(color: Colors.blue.shade900, width: 2.0),
+                                    right: BorderSide(color: Colors.blue.shade900, width: 2.0),
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Expanded(
+                                      child: Text(
+                                        'Odabrani datum: ',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                    Text(
+                                      '$odabraniDatum',
+                                      style: const TextStyle(color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            const SizedBox(height: 20.0),
+                            ElevatedButton(
+                              onPressed: () {
+                                
+                              },
+                              child: const Text("Rezervisi"),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -156,6 +250,7 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
   }
 
   Widget _buildDetailContainer(String label, dynamic value) {
+    double marginBottom = MediaQuery.of(context).size.height * 0.04;
     return Container(
       padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
@@ -167,17 +262,18 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
         ),
         borderRadius: BorderRadius.circular(8.0),
       ),
+      margin: EdgeInsets.only(bottom: marginBottom), // Razmak između kontejnera
       child: Row(
         children: [
           Expanded(
             child: Text(
               '$label: ',
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold), // Podebljan tekst
             ),
           ),
           Text(
             '$value',
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold), // Podebljan tekst
           ),
         ],
       ),

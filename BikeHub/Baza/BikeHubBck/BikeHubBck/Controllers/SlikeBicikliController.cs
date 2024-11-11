@@ -25,7 +25,7 @@ namespace BikeHubBck.Controllers
             return base.GetList(searchObject);
         }
         
-        public override BikeHub.Model.SlikeFM.SlikeBicikli Insert([FromForm] SlikeBicikliInsertR request)
+        public override BikeHub.Model.SlikeFM.SlikeBicikli Insert( SlikeBicikliInsertR request)
         {
             var currentUsername = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (currentUsername != null)
@@ -38,7 +38,7 @@ namespace BikeHubBck.Controllers
             return base.Insert(request);
         }
 
-        public override BikeHub.Model.SlikeFM.SlikeBicikli Update(int id, [FromForm] SlikeBicikliUpdateR request)
+        public override BikeHub.Model.SlikeFM.SlikeBicikli Update(int id, SlikeBicikliUpdateR request)
         {
             var currentUsername = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (currentUsername != null)

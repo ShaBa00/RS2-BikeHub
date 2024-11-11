@@ -57,17 +57,11 @@ namespace BikeHub.Services
                 throw new UserException("Bicikl sa datim ID-om ne postoji.");
             }
 
-            if (request?.Slika == null || request.Slika.Length == 0)
+            if (request?.Slika == null)
             {
                 throw new UserException("Slika ne smije biti prazna.");
             }
-
-            using (var memoryStream = new MemoryStream())
-            {
-                request.Slika.CopyTo(memoryStream);
-                entity.Slika = memoryStream.ToArray(); 
-            }
-
+            entity.Slika = request.Slika;
             entity.BiciklId = request.BiciklId;
             base.BeforeInsert(request, entity);
         }
@@ -94,11 +88,7 @@ namespace BikeHub.Services
             }
             if (request.Slika != null)
             {
-                using (var memoryStream = new MemoryStream())
-                {
-                    request.Slika.CopyTo(memoryStream);
-                    entity.Slika = memoryStream.ToArray();
-                }
+                entity.Slika = request.Slika;
             }
             base.BeforeUpdate(request, entity);
         }

@@ -1,5 +1,6 @@
 ﻿using BikeHub.Model;
 using BikeHub.Model.RecommendedKategorijaFM;
+using BikeHub.Model.ServisFM;
 using BikeHub.Services;
 using BikeHub.Services.Database;
 using BikeHubBck.Ostalo;
@@ -15,8 +16,15 @@ namespace BikeHubBck.Controllers
     {
         private BikeHubDbContext _context;
         private readonly FunctionHelper _functionHelper;
-        public RecommendedKategorijaController(IRecommendedKategorijaService service, BikeHubDbContext context, FunctionHelper functionHelper) 
-        : base(service, context) { _functionHelper = functionHelper; _context = context; }
+        private readonly RecommendedKategorijaService _recommendedKategorijaService;
+        public RecommendedKategorijaController(IRecommendedKategorijaService service, BikeHubDbContext context,
+            FunctionHelper functionHelper) 
+        : base(service, context)
+        { 
+            _functionHelper = functionHelper;
+            _context = context;
+            _recommendedKategorijaService= (RecommendedKategorijaService)service;
+        }
 
         [AllowAnonymous]
         public override PagedResult<BikeHub.Model.RecommendedKategorijaFM.RecommendedKategorija> GetList([FromQuery] RecommendedKategorijaSearchObject searchObject)
@@ -66,6 +74,21 @@ namespace BikeHubBck.Controllers
                 }
             }
             return base.SoftDelete(id);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("GetRecommendedBiciklList")]
+        public ActionResult<List<BikeHub.Model.BicikliFM.Bicikli>> GetRecommendedBiciklList([FromQuery] int DijeloviID)
+        {
+            var result = _recommendedKategorijaService.GetRecommendedBiciklList(DijeloviID);
+            return Ok(result);
+        }
+        [AllowAnonymous]
+        [HttpGet("GetRecommendedDijeloviList")]
+        public ActionResult<List<BikeHub.Model.DijeloviFM.Dijelovi>> GetRecommendedDijeloviList([FromQuery] int BiciklID)
+        {
+            var result = _recommendedKategorijaService.GetRecommendedDijeloviList(BiciklID);
+            return Ok(result);
         }
     }
 }

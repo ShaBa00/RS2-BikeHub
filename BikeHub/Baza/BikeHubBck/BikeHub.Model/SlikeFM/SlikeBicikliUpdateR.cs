@@ -9,6 +9,6 @@ namespace BikeHub.Model.SlikeFM
     public class SlikeBicikliUpdateR
     {
         public int? BiciklId { get; set; }
-        public IFormFile? Slika { get; set; }
+        public byte[]? Slika { get; set; }
     }
 }

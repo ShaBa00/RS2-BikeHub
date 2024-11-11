@@ -1,3 +1,5 @@
+import 'package:bikehub_desktop/modeli/bicikli/bicikl_model.dart';
+import 'package:bikehub_desktop/services/korisnik/korisnik_service.dart';
 import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
 import '../ostalo/helper_service.dart';
@@ -6,6 +8,7 @@ import 'package:flutter/foundation.dart';
 class BiciklService {
   final Dio _dio = Dio();
   final logger = Logger();
+  final KorisnikService _korisnikService = KorisnikService();
 
   // ignore: non_constant_identifier_names
   final ValueNotifier<List<Map<String, dynamic>>> lista_ucitanih_bicikala = ValueNotifier([]);
@@ -90,7 +93,76 @@ class BiciklService {
       return [];
     }
   }
-   Future<Map<String, dynamic>?> getBiciklById(int biciklId) async {
+  
+  Future<void> _addAuthorizationHeader() async {
+    // Provjera da li je korisnik prijavljen
+    final isLoggedIn = await _korisnikService.isLoggedIn();
+    if (!isLoggedIn) {
+      throw Exception("User not logged in");
+    }
+
+    // Dohvati korisničke podatke iz secure storage-a
+    final korisnikInfo = await _korisnikService.getUserInfo();
+    final username = korisnikInfo['username'];
+    final password = korisnikInfo['password'];
+
+    if (username == null || password == null) {
+      throw Exception("Missing credentials");
+    }
+    // Generiraj Authorization header
+    final authHeader = _korisnikService.encodeBasicAuth(username, password);
+    _dio.options.headers['Authorization'] = authHeader; 
+  }
+
+  Future<Map<String, dynamic>?> postBicikl(Bicikl biciklData) async {
+    try {
+      await _addAuthorizationHeader();
+
+      final response = await _dio.post(
+        '${HelperService.baseUrl}/Bicikli',
+        options: Options(
+          headers: {
+            'accept': 'text/plain',
+            'Content-Type': 'application/json',
+          },
+        ),
+        data: biciklData,
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> bicikl = response.data;
+        return bicikl;
+      } else {
+        throw Exception('Failed to create bicikl');
+      }
+    } catch (e) {
+      logger.e('Greška: $e');
+      return null;
+    }
+  }
+
+  Future<void> removeBicikl(int idBicikl) async {
+    try {
+      await _addAuthorizationHeader();
+
+      final response = await _dio.delete(
+        '${HelperService.baseUrl}/Bicikli/$idBicikl',
+      );
+
+      if (response.statusCode == 200) {
+        lista_ucitanih_bicikala.value.removeWhere((bicikl) => bicikl['id'] == idBicikl);
+        // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
+        lista_ucitanih_bicikala.notifyListeners();
+        logger.i('Bicikl uspješno uklonjen.');
+      } else {
+        throw Exception('Neuspješno uklanjanje  bicikla.');
+      }
+    } catch (e) {
+      logger.e('Greška pri uklanjanju  bicikla: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>?> getBiciklById(int biciklId) async {
     try {
       final response = await _dio.get(
         '${HelperService.baseUrl}/Bicikli/$biciklId',

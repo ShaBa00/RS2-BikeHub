@@ -25,7 +25,7 @@ namespace BikeHubBck.Controllers
             return base.GetList(searchObject);
         }
 
-        public override BikeHub.Model.SlikeFM.SlikeDijelovi Insert([FromForm] SlikeDijeloviInsertR request)
+        public override BikeHub.Model.SlikeFM.SlikeDijelovi Insert( SlikeDijeloviInsertR request)
         {
             var currentUsername = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (currentUsername != null)
@@ -38,7 +38,7 @@ namespace BikeHubBck.Controllers
             return base.Insert(request);
         }
 
-        public override BikeHub.Model.SlikeFM.SlikeDijelovi Update(int id, [FromForm] SlikeDijeloviUpdateR request)
+        public override BikeHub.Model.SlikeFM.SlikeDijelovi Update(int id,  SlikeDijeloviUpdateR request)
         {
             var currentUsername = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (currentUsername != null)

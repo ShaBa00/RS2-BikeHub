@@ -40,9 +40,9 @@ class KategorijaServis {
         final List<Map<String, dynamic>> kategorije = List<Map<String, dynamic>>.from(response.data['resultsList'])
             .where((kategorija) => kategorija['isBikeKategorija'] == false)
             .toList();
-        lista_ucitanih_kategorija.value = kategorije;
+        lista_ucitanih_d_kategorija.value = kategorije;
         // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-        lista_ucitanih_kategorija.notifyListeners();
+        lista_ucitanih_d_kategorija.notifyListeners();
         return kategorije;
       } else {
         throw Exception('Failed to load categories');

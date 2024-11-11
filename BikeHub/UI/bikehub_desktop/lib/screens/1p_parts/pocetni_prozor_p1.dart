@@ -1,11 +1,59 @@
+// ignore_for_file: use_build_context_synchronously, duplicate_ignore
+
+import 'package:bikehub_desktop/screens/bicikli/bicikl_dodaj.dart';
+import 'package:bikehub_desktop/screens/dijelovi/dijelovi_dodaj.dart';
+import 'package:bikehub_desktop/screens/korisnik/profil_prozor.dart';
+import 'package:bikehub_desktop/screens/korisnik/sacuvani_proizvodi.dart';
+import 'package:bikehub_desktop/screens/prijava/log_in_prozor.dart';
 import 'package:flutter/material.dart';
 import '../bicikli/bicikl_prozor.dart';
 import '../dijelovi/dijelovi_prozor.dart';
 import '../serviser/servis_prozor.dart';
+import '../../services/korisnik/korisnik_service.dart';
 
-class PocetniProzorP1 extends StatelessWidget {
-  const PocetniProzorP1({super.key, required void Function() onToggleDisplay, required bool showBicikli});
+class PocetniProzorP1 extends StatefulWidget {
+  const PocetniProzorP1({super.key, required this.onToggleDisplay, required this.showBicikli});
 
+  final VoidCallback onToggleDisplay;
+  final bool showBicikli;
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _PocetniProzorP1State createState() => _PocetniProzorP1State();
+  }
+  class _PocetniProzorP1State extends State<PocetniProzorP1> {
+    final KorisnikService korisnikService = KorisnikService();
+    bool isLoggedIn = false;
+    int korisnikId=0;
+    @override
+    void initState() {
+      super.initState();
+      _checkLoginStatus();
+    }
+    @override
+    void didUpdateWidget(covariant PocetniProzorP1 oldWidget) {
+      super.didUpdateWidget(oldWidget);
+      _checkLoginStatus();
+    }
+    Future<void> _checkLoginStatus() async {
+      isLoggedIn = await korisnikService.isLoggedIn();
+      if (isLoggedIn) {
+        var korisnik = await korisnikService.getUserInfo();
+        korisnikId = int.parse(korisnik['korisnikId'] as String); // Pretvara String u int
+      }
+      setState(() {});
+    }
+
+    Future<void> _logout() async {
+      await korisnikService.logout();
+      setState(() {
+        isLoggedIn = false;
+      });
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Uspješno ste se odjavili!')),
+      );
+    }
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -44,10 +92,27 @@ class PocetniProzorP1 extends StatelessWidget {
                         Flexible(
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              _buildResponsiveButton2(context, 'Log in'),
-                              _buildResponsiveButton2(context, 'Sign up'),
-                            ],
+                            children: isLoggedIn
+                                ? [
+                                    _buildResponsiveButton3(context, 'Sign out', _logout),
+                                  ]
+                                : [
+                                    _buildResponsiveButton3(context, 'Log in', () async {
+                                      // Navigiraj ka ekranu za prijavu
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => LogInProzor(
+                                            onLogin: _checkLoginStatus, // Osvježava status kad je login uspješan
+                                          ),
+                                        ),
+                                      );
+                                      _checkLoginStatus();
+                                    }),
+                                    _buildResponsiveButton3(context, 'Sign up', () {
+                                      // Logika za "Sign up"
+                                    }),
+                                  ],
                           ),
                         ),
                       ],
@@ -58,7 +123,7 @@ class PocetniProzorP1 extends StatelessWidget {
             ),
           ),
         ),
-Expanded(
+        Expanded(
           flex: 7,
           child: Container(
             color: const Color.fromARGB(255, 92, 225, 230),
@@ -87,11 +152,104 @@ Expanded(
     ];
   }
 
-  IconButton _buildIconButton(BuildContext context, IconData icon) {
+Widget _buildIconButton(BuildContext context, IconData icon) {
+  if (icon == Icons.add) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color.fromARGB(255, 9, 72, 138),
+        borderRadius: BorderRadius.circular(24.0),
+      ),
+      child: PopupMenuButton<String>(
+        icon: Icon(icon, color: Colors.white),
+        onSelected: (String result) async {
+          final isLoggedIn = await KorisnikService().isLoggedIn();
+          if (result == 'Bicikl') {
+            if (isLoggedIn) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const BiciklDodajProzor()),
+              );
+            } else {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LogInProzor(
+                    onLogin: _checkLoginStatus,
+                  ),
+                ),
+              );
+            }
+          } else if (result == 'Dijelovi') {
+            if (isLoggedIn) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const DijeloviDodajProzor()),
+              );
+            } else {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LogInProzor(
+                    onLogin: _checkLoginStatus,
+                  ),
+                ),
+              );
+            }
+          }
+        },
+        itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+          const PopupMenuItem<String>(
+            value: 'Bicikl',
+            child: Text('Bicikl'),
+          ),
+          const PopupMenuItem<String>(
+            value: 'Dijelovi',
+            child: Text('Dijelovi'),
+          ),
+        ],
+      ),
+    );
+  } else {
     return IconButton(
       icon: Icon(icon),
       color: Colors.white,
-      onPressed: () {},
+      onPressed: () async {
+        final isLoggedIn = await KorisnikService().isLoggedIn();
+
+        if (icon == Icons.person) {
+          if (isLoggedIn) {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilProzor(korisnikId: korisnikId)),
+            );
+          } else {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LogInProzor(
+                  onLogin: _checkLoginStatus,
+                ),
+              ),
+            );
+          }
+        } else if (icon == Icons.bookmark) {
+          if (isLoggedIn) {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SacuvaniProizvodiProzor()),
+            );
+          } else {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LogInProzor(
+                  onLogin: _checkLoginStatus,
+                ),
+              ),
+            );
+          }
+        }
+      },
       iconSize: MediaQuery.of(context).size.width * 0.018,
       padding: EdgeInsets.zero,
       splashRadius: MediaQuery.of(context).size.width * 0.004,
@@ -103,10 +261,11 @@ Expanded(
       style: IconButton.styleFrom(
         backgroundColor: icon == Icons.home
             ? const Color.fromARGB(255, 7, 181, 255)
-            : const Color.fromARGB(255, 9, 72, 138), 
+            : const Color.fromARGB(255, 9, 72, 138),
       ),
     );
   }
+}
 
 Widget _buildResponsiveButton(BuildContext context, String label) {
   return SizedBox(
@@ -140,12 +299,13 @@ Widget _buildResponsiveButton(BuildContext context, String label) {
   );
 }
 
-  Widget _buildResponsiveButton2(BuildContext context, String label) {
+
+   Widget _buildResponsiveButton3(BuildContext context, String label, VoidCallback onPressed) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.066,
       height: MediaQuery.of(context).size.height * 0.035,
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color.fromARGB(255, 9, 72, 138),
         ),

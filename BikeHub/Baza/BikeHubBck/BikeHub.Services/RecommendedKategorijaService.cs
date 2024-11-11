@@ -1,10 +1,12 @@
 ﻿using BikeHub.Model;
+using BikeHub.Model.BicikliFM;
 using BikeHub.Model.KorisnikFM;
 using BikeHub.Model.RecommendedKategorijaFM;
 using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,11 +23,13 @@ namespace BikeHub.Services
         public BasePrvaGrupaState<Model.RecommendedKategorijaFM.RecommendedKategorija, Database.RecommendedKategorija,
             Model.RecommendedKategorijaFM.RecommendedKategorijaInsertR,Model.RecommendedKategorijaFM.RecommendedKategorijaUpdateR> _basePrvaGrupaState;
 
+        public IMapper _mapper;
         public RecommendedKategorijaService(BikeHubDbContext context, IMapper mapper,
             BasePrvaGrupaState<Model.RecommendedKategorijaFM.RecommendedKategorija, Database.RecommendedKategorija,
             Model.RecommendedKategorijaFM.RecommendedKategorijaInsertR, Model.RecommendedKategorijaFM.RecommendedKategorijaUpdateR> basePrvaGrupaState) 
         : base(context, mapper)
         {
+            _mapper = mapper;
             _context = context;
             _basePrvaGrupaState = basePrvaGrupaState;
         }
@@ -40,14 +44,6 @@ namespace BikeHub.Services
             if (search?.BicikliId != null)
             {
                 NoviQuery = NoviQuery.Where(x => x.BicikliId == search.BicikliId);
-            }
-            if (search?.BrojPreporuka != null)
-            {
-                NoviQuery = NoviQuery.Where(x => x.BrojPreporuka == search.BrojPreporuka);
-            }
-            if (search?.DatumKreiranja != null)
-            {
-                NoviQuery = NoviQuery.Where(x => x.DatumKreiranja.Value.Date == search.DatumKreiranja.Value.Date);
             }
             if (!string.IsNullOrWhiteSpace(search?.Status))
             {
@@ -170,6 +166,124 @@ namespace BikeHub.Services
         public override void Zavrsavanje(int id)
         {
             throw new UserException("Za ovaj entitet nije moguce izvrsiti ovu naredbu");
+        }
+
+        public List<Model.BicikliFM.Bicikli> GetRecommendedBiciklList(int DijeloviID)
+        {
+            // Pronađi preporučene bicikle za dati DijeloviID
+            var recommendedBicikliIds = _context.RecommendedKategorijas
+                .Where(rk => rk.DijeloviId == DijeloviID && rk.Status == "aktivan")
+                .Select(rk => rk.BicikliId)
+                .ToList();
+
+            if (recommendedBicikliIds.IsNullOrEmpty())
+            {
+                var bicikli = _context.Bicikls
+                        .Include(x => x.SlikeBiciklis)
+                        .Where(rk => rk.Status == "aktivan")
+                        .Take(4)
+                        .ToList();
+                if (bicikli != null)
+                {
+                    List<BikeHub.Model.BicikliFM.Bicikli> mappedBicikli = 
+                        _mapper.Map<List<BikeHub.Services.Database.Bicikl>, List<BikeHub.Model.BicikliFM.Bicikli>>(bicikli);
+                    return mappedBicikli;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            // Filtriraj bicikle s količinom > 0 među preporučenima
+            var recommendedBicikli = _context.Bicikls
+                .Include(x => x.SlikeBiciklis)
+                .Where(b => recommendedBicikliIds.Contains(b.BiciklId) && b.Kolicina > 0 && b.Status == "aktivan")
+                .Take(4) 
+                .ToList();
+            if (recommendedBicikli.Count < 4)
+            {
+                var additionalBicikli = _context.Bicikls
+                    .Include(x => x.SlikeBiciklis)
+                    .Where(b => !recommendedBicikliIds.Contains(b.BiciklId) && b.Kolicina > 0 && b.Status == "aktivan")
+                    .Take(4 - recommendedBicikli.Count)
+                    .ToList();
+                recommendedBicikli.AddRange(additionalBicikli);
+                if (recommendedBicikli != null)
+                {
+                    List<BikeHub.Model.BicikliFM.Bicikli> mappedBicikli =
+                    _mapper.Map<List<BikeHub.Services.Database.Bicikl>, List<BikeHub.Model.BicikliFM.Bicikli>>(recommendedBicikli);
+                    return mappedBicikli;
+                }
+            }
+            if (recommendedBicikli == null || recommendedBicikli.Count == 0)
+            {
+                recommendedBicikli = _context.Bicikls
+                .Include(x => x.SlikeBiciklis)
+                .Where(b => recommendedBicikliIds.Contains(b.BiciklId) && b.Kolicina > 0 && b.Status == "aktivan")
+                .Take(4)
+                .ToList();
+            }
+            List<BikeHub.Model.BicikliFM.Bicikli> Bicikli =
+            _mapper.Map<List<BikeHub.Services.Database.Bicikl>, List<BikeHub.Model.BicikliFM.Bicikli>>(recommendedBicikli);
+            return Bicikli;
+        }
+        public List<Model.DijeloviFM.Dijelovi> GetRecommendedDijeloviList(int BiciklID)
+        {
+            // Pronađi preporučene bicikle za dati DijeloviID
+            var recommendedDijeloviIds = _context.RecommendedKategorijas
+                .Where(rk => rk.BicikliId == BiciklID && rk.Status == "aktivan")
+                .Select(rk => rk.DijeloviId)
+                .ToList();
+
+            if (recommendedDijeloviIds.IsNullOrEmpty())
+            {
+                var dijelovi = _context.Dijelovis
+                        .Include(x => x.SlikeDijelovis)
+                        .Where(rk => rk.Status == "aktivan")
+                        .Take(4)
+                        .ToList();
+                if (dijelovi != null)
+                {
+                    List<BikeHub.Model.DijeloviFM.Dijelovi> mappedBicikli =
+                        _mapper.Map<List<BikeHub.Services.Database.Dijelovi>, List<BikeHub.Model.DijeloviFM.Dijelovi>>(dijelovi);
+                    return mappedBicikli;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            var recommendedDijelovi = _context.Dijelovis
+                .Include(x => x.SlikeDijelovis)
+                .Where(b => recommendedDijeloviIds.Contains(b.DijeloviId) && b.Kolicina > 0)
+                .Take(4)
+                .ToList();
+            if (recommendedDijelovi.Count < 4)
+            {
+                var additionalDijelovi = _context.Dijelovis
+                    .Include(x => x.SlikeDijelovis)
+                    .Where(b => !recommendedDijeloviIds.Contains(b.DijeloviId) && b.Kolicina > 0)
+                    .Take(4 - recommendedDijelovi.Count)
+                    .ToList();
+                recommendedDijelovi.AddRange(additionalDijelovi);
+                if (recommendedDijelovi != null)
+                {
+                    List<BikeHub.Model.DijeloviFM.Dijelovi> mappedBicikli =
+                    _mapper.Map<List<BikeHub.Services.Database.Dijelovi>, List<BikeHub.Model.DijeloviFM.Dijelovi>>(recommendedDijelovi);
+                    return mappedBicikli;
+                }
+            }
+            if(recommendedDijelovi==null || recommendedDijelovi.Count == 0)
+            {
+                recommendedDijelovi = _context.Dijelovis
+                .Include(x => x.SlikeDijelovis)
+                .Where(b => recommendedDijeloviIds.Contains(b.DijeloviId) && b.Kolicina > 0)
+                .Take(4)
+                .ToList();
+            }
+            List<BikeHub.Model.DijeloviFM.Dijelovi> Bicikli =
+            _mapper.Map<List<BikeHub.Services.Database.Dijelovi>, List<BikeHub.Model.DijeloviFM.Dijelovi>>(recommendedDijelovi);
+            return Bicikli;
         }
     }
 }

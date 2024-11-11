@@ -1,11 +1,61 @@
+import 'package:bikehub_desktop/modeli/dijelovi/dijelovi_model.dart';
 import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
 import '../ostalo/helper_service.dart';
 import 'package:flutter/foundation.dart';
+import 'package:bikehub_desktop/services/korisnik/korisnik_service.dart';
 
 class DijeloviService {
   final Dio _dio = Dio();
   final logger = Logger();
+  final KorisnikService _korisnikService = KorisnikService();
+
+  Future<void> _addAuthorizationHeader() async {
+    // Provjera da li je korisnik prijavljen
+    final isLoggedIn = await _korisnikService.isLoggedIn();
+    if (!isLoggedIn) {
+      throw Exception("User not logged in");
+    }
+
+    // Dohvati korisničke podatke iz secure storage-a
+    final korisnikInfo = await _korisnikService.getUserInfo();
+    final username = korisnikInfo['username'];
+    final password = korisnikInfo['password'];
+
+    if (username == null || password == null) {
+      throw Exception("Missing credentials");
+    }
+    // Generiraj Authorization header
+    final authHeader = _korisnikService.encodeBasicAuth(username, password);
+    _dio.options.headers['Authorization'] = authHeader; 
+  }
+ 
+ Future<Map<String, dynamic>?> postDijelovi(Dijelovi dijeloviData) async {
+    try {
+      await _addAuthorizationHeader();
+
+      final response = await _dio.post(
+        '${HelperService.baseUrl}/Dijelovi',
+        options: Options(
+          headers: {
+            'accept': 'text/plain',
+            'Content-Type': 'application/json',
+          },
+        ),
+        data: dijeloviData,
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> bicikl = response.data;
+        return bicikl;
+      } else {
+        throw Exception('Failed to create bicikl');
+      }
+    } catch (e) {
+      logger.e('Greška: $e');
+      return null;
+    }
+  }
 
   // ignore: non_constant_identifier_names
   final ValueNotifier<List<Map<String, dynamic>>> lista_ucitanih_dijelova = ValueNotifier([]);
@@ -86,4 +136,26 @@ class DijeloviService {
       return null;
     }
   }
+
+  Future<void> removeDijelovi(int idDijelovi) async {
+    try {
+      await _addAuthorizationHeader();
+
+      final response = await _dio.delete(
+        '${HelperService.baseUrl}/Dijelovi/$idDijelovi',
+      );
+
+      if (response.statusCode == 200) {
+        lista_ucitanih_dijelova.value.removeWhere((dijelovi) => dijelovi['id'] == idDijelovi);
+        // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
+        lista_ucitanih_dijelova.notifyListeners();
+        logger.i('Dio uspješno uklonjen.');
+      } else {
+        throw Exception('Neuspješno uklanjanje  dijela.');
+      }
+    } catch (e) {
+      logger.e('Greška pri uklanjanju  dijela: $e');
+    }
+  }
+
 }

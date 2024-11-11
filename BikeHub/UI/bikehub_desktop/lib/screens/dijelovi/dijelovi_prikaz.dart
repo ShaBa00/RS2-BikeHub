@@ -1,4 +1,6 @@
+import 'package:bikehub_desktop/screens/bicikli/bicikl_prikaz.dart';
 import 'package:bikehub_desktop/services/dijelovi/dijelovi_service.dart';
+import 'package:bikehub_desktop/services/kategorije/recommended_kategorije_service.dart';
 import 'package:flutter/material.dart';
 import '../../services/adresa/adresa_service.dart';
 import '../../services/korisnik/korisnik_service.dart';
@@ -20,11 +22,13 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
   Map<String, dynamic>? korisnik;
   Map<String, dynamic>? dio;
   Map<String, dynamic>? adresa;
-  int currentImageIndex = 0;
+  int currentImageIndex = 0;  
+  final RecommendedKategorijaService recommendedKategorijaService = RecommendedKategorijaService();
 
   @override
   void initState() {
     super.initState();
+    recommendedKategorijaService.getRecommendedBiciklList(widget.dioId);
     fetchData();
   }
 
@@ -85,12 +89,14 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
       ),
       body: korisnik == null || dio == null || adresa == null
           ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      // Left Panel (LP)
+          : SingleChildScrollView(
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.8, // prilagođeno za središnji sadržaj
+                    child: Row(
+                      children: [
+                        // Left Panel (LP)
                       Expanded(
                         child: Center(
                           child: Container(
@@ -128,7 +134,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                       ),
                                       const SizedBox(width: 8.0),
                                       Text(
-                                        korisnik!['username'],
+                                        korisnik?['username'] ?? 'Korisničko ime nije pronađeno',
                                         style: const TextStyle(color: Colors.white),
                                       ),
                                     ],
@@ -153,7 +159,9 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                       ),
                                       const SizedBox(width: 8.0),
                                       Text(
-                                        korisnik!['korisnikInfos'][0]['telefon'],
+                                        korisnik?['korisnikInfos'] != null && korisnik!['korisnikInfos'].isNotEmpty 
+                                          ? korisnik!['korisnikInfos'][0]['telefon'] ?? 'Telefon nije pronađen' 
+                                          : 'Telefon nije pronađen',
                                         style: const TextStyle(color: Colors.white),
                                       ),
                                     ],
@@ -164,7 +172,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                           ),
                         ),
                       ),
-                      // Middle Panel (SP)
+                    // Middle Panel (SP)
                       Expanded(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -195,85 +203,85 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                           ],
                         ),
                       ),
-                      // Right Panel (DP)
-                      Expanded(
-                        child: Center(
-                          child: Container(
-                            width: MediaQuery.of(context).size.width * 0.2, // 20% širine ekrana
-                            height: MediaQuery.of(context).size.height * 0.3, // 30% visine ekrana
-                            padding: const EdgeInsets.all(16.0),
-                            decoration: BoxDecoration(
-                              color: Colors.transparent, // Prozirna pozadina
-                              border: Border(
-                                left: BorderSide(color: Colors.blue.shade900, width: 2.0),
-                                bottom: BorderSide(color: Colors.blue.shade900, width: 2.0),
-                                right: BorderSide(color: Colors.blue.shade900, width: 2.0),
+                          // Right Panel (DP)
+                          Expanded(
+                          child: Center(
+                            child: Container(
+                              width: MediaQuery.of(context).size.width * 0.2, // 20% širine ekrana
+                              height: MediaQuery.of(context).size.height * 0.3, // 30% visine ekrana
+                              padding: const EdgeInsets.all(16.0),
+                              decoration: BoxDecoration(
+                                color: Colors.transparent, // Prozirna pozadina
+                                border: Border(
+                                  left: BorderSide(color: Colors.blue.shade900, width: 2.0),
+                                  bottom: BorderSide(color: Colors.blue.shade900, width: 2.0),
+                                  right: BorderSide(color: Colors.blue.shade900, width: 2.0),
+                                ),
+                                borderRadius: BorderRadius.circular(12.0),
                               ),
-                              borderRadius: BorderRadius.circular(12.0),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(8.0),
-                                  decoration: BoxDecoration(
-                                    border: Border(
-                                      left: BorderSide(color: Colors.blue.shade900, width: 2.0),
-                                      bottom: BorderSide(color: Colors.blue.shade900, width: 2.0),
-                                      right: BorderSide(color: Colors.blue.shade900, width: 2.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8.0),
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        left: BorderSide(color: Colors.blue.shade900, width: 2.0),
+                                        bottom: BorderSide(color: Colors.blue.shade900, width: 2.0),
+                                        right: BorderSide(color: Colors.blue.shade900, width: 2.0),
+                                      ),
+                                      borderRadius: BorderRadius.circular(8.0),
                                     ),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Text(
-                                        'Grad: ',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                      const SizedBox(width: 8.0),
-                                      Text(
-                                        adresa!['grad'],
-                                        style: const TextStyle(color: Colors.white),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 16.0),
-                                Container(
-                                  padding: const EdgeInsets.all(8.0),
-                                  decoration: BoxDecoration(
-                                    border: Border(
-                                      left: BorderSide(color: Colors.blue.shade900, width: 2.0),
-                                      bottom: BorderSide(color: Colors.blue.shade900, width: 2.0),
-                                      right: BorderSide(color: Colors.blue.shade900, width: 2.0),
+                                    child: Row(
+                                      children: [
+                                        const Text(
+                                          'Grad: ',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        const SizedBox(width: 8.0),
+                                        Text(
+                                          adresa?['grad'] ?? 'Grad nije pronađen',
+                                          style: const TextStyle(color: Colors.white),
+                                        ),
+                                      ],
                                     ),
-                                    borderRadius: BorderRadius.circular(8.0),
                                   ),
-                                  child: Row(
-                                    children: [
-                                      const Text(
-                                        'Ulica: ',
-                                        style: TextStyle(color: Colors.white),
+                                  const SizedBox(height: 16.0),
+                                  Container(
+                                    padding: const EdgeInsets.all(8.0),
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        left: BorderSide(color: Colors.blue.shade900, width: 2.0),
+                                        bottom: BorderSide(color: Colors.blue.shade900, width: 2.0),
+                                        right: BorderSide(color: Colors.blue.shade900, width: 2.0),
                                       ),
-                                      const SizedBox(width: 8.0),
-                                      Text(
-                                        adresa!['ulica'],
-                                        style: const TextStyle(color: Colors.white),
-                                      ),
-                                    ],
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Text(
+                                              'Ulica: ',
+                                           style: TextStyle(color: Colors.white),
+                                        ),
+                                        const SizedBox(width: 8.0),
+                                        Text(
+                                          adresa?['ulica'] ?? 'Ulica nije pronađena',
+                                          style: const TextStyle(color: Colors.white),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                // Bottom Info Panel
-                Align(
+                  // Bottom Info Panel
+                  Align(
                   alignment: Alignment.center,
                   child: Container(
                     width: MediaQuery.of(context).size.width * 0.8, 
@@ -290,79 +298,11 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8.0),
-                          decoration: BoxDecoration(
-                            border: Border(
-                              left: BorderSide(color: Colors.blue.shade900, width: 2.0),
-                              bottom: BorderSide(color: Colors.blue.shade900, width: 2.0),
-                              right: BorderSide(color: Colors.blue.shade900, width: 2.0),
-                            ),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: Row(
-                            children: [
-                              const Text(
-                                'Naziv: ',
-                                style: TextStyle(color: Colors.white),
-                              ),   
-                              const SizedBox(width: 118.0),
-                              Text(
-                                dio!['naziv'],
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(8.0),
-                          decoration: BoxDecoration(
-                            border: Border(
-                              left: BorderSide(color: Colors.blue.shade900, width: 2.0),
-                              bottom: BorderSide(color: Colors.blue.shade900, width: 2.0),
-                              right: BorderSide(color: Colors.blue.shade900, width: 2.0),
-                            ),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: Row(
-                            children: [
-                              const Text(
-                                'Opis: ',
-                                style: TextStyle(color: Colors.white),
-                              ),   
-                              const SizedBox(width: 118.0),
-                              Text(
-                                dio!['opis'],
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(8.0),
-                          decoration: BoxDecoration(
-                            border: Border(
-                              left: BorderSide(color: Colors.blue.shade900, width: 2.0),
-                              bottom: BorderSide(color: Colors.blue.shade900, width: 2.0),
-                              right: BorderSide(color: Colors.blue.shade900, width: 2.0),
-                            ),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: Row(
-                            children: [
-                              const Text(
-                                'Cijena: ',
-                                style: TextStyle(color: Colors.white),
-                              ),   
-                              const SizedBox(width: 118.0),
-                              Text(
-                                dio!['cijena'].toString(),
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ),
+                      children: [                        
+                        _buildDetailContainer('Naziv', dio?['naziv'] ?? 'Naziv nije pronađen'),
+                        _buildDetailContainer('Opis', dio?['opis'] ?? 'Opis nije pronađen'),
+                        _buildDetailContainer('Cijena', dio?['cijena']?.toString() ?? 'Cijena nije pronađena'),
+                        _buildDetailContainer('Količina', dio?['kolicina']?.toString() ?? 'Količina nije pronađena'),
                         Container(
                           padding: const EdgeInsets.all(8.0),
                           decoration: BoxDecoration(
@@ -391,9 +331,137 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                     ),
                   ),
                 ),
-              ],
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    height: MediaQuery.of(context).size.height * 0.40, // Visina glavnog okvira
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Color.fromARGB(255, 255, 255, 255),
+                          Color.fromARGB(255, 188, 188, 188),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                    ),
+                    child: ValueListenableBuilder<List<Map<String, dynamic>>>(
+                      valueListenable: recommendedKategorijaService.recommendedBicikliList,
+                      builder: (context, bicikli, _) {
+                        return bicikli.isEmpty
+                            ? const Center(
+                                child: Text(
+                                  "Nema preporučenih bicikl.",
+                                  style: TextStyle(fontSize: 20, color: Colors.black54),
+                                ),
+                              )
+                            : GridView.builder(
+                                padding: const EdgeInsets.all(8.0),
+                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 4, // Prilagodi broj stupaca prema potrebi
+                                  childAspectRatio: 1,
+                                  mainAxisSpacing: 12.0,
+                                  crossAxisSpacing: 12.0,
+                                ),
+                                itemCount: bicikli.length,
+                                itemBuilder: (context, index) {
+                                  final item = bicikli[index];
+                                  final korisnikId = item['korisnikId'] ?? 0;
+                                  final biciklId = item['biciklId'] ?? 0;
+                                  final naziv = item['naziv'] ?? 'Nepoznato';
+                                  final cijena = item['cijena'] ?? 0;
+                                  Uint8List? imageBytes;
+
+                                  if (item['slikeBiciklis'] != null && item['slikeBiciklis'].isNotEmpty) {
+                                    final base64Image = item['slikeBiciklis'][0]['slika'];
+                                    imageBytes = base64Decode(base64Image);
+                                  }
+
+                                  return MouseRegion(
+                                    cursor: SystemMouseCursors.click,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => BiciklPrikaz(biciklId: biciklId, korisnikId: korisnikId),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        height: MediaQuery.of(context).size.height * 0.02,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(8.0),
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                                          children: [
+                                            Expanded(
+                                              child: ClipRRect(
+                                                borderRadius: const BorderRadius.only(
+                                                  topLeft: Radius.circular(8.0),
+                                                  topRight: Radius.circular(8.0),
+                                                ),
+                                                child: imageBytes != null
+                                                ? Image.memory(
+                                                    imageBytes,
+                                                    fit: BoxFit.cover,
+                                                  )
+                                                : const Icon(Icons.image_not_supported, size: 50),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(naziv, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                                                  const SizedBox(height: 4),
+                                                  Text('Cijena: $cijena KM', style: const TextStyle(fontSize: 12)),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
       ),
     );
   }
 }
+  Widget _buildDetailContainer(String label, dynamic value) {
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(        
+        border: Border(
+          left: BorderSide(color: Colors.blue.shade900, width: 2.0),
+          bottom: BorderSide(color: Colors.blue.shade900, width: 2.0),
+          right: BorderSide(color: Colors.blue.shade900, width: 2.0),
+        ),
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Row(
+        children: [
+          Text(
+            '$label: ',
+            // ignore: prefer_const_constructors
+            style: TextStyle(color: Colors.white),
+          ),   
+          Text(
+            '$value',
+            style: const TextStyle(color: Colors.white),
+          ),                           
+        ],
+      ),
+    );
+  }
