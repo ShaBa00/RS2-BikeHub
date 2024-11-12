@@ -1,10 +1,88 @@
+// ignore_for_file: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member, non_constant_identifier_names
+
+import 'package:bikehub_desktop/services/korisnik/korisnik_service.dart';
 import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
 import '../ostalo/helper_service.dart';
+import 'package:flutter/foundation.dart';
+
 
 class RezervacijaServisaService {
   final Dio _dio = Dio();
   final logger = Logger();
+  final KorisnikService _korisnikService = KorisnikService();
+  int count=0;
+
+  Future<void> _addAuthorizationHeader() async {
+    // Provjera da li je korisnik prijavljen
+    final isLoggedIn = await _korisnikService.isLoggedIn();
+    if (!isLoggedIn) {
+      throw Exception("User not logged in");
+    }
+
+    // Dohvati korisničke podatke iz secure storage-a
+    final korisnikInfo = await _korisnikService.getUserInfo();
+    final username = korisnikInfo['username'];
+    final password = korisnikInfo['password'];
+
+    if (username == null || password == null) {
+      throw Exception("Missing credentials");
+    }
+    // Generiraj Authorization header
+    final authHeader = _korisnikService.encodeBasicAuth(username, password);
+    _dio.options.headers['Authorization'] = authHeader; 
+  }
+
+ 
+  final ValueNotifier<List<Map<String, dynamic>>> lista_ucitanih_rezervacija = ValueNotifier([]);
+  Future<Map<String, dynamic>?> getRezervacije({
+    int? serviserId,
+    double? ocjena,
+    String? status,
+    int page = 0,
+    int pageSize = 5,
+  }) async {
+    try {
+      await _addAuthorizationHeader();
+
+      final queryParams = <String, dynamic>{};
+
+      if (serviserId != null) queryParams['ServiserId'] = serviserId;
+      if (ocjena != null) queryParams['Ocjena'] = ocjena;
+      if (status != null) queryParams['Status'] = status;
+
+      queryParams['Page'] = page;
+      queryParams['PageSize'] = pageSize;
+
+      // Pošalji GET zahtev
+      final response = await _dio.get(
+        '${HelperService.baseUrl}/RezervacijaServisa',
+        queryParameters: queryParams,
+        options: Options(
+          headers: {
+            'accept': 'application/json',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        count = response.data['count'];
+
+        List<Map<String, dynamic>> lista = List<Map<String, dynamic>>.from(response.data['resultsList']);
+        
+        lista_ucitanih_rezervacija.value= lista;
+        lista_ucitanih_rezervacija.notifyListeners();
+
+        final Map<String, dynamic> data = response.data;
+        return data;
+      } else {
+        throw Exception('Failed to fetch rezervacije servisa');
+      }
+    } catch (e) {
+      logger.e('Greška: $e');
+      return null;
+    }
+  }
 
   Future<List<int>> getSlobodniDani({
     required int serviserId,
@@ -32,4 +110,37 @@ class RezervacijaServisaService {
       return [];
     }
   }
+
+  Future<bool> postaviStanje(int idRezervacije, String stanje) async {
+    try {
+      await _addAuthorizationHeader();
+
+      final pathMap = {
+        "aktivan": "/RezervacijaServisa/aktivacija/$idRezervacije",
+        "vracen": "/RezervacijaServisa/aktivacija/$idRezervacije",
+        "zavrseno": "/RezervacijaServisa/zavrsi/$idRezervacije"
+      };
+
+      final queryParameters = (stanje == "aktivan" || stanje == "vracen")
+          ? {'aktivacija': stanje == "aktivan"}
+          : null;
+
+      final response = await _dio.put(
+        '${HelperService.baseUrl}${pathMap[stanje]}',
+        queryParameters: queryParameters,
+        options: Options(headers: {'accept': 'application/json'}),
+      );
+
+      if (response.statusCode == 200) {
+        logger.i('Rezervacija status updated successfully');
+        return true;
+      } else {
+        throw Exception('Failed to update rezervacija status');
+      }
+    } catch (e) {
+      logger.e('Greška: $e');
+      return false;
+    }
+  }
+
 }

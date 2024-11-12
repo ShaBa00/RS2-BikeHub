@@ -8,6 +8,7 @@ namespace BikeHub.Model.ServisFM
     public class ServiserSearchObjectDTO : BaseSearchObject
     {
         public int? ServiserId { get; set; }
+        public int? KorisnikId { get; set; }
         public string? Username { get; set; }
         public decimal? PocetnaCijena { get; set; }
         public decimal? KrajnjaCijena { get; set; }

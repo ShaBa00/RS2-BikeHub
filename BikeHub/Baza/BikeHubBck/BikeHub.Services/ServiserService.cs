@@ -150,6 +150,8 @@ namespace BikeHub.Services
             // Filtriranje
             if (searchObject.ServiserId != null)
                 query = query.Where(x => x.ServiserId == searchObject.ServiserId);
+            if (searchObject.KorisnikId != null)
+                query = query.Where(x => x.KorisnikId == searchObject.KorisnikId);
 
             if (!string.IsNullOrWhiteSpace(searchObject?.Status))
                 query = query.Where(x => x.Status == searchObject.Status);

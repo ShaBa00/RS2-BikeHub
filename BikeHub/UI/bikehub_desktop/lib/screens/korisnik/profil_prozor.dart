@@ -1,6 +1,7 @@
 // ignore_for_file: sort_child_properties_last
 
 import 'package:bikehub_desktop/screens/korisnik/korisnik_proizvodi_prikaz.dart';
+import 'package:bikehub_desktop/screens/serviser/serviser_profil.dart';
 import 'package:bikehub_desktop/services/korisnik/korisnik_service.dart';
 import 'package:flutter/material.dart';
 
@@ -174,7 +175,11 @@ class _ProfilProzorState extends State<ProfilProzor> {
                                 const SizedBox(height: 20), 
                                 ElevatedButton(
                                     onPressed: () {
-                                      // Za sada dugme ne radi ništa
+                                      Navigator.push(
+                                        context,
+                                        // ignore: prefer_const_constructors
+                                        MaterialPageRoute(builder: (context) => ServiserProfil()),
+                                      );
                                     },
                                     child: const Text("Serviser"),
                                   ),

@@ -18,6 +18,7 @@ class ServiserService {
     double? pocetnaOcjena,
     double? krajnjaOcjena,
     int? pocetniBrojServisa,
+    int? korisnikId,
     int? krajnjiBrojServisa,
     List<int>? korisniciId,
     int page = 1,
@@ -38,6 +39,7 @@ class ServiserService {
       if (krajnjaOcjena != null) queryParameters['KrajnjaOcjena'] = krajnjaOcjena;
 
       if (korisniciId != null) queryParameters['korisniciId'] = korisniciId;
+      if (korisnikId != null) queryParameters['korisnikId'] = korisnikId;
       queryParameters['Page'] = page;
       queryParameters['PageSize'] = pageSize;
 
