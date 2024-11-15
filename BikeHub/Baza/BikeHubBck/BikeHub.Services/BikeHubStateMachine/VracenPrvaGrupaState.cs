@@ -20,6 +20,7 @@ namespace BikeHub.Services.BikeHubStateMachine
             var set = Context.Set<TDbEntity>();
             var entity = set.Find(id);
             entity.GetType().GetProperty("Status").SetValue(entity, "aktivan");
+            Context.Update(entity);
             Context.SaveChanges();
 
             return Mapper.Map<TModel>(entity);
@@ -31,6 +32,7 @@ namespace BikeHub.Services.BikeHubStateMachine
             var entity = set.Find(id);
             Mapper.Map(request, entity);
             entity.GetType().GetProperty("Status").SetValue(entity, "izmijenjen");
+            Context.Update(entity);
             Context.SaveChanges();
 
             return Mapper.Map<TModel>(entity);
@@ -41,6 +43,7 @@ namespace BikeHub.Services.BikeHubStateMachine
             var set = Context.Set<TDbEntity>();
             var entity = set.Find(id);
             entity.GetType().GetProperty("Status").SetValue(entity, "obrisan");
+            Context.Update(entity);
             Context.SaveChanges();
 
             return Mapper.Map<TModel>(entity);

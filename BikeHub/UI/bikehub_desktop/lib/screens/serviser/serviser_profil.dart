@@ -124,7 +124,7 @@ void tipRezervacije(String _status) async {
   }
 
   Widget buildRezervacijeList() {
-    final rezervacije = rezervacijeList?.take(10).toList() ?? [];
+    final rezervacije = rezervacijeList ?? [];
 
     return ListView.builder(
       itemCount: rezervacije.length,

@@ -1,4 +1,8 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:bikehub_desktop/screens/dijelovi/dijelovi_prikaz.dart';
+import 'package:bikehub_desktop/screens/ostalo/poruka_helper.dart';
+import 'package:bikehub_desktop/services/bicikli/spaseni_bicikl_service.dart';
 import 'package:flutter/material.dart';
 import '../../services/bicikli/bicikl_service.dart';
 import '../../services/adresa/adresa_service.dart';
@@ -23,13 +27,38 @@ class _BiciklPrikazState extends State<BiciklPrikaz> {
   Map<String, dynamic>? bicikl;
   Map<String, dynamic>? adresa;
   final RecommendedKategorijaService recommendedKategorijaService = RecommendedKategorijaService();
+  final KorisnikService korisnikService = KorisnikService();
+  final SpaseniBicikliService spaseniBicikliService = SpaseniBicikliService();
   int currentImageIndex = 0;
+  bool isLoggedIn=false;
 
   @override
   void initState() {
     super.initState();
     recommendedKategorijaService.getRecommendedDijeloviList(widget.biciklId);
     fetchData();
+  }
+
+  loggedIn() async {
+    isLoggedIn = await korisnikService.isLoggedIn();
+    setState(() {});
+  }
+
+  saveProduct() async {
+    if(!isLoggedIn){
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je prijaviti se da bi mogli sacuvati proizvod");
+    }
+    final userInfo = await korisnikService.getUserInfo();
+    final int? idKorisnika = int.tryParse(userInfo['korisnikId'] ?? '');
+    if (bicikl != null && korisnik != null) {
+      await spaseniBicikliService.addSpaseniBicikl(context,bicikl?['biciklId'], idKorisnika!);
+    }
+  }
+
+  orderProduct() async {
+    if(!isLoggedIn){
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je prijaviti se da bi mogli narucili proizvod");
+    }
   }
 
   Future<void> fetchData() async {
@@ -42,6 +71,7 @@ class _BiciklPrikazState extends State<BiciklPrikaz> {
       bicikl = fetchedBicikl;
       adresa = fetchedAdresa;
     });
+    await loggedIn();
   }
   Uint8List? getCurrentImageBytes() {
     if (bicikl != null &&
@@ -175,35 +205,49 @@ class _BiciklPrikazState extends State<BiciklPrikaz> {
                             ),
                         // Middle Panel (SP)
                         Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  if (getCurrentImageBytes() != null)
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(16.0), // Zaobljenje ivica
-                                      child: Image.memory(
-                                        getCurrentImageBytes()!,
-                                        width: MediaQuery.of(context).size.width * 0.4, // širine ekrana
-                                        height: MediaQuery.of(context).size.width * 0.32, // širine ekrana za kvadratne slike
-                                        fit: BoxFit.cover, 
-                                      ),
-                                    ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      IconButton(
-                                        icon: const Icon(Icons.arrow_back),
-                                        onPressed: showPreviousImage,
-                                      ),
-                                      IconButton(
-                                        icon: const Icon(Icons.arrow_forward),
-                                        onPressed: showNextImage,
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (getCurrentImageBytes() != null)
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(16.0), // Zaobljenje ivica
+                                child: Image.memory(
+                                  getCurrentImageBytes()!,
+                                  width: MediaQuery.of(context).size.width * 0.4, // širine ekrana
+                                  height: MediaQuery.of(context).size.width * 0.32, // širine ekrana za kvadratne slike
+                                  fit: BoxFit.cover,
+                                ),
                               ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.arrow_back),
+                                  onPressed: showPreviousImage,
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.arrow_forward),
+                                  onPressed: showNextImage,
+                                ),
+                              ],
                             ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: saveProduct,
+                                  child: const Text('Sačuvaj'),
+                                ),
+                                const SizedBox(width: 16.0),
+                                ElevatedButton(
+                                  onPressed: orderProduct,
+                                  child: const Text('Naruči'),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                         // Right Panel (DP)
                         Expanded(
                               child: Center(

@@ -4,6 +4,7 @@ import 'package:bikehub_desktop/screens/bicikli/bicikl_dodaj.dart';
 import 'package:bikehub_desktop/screens/dijelovi/dijelovi_dodaj.dart';
 import 'package:bikehub_desktop/screens/korisnik/profil_prozor.dart';
 import 'package:bikehub_desktop/screens/korisnik/sacuvani_proizvodi.dart';
+import 'package:bikehub_desktop/screens/ostalo/poruka_helper.dart';
 import 'package:bikehub_desktop/screens/prijava/log_in_prozor.dart';
 import 'package:flutter/material.dart';
 import '../bicikli/bicikl_prozor.dart';
@@ -41,6 +42,9 @@ class PocetniProzorP1 extends StatefulWidget {
         var korisnik = await korisnikService.getUserInfo();
         korisnikId = int.parse(korisnik['korisnikId'] as String); // Pretvara String u int
       }
+      else{
+        isLoggedIn=false;
+      }
       setState(() {});
     }
 
@@ -49,10 +53,7 @@ class PocetniProzorP1 extends StatefulWidget {
       setState(() {
         isLoggedIn = false;
       });
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Uspješno ste se odjavili!')),
-      );
+      PorukaHelper.prikaziPorukuUspjeha(context, 'Uspješno ste se odjavili!');
     }
   @override
   Widget build(BuildContext context) {
@@ -300,7 +301,7 @@ Widget _buildResponsiveButton(BuildContext context, String label) {
 }
 
 
-   Widget _buildResponsiveButton3(BuildContext context, String label, VoidCallback onPressed) {
+  Widget _buildResponsiveButton3(BuildContext context, String label, VoidCallback onPressed) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.066,
       height: MediaQuery.of(context).size.height * 0.035,

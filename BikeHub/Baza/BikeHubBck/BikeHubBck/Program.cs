@@ -53,7 +53,7 @@ StateRegistrationHelper.RegisterStates<BikeHub.Model.AdresaFM.Adresa, BikeHub.Se
 StateRegistrationHelper.RegisterStates<BikeHub.Model.BicikliFM.Bicikli, BikeHub.Services.Database.Bicikl, BicikliInsertR, BicikliUpdateR>(builder.Services);
 StateRegistrationHelper.RegisterStates<BikeHub.Model.DijeloviFM.Dijelovi, BikeHub.Services.Database.Dijelovi, DijeloviInsertR, DijeloviUpdateR>(builder.Services);
 StateRegistrationHelper.RegisterStates<BikeHub.Model.KategorijaFM.Kategorija, BikeHub.Services.Database.Kategorija, KategorijaInsertR, KategorijaUpdateR>(builder.Services);
-StateRegistrationHelper.RegisterStates<BikeHub.Model.KorisnikFM.Korisnik, BikeHub.Services.Database.Korisnik, KorisniciInsertRHS, KorisniciUpdateR>(builder.Services);
+StateRegistrationHelper.RegisterStates<BikeHub.Model.KorisnikFM.Korisnik, BikeHub.Services.Database.Korisnik, KorisniciInsertRHS, BikeHub.Services.Database.Korisnik>(builder.Services);
 StateRegistrationHelper.RegisterStates<BikeHub.Model.KorisnikFM.KorisnikInfo, BikeHub.Services.Database.KorisnikInfo, KorisnikInfoInsertR, KorisnikInfoUpdateR>(builder.Services);
 StateRegistrationHelper.RegisterStates<BikeHub.Model.RecommendedKategorijaFM.RecommendedKategorija, BikeHub.Services.Database.RecommendedKategorija, RecommendedKategorijaInsertR, RecommendedKategorijaUpdateR>(builder.Services);
 StateRegistrationHelper.RegisterStates<BikeHub.Model.ServisFM.Serviser, BikeHub.Services.Database.Serviser, ServiserInsertR, ServiserUpdateR>(builder.Services);

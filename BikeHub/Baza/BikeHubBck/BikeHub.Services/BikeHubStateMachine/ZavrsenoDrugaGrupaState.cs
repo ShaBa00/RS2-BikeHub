@@ -19,6 +19,7 @@ namespace BikeHub.Services.BikeHubStateMachine
             var set = Context.Set<TDbEntity>();
             var entity = set.Find(id);
             entity.GetType().GetProperty("Status").SetValue(entity, "obrisano");
+            Context.Update(entity);
             Context.SaveChanges();
 
             return Mapper.Map<TModel>(entity);

@@ -16,7 +16,8 @@ namespace BikeHub.Model.KorisnikFM
         public string Status { get; set; }
 
         // Novi propertiji
-        public int? brojProizvoda { get; set; }
+        public int? BrojProizvoda { get; set; }
+        public int? BrojRezervacija { get; set; }
         public int? UkupnaKolicina { get; set; }
         public bool? JeServiser { get; set; }
     }

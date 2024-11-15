@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class PorukaHelper {
+  static OverlayEntry? _trenutnaPoruka;
+
   static void prikaziPorukuUpozorenja(BuildContext context, String poruka) {
     _prikaziPoruku(context, poruka, const Color.fromARGB(255, 255, 255, 62).withOpacity(0.8), const Color.fromARGB(255, 0, 0, 0));
   }
@@ -14,6 +16,10 @@ class PorukaHelper {
   }
 
   static void _prikaziPoruku(BuildContext context, String poruka, Color backgroundColor, Color textColor) {
+    // Ukloni prethodnu poruku ako postoji
+    _trenutnaPoruka?.remove();
+    _trenutnaPoruka = null;
+
     final overlay = Overlay.of(context);
     final overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
@@ -38,10 +44,16 @@ class PorukaHelper {
       ),
     );
 
-    // Prikaži poruku i automatski ukloni nakon određenog vremena
+    // Prikaži novu poruku
     overlay.insert(overlayEntry);
+    _trenutnaPoruka = overlayEntry;
+
+    // Automatski ukloni poruku nakon određenog vremena
     Future.delayed(const Duration(seconds: 5), () {
       overlayEntry.remove();
+      if (_trenutnaPoruka == overlayEntry) {
+        _trenutnaPoruka = null;
+      }
     });
   }
 }

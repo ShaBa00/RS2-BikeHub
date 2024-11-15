@@ -276,7 +276,7 @@ Widget _buildDijeloviList(List<Map<String, dynamic>> dijelovi) {
     // Dohvatimo listu spasenih dijelova
     final spaseniDijeloviList = await spaseniDijeloviService.getSpaseniDijelovi(korisnikId: korisnikId);
     // Dohvatimo listu spasenih bicikala
-    final spaseniBicikliList = await spaseniBicikliService.getSpaseniBicikli(korisnikId: korisnikId);
+    final spaseniBicikliList = await spaseniBicikliService.getSpaseniBicikli(korisnikId: korisnikId,status: "",biciklId: 0);
 
   // Dohvati detalje za svaki sačuvani dio i dodaj samo one koji nisu obrisani
   final List<Map<String, dynamic>> sacuvaniDijelovi = [];

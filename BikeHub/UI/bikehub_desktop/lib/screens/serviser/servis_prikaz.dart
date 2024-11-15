@@ -1,3 +1,8 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:bikehub_desktop/screens/ostalo/poruka_helper.dart';
+import 'package:bikehub_desktop/screens/prijava/log_in_prozor.dart';
+import 'package:bikehub_desktop/services/korisnik/korisnik_service.dart';
 import 'package:bikehub_desktop/services/serviser/rezervacija_servisa_service.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -22,20 +27,78 @@ class ServiserPrikaz extends StatefulWidget {
 }
 
 class _ServiserPrikazState extends State<ServiserPrikaz> {
+  final ServiserService _serviserService = ServiserService(); 
+  final KorisnikService _korisnikService = KorisnikService();
+
   int selectedMonth = DateTime.now().month;
   int selectedYear = DateTime.now().year;
   List<int> slobodniDani = [];
   String? odabraniDatum="YYYY-MM-DD";
   DateTime newfocusedDay = DateTime.now();
-  final ServiserService _serviserService = ServiserService();
+
   final Logger logger = Logger();
+
   Map<String, dynamic>? serviserDetalji;
+
+  bool isLoggedIn = false;
+  int korisnikId=0;
+
+  void rezervacija() async {
+    final rezervacijaServisaService = RezervacijaServisaService();
+
+    bool isLoggedIn = await _korisnikService.isLoggedIn();
+    if (!isLoggedIn) {
+      PorukaHelper.prikaziPorukuUpozorenja(
+        context,
+        "Morate biti prijavljeni da biste rezervirali termin.",
+      );
+      return;
+    }
+    
+    if (odabraniDatum == null || odabraniDatum!.isEmpty || odabraniDatum == "YYYY-MM-DD") {
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je odabrati datum");
+      return;
+    }
+    
+    if (newfocusedDay.isBefore(DateTime.now())) {
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je odabrati datum koji je u budućnosti");
+      return;
+    }
+    
+    int odabraniDan = newfocusedDay.day;
+    if (!slobodniDani.contains(odabraniDan)) {
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je odabrati slobodni datum");
+      return;
+    }
+
+    Map<String, String?> userInfo = await _korisnikService.getUserInfo();
+    int? korisnikId = int.tryParse(userInfo['korisnikId'] ?? '');
+
+    if (korisnikId == null) {
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Neuspješno dohvaćanje korisničkih podataka.");
+      return;
+    }
+    
+    bool success = await rezervacijaServisaService.rezervisi(
+      korisnikId: korisnikId,
+      serviserId: widget.serviserId,
+      datumRezervacije: newfocusedDay,
+    );
+
+    if (success) {
+      fetchSlobodniDani(selectedMonth, selectedYear);
+      PorukaHelper.prikaziPorukuUspjeha(context, "Rezervacija uspješno kreirana.");
+    } else {
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Došlo je do greške pri kreiranju rezervacije.");
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     _fetchServiserDetalji();
     fetchSlobodniDani(selectedMonth, selectedYear);
+    _checkLoginStatus();
   }
   Future<void> fetchSlobodniDani(int month, int year) async {
     selectedMonth=month;
@@ -55,11 +118,27 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
     }
   }
 
+  Future<void> _checkLoginStatus() async {
+    isLoggedIn = await _korisnikService.isLoggedIn();
+    if (isLoggedIn) {
+      var korisnik = await _korisnikService.getUserInfo();
+      korisnikId = int.parse(korisnik['korisnikId'] as String); 
+    }
+    setState(() {});
+  }
+
+  Future<void> _logout() async {
+    await _korisnikService.logout();
+    setState(() {
+      isLoggedIn = false;
+    });
+    PorukaHelper.prikaziPorukuUspjeha(context, 'Uspješno ste se odjavili!');
+  }
 
   Future<void> _fetchServiserDetalji() async {
     try {
       final List<Map<String, dynamic>> serviseri = await _serviserService.getServiseriDTO(
-        korisniciId: [widget.korisnikId],
+        korisnikId: widget.korisnikId,
       );
       if (serviseri.isNotEmpty) {
         setState(() {
@@ -79,8 +158,7 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
     // ignore: unused_local_variable
     //final daysInMonth = DateTime(selectedYear, selectedMonth + 1, 0).day;
     // ignore: unused_local_variable
-    //final startDay = DateTime(selectedYear, selectedMonth, 1).weekday;
-    
+    //final startDay = DateTime(selectedYear, selectedMonth, 1).weekday;    
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -98,6 +176,30 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
           title: const Text('Detalji o Serviseru'),
           backgroundColor: Colors.transparent,
           elevation: 0,
+          actions: isLoggedIn
+              ? [
+                  _buildResponsiveButton(context, 'Sign out', _logout),
+                  const SizedBox(width: 40.0),
+                ]
+              : [
+                  _buildResponsiveButton(context, 'Log in', () async {
+                    // Navigiraj ka ekranu za prijavu
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LogInProzor(
+                          onLogin: _checkLoginStatus, // Osvježava status kad je login uspješan
+                        ),
+                      ),
+                    );
+                    _checkLoginStatus();
+                  }),
+                  const SizedBox(width: 20.0),
+                  _buildResponsiveButton(context, 'Sign up', () {
+                    // Logika za "Sign up"
+                  }),
+                  const SizedBox(width: 40.0),
+                ],
         ),
         body: Row(
           children: [
@@ -231,7 +333,7 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
                             const SizedBox(height: 20.0),
                             ElevatedButton(
                               onPressed: () {
-                                
+                                rezervacija();
                               },
                               child: const Text("Rezervisi"),
                             ),
@@ -276,6 +378,19 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold), // Podebljan tekst
           ),
         ],
+      ),
+    );
+  }
+  Widget _buildResponsiveButton(BuildContext context, String label, VoidCallback onPressed) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.066,
+      height: MediaQuery.of(context).size.height * 0.035,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color.fromARGB(255, 9, 72, 138),
+        ),
+        child: Text(label, style: const TextStyle(color: Colors.white)),
       ),
     );
   }

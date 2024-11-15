@@ -1,5 +1,6 @@
 ﻿using BikeHub.Services.Database;
 using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,7 @@ namespace BikeHub.Services.BikeHubStateMachine
             var set = Context.Set<TDbEntity>();
             var entity = set.Find(id);
             entity.GetType().GetProperty("Status").SetValue(entity, "obrisan");
+            Context.Update(entity);
             Context.SaveChanges();
 
             return Mapper.Map<TModel>(entity);
@@ -29,6 +31,7 @@ namespace BikeHub.Services.BikeHubStateMachine
             var set = Context.Set<TDbEntity>();
             var entity = set.Find(id);
             entity.GetType().GetProperty("Status").SetValue(entity, "zavrseno");
+            Context.Update(entity);
             Context.SaveChanges();
 
             return Mapper.Map<TModel>(entity);

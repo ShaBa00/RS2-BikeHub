@@ -37,6 +37,10 @@ namespace BikeHub.Services
             {
                 NoviQuery = NoviQuery.Where(x => x.ServiserId == search.ServiserId);
             }
+            if (search?.KorisnikId != null)
+            {
+                NoviQuery = NoviQuery.Where(x => x.KorisnikId == search.KorisnikId);
+            }
             if (search?.Ocjena != null)
             {
                 NoviQuery = NoviQuery.Where(x => x.Ocjena == search.Ocjena);
@@ -138,6 +142,14 @@ namespace BikeHub.Services
             if (entity == null)
             {
                 throw new UserException("Entitet sa datim ID-om ne postoji");
+            }
+            if (request.Ocjena.HasValue && request.Ocjena >= 1 && request.Ocjena <= 5 &&
+                request.DatumKreiranja == null && request.DatumRezervacije == null)
+            {
+                entity.Ocjena = request.Ocjena.Value;
+                _context.Update(entity);
+                _context.SaveChanges();
+                return Mapper.Map<Model.ServisFM.RezervacijaServisa>(entity); 
             }
             BeforeUpdate(request, entity);
             var state = _baseDrugaGrupaState.CreateState(entity.Status);

@@ -21,9 +21,19 @@ namespace BikeHub.Services
         public KorisnikInfoService(BikeHubDbContext context, IMapper mapper, BasePrvaGrupaState<Model.KorisnikFM.KorisnikInfo, Database.KorisnikInfo, Model.KorisnikFM.KorisnikInfoInsertR,
             Model.KorisnikFM.KorisnikInfoUpdateR> basePrvaGrupaState) 
         : base(context, mapper)        
-        { 
+        {
             _context = context;
             _basePrvaGrupaState = basePrvaGrupaState;
+        }
+        public void updateKorisnikStatus(int korisnikId, string status)
+        {
+            var korisnik = _context.Korisniks.FirstOrDefault(x => x.KorisnikId == korisnikId);
+            if (korisnik != null)
+            {
+                korisnik.Status = status;
+                _context.Update(korisnik);
+                _context.SaveChanges();
+            }
         }
 
         public override IQueryable<Database.KorisnikInfo> AddFilter(KorisnikInfoSearchObject search, IQueryable<Database.KorisnikInfo> query)
@@ -40,6 +50,10 @@ namespace BikeHub.Services
             if (search?.BrojNarudbi != null)
             {
                 NoviQuery = NoviQuery.Where(x => x.BrojNarudbi == search.BrojNarudbi);
+            }
+            if (search?.KorisnikId != null)
+            {
+                NoviQuery = NoviQuery.Where(x => x.KorisnikId == search.KorisnikId);
             }
             if (search?.BrojServisa != null)
             {
@@ -121,7 +135,9 @@ namespace BikeHub.Services
                 throw new UserException("Entitet sa datim ID-om ne postoji");
             }
             BeforeUpdate(request, entity);
+            Mapper.Map(entity, request);
             var state = _basePrvaGrupaState.CreateState(entity.Status);
+            updateKorisnikStatus(entity.KorisnikId, "izmijenjen");
             return state.Update(id, request);
         }
         
@@ -134,6 +150,7 @@ namespace BikeHub.Services
             }
 
             var state = _basePrvaGrupaState.CreateState(entity.Status);
+            updateKorisnikStatus(entity.KorisnikId.Value, "obrisan");
             state.Delete(id);
         }
 

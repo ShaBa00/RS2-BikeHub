@@ -1,4 +1,5 @@
-﻿using BikeHub.Model;
+﻿using Azure.Core;
+using BikeHub.Model;
 using BikeHub.Model.KorisnikFM;
 using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
@@ -18,11 +19,12 @@ namespace BikeHub.Services
         KorisniciInsertR, KorisniciUpdateR>, IKorisnikService
     {
         public BasePrvaGrupaState<Model.KorisnikFM.Korisnik, Database.Korisnik,
-        KorisniciInsertRHS, KorisniciUpdateR> _basePrvaGrupaState;
+        KorisniciInsertRHS, Database.Korisnik> _basePrvaGrupaState;
         private BikeHubDbContext _context;
 
+
         public KorisnikService(BikeHubDbContext context, IMapper mapper, BasePrvaGrupaState<Model.KorisnikFM.Korisnik, Database.Korisnik,
-        KorisniciInsertRHS, KorisniciUpdateR> basePrvaGrupaState) : base(context, mapper)
+        KorisniciInsertRHS, Database.Korisnik> basePrvaGrupaState) : base(context, mapper)
         {
             _context = context;
             _basePrvaGrupaState = basePrvaGrupaState;
@@ -80,6 +82,7 @@ namespace BikeHub.Services
                 .Include(b => b.Bicikls)//.Where(b=>b.Status== "aktivan")
                 .Include(b => b.Dijelovis)//.Where(b => b.Status == "aktivan")
                 .Include(b => b.Servisers)//.Where(b => b.Status == "aktivan")
+                .Include(b => b.RezervacijaServisas)
                 .FirstOrDefault(b => b.KorisnikId == id);
 
             if (result == null)
@@ -92,11 +95,13 @@ namespace BikeHub.Services
             int ukupnaKolicinaBicikala = result.Bicikls.Where(b => b.Status == "aktivan").ToList().Sum(b => b.Kolicina);
             int ukupnaKolicinaDijelova = result.Dijelovis.Where(b => b.Status == "aktivan").ToList().Sum(d => d.Kolicina);
             int ukupnaKolicina = ukupnaKolicinaBicikala + ukupnaKolicinaDijelova;
+            int brojRezervacija = result.RezervacijaServisas.Where(b=>b.KorisnikId==id).ToList().Count;
 
             // Provjera da li je korisnik serviser
             bool jeServiser = result.Servisers.Where(b => b.Status == "aktivan").ToList().Any();
             var mappedKorisnik = Mapper.Map<Model.KorisnikFM.Korisnik>(result);
-            mappedKorisnik.brojProizvoda = brojProizvoda;
+            mappedKorisnik.BrojRezervacija = brojRezervacija;
+            mappedKorisnik.BrojProizvoda = brojProizvoda;
             mappedKorisnik.UkupnaKolicina = ukupnaKolicina;
             mappedKorisnik.JeServiser = jeServiser;
 
@@ -139,6 +144,11 @@ namespace BikeHub.Services
             {
                 throw new UserException("Email mora biti unesen");
             }
+            var emailP = _context.Korisniks.FirstOrDefault(s => s.Email == request.Email);
+            if (emailP != null)
+            {
+                throw new UserException("Email je zauzet");
+            }
             entity.Username = request.Username;
             entity.Email = request.Username;
             entity.LozinkaSalt = GenerateSalt();
@@ -168,18 +178,37 @@ namespace BikeHub.Services
             }
             if (!request.Email.IsNullOrEmpty())
             {
+                var emailP=_context.Korisniks.FirstOrDefault(e=>e.Email==request.Email);
+                if (emailP != null)
+                {
+                    throw new UserException("Email je zauzet");
+                }
                 entity.Email = request.Email;
             }
-            if (request.Lozinka != null)
+            bool isPasswordChangeRequested = !string.IsNullOrEmpty(request.StaraLozinka) &&
+                                 !string.IsNullOrEmpty(request.Lozinka) &&
+                                 !string.IsNullOrEmpty(request.LozinkaPotvrda);
+
+            if (isPasswordChangeRequested)
             {
+                string oldPasswordHash = GenerateHash(entity.LozinkaSalt, request.StaraLozinka);
+                if (oldPasswordHash != entity.LozinkaHash)
+                {
+                    throw new UserException("Stara lozinka nije ispravna");
+                }
                 if (request.Lozinka != request.LozinkaPotvrda)
                 {
                     throw new UserException("Lozinka i LozinkaPotvrda moraju biti iste");
                 }
-
                 entity.LozinkaSalt = GenerateSalt();
                 entity.LozinkaHash = GenerateHash(entity.LozinkaSalt, request.Lozinka);
             }
+            if(request.Username.IsNullOrEmpty() && !isPasswordChangeRequested
+                && request.Email.IsNullOrEmpty())
+            {
+                throw new UserException("Potreno je izvrsiti promjenu na nekom od objekata");
+            }
+
             base.BeforeUpdate(request, entity);
         }
 
@@ -193,7 +222,29 @@ namespace BikeHub.Services
             }
             BeforeUpdate(request, entity);
             var state = _basePrvaGrupaState.CreateState(entity.Status);
-            return state.Update(id, request);
+            return state.Update(id, entity);
+        }
+
+        public override void Aktivacija(int id, bool aktivacija)
+        {
+            var set = Context.Set<Database.Korisnik>();
+            var entity = set.Find(id);
+            if (entity == null)
+            {
+                throw new UserException("Entitet sa datim ID-om ne postoji");
+            }
+            string status = "";
+            if (aktivacija)
+            {
+                status = "aktivan";
+            }
+            else
+            {
+                status = "vracen";
+            }
+            var state = _basePrvaGrupaState.CreateState(entity.Status);
+            updateKorisnikInfoStatus(id, status);
+            base.Aktivacija(id, aktivacija);
         }
 
         public override void SoftDelete(int id)
@@ -203,13 +254,9 @@ namespace BikeHub.Services
             {
                 throw new UserException("Entity not found.");
             }
-            var korisnikInfo = _context.KorisnikInfos.FirstOrDefault(x => x.KorisnikId == id);
-            if (korisnikInfo != null)
-            {
-                korisnikInfo.Status = "obrisan";
-                _context.KorisnikInfos.Update(korisnikInfo);
-            }
+            updateKorisnikInfoStatus(id, "obrisan");
             var state = _basePrvaGrupaState.CreateState(entity.Status);
+            updateKorisnikInfoStatus(id, "obrisan");
             state.Delete(id);
         }
 
@@ -232,6 +279,14 @@ namespace BikeHub.Services
             throw new UserException("Za ovaj entitet nije moguce izvrsiti ovu naredbu");
         }
 
-
+        public void updateKorisnikInfoStatus(int korisnikId, string status)
+        {
+            var korisnikInfo = _context.KorisnikInfos.FirstOrDefault(x => x.KorisnikId == korisnikId);
+            if (korisnikInfo != null)
+            {
+                korisnikInfo.Status = status;
+                _context.Update(korisnikInfo);
+            }
+        }
     }
 }

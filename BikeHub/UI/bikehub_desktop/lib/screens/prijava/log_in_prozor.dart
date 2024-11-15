@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 //import 'package:bikehub_desktop/screens/pocetni_prozor.dart';
+import 'package:bikehub_desktop/screens/ostalo/poruka_helper.dart';
 import 'package:bikehub_desktop/services/korisnik/korisnik_service.dart';
 import 'package:flutter/material.dart';
 
@@ -85,24 +86,20 @@ class LogInProzor extends StatelessWidget {
                   width: MediaQuery.of(context).size.width * 0.1,
                   child: ElevatedButton(
                     onPressed: () async {
-  final username = usernameController.text;
-  final password = passwordController.text;
+                      final username = usernameController.text;
+                      final password = passwordController.text;
 
-  final korisnik = await korisnikService.login(username, password);
+                      final korisnik = await korisnikService.login(username, password);
 
 
-  if (korisnik != null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Uspješno prijavljivanje!')),
-    );
-    onLogin();
-    Navigator.pop(context);
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Neuspješno prijavljivanje.')),
-    );
-  }
-},
+                      if (korisnik != null) {
+                        PorukaHelper.prikaziPorukuUspjeha(context, 'Uspješno prijavljivanje!');
+                        onLogin();
+                        Navigator.pop(context);
+                      } else {
+                        PorukaHelper.prikaziPorukuGreske(context, 'Neuspješno prijavljivanje.');
+                      }
+                    },
                     child: const Text(
                       'Prijavi',
                       style: TextStyle(color: Colors.white),

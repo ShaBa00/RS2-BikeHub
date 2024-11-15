@@ -33,10 +33,46 @@ class RezervacijaServisaService {
     _dio.options.headers['Authorization'] = authHeader; 
   }
 
+  Future<void> dodajOcjenu(int rezervacijaId, int ocjena) async {
+    try {
+      // Dodavanje Authorization headera
+      await _addAuthorizationHeader();
+      if(ocjena<1 && ocjena >5) {
+        return;
+      }
+      // Priprema body za slanje
+      final body = {
+        'ocjena': ocjena,
+      };
+
+      // Slanje POST zahtjeva
+      final response = await _dio.put(
+        '${HelperService.baseUrl}/RezervacijaServisa/$rezervacijaId',
+        data: body,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'accept': 'application/json',
+          },
+        ),
+      );
+
+      // Provjera statusa odgovora
+      if (response.statusCode == 200) {
+        logger.i('Ocjena uspješno dodana.');
+      } else {
+        throw Exception('Neuspješno dodavanje ocjene.');
+      }
+    } catch (e) {
+      logger.e('Greška prilikom dodavanja ocjene: $e');
+    }
+  }
+
  
   final ValueNotifier<List<Map<String, dynamic>>> lista_ucitanih_rezervacija = ValueNotifier([]);
   Future<Map<String, dynamic>?> getRezervacije({
     int? serviserId,
+    int? korisnikId,
     double? ocjena,
     String? status,
     int page = 0,
@@ -48,6 +84,7 @@ class RezervacijaServisaService {
       final queryParams = <String, dynamic>{};
 
       if (serviserId != null) queryParams['ServiserId'] = serviserId;
+      if (korisnikId != null) queryParams['KorisnikId'] = korisnikId;
       if (ocjena != null) queryParams['Ocjena'] = ocjena;
       if (status != null) queryParams['Status'] = status;
 
@@ -118,18 +155,28 @@ class RezervacijaServisaService {
       final pathMap = {
         "aktivan": "/RezervacijaServisa/aktivacija/$idRezervacije",
         "vracen": "/RezervacijaServisa/aktivacija/$idRezervacije",
-        "zavrseno": "/RezervacijaServisa/zavrsi/$idRezervacije"
+        "zavrseno": "/RezervacijaServisa/zavrsi/$idRezervacije",
+        "obrisan": "/RezervacijaServisa/$idRezervacije"
       };
 
       final queryParameters = (stanje == "aktivan" || stanje == "vracen")
           ? {'aktivacija': stanje == "aktivan"}
           : null;
 
-      final response = await _dio.put(
-        '${HelperService.baseUrl}${pathMap[stanje]}',
-        queryParameters: queryParameters,
-        options: Options(headers: {'accept': 'application/json'}),
-      );
+      Response response;
+
+      if (stanje == "obrisan") {
+        response = await _dio.delete(
+          '${HelperService.baseUrl}${pathMap[stanje]}',
+          options: Options(headers: {'accept': 'application/json'}),
+        );
+      } else {
+        response = await _dio.put(
+          '${HelperService.baseUrl}${pathMap[stanje]}',
+          queryParameters: queryParameters,
+          options: Options(headers: {'accept': 'application/json'}),
+        );
+      }
 
       if (response.statusCode == 200) {
         logger.i('Rezervacija status updated successfully');
@@ -143,4 +190,42 @@ class RezervacijaServisaService {
     }
   }
 
+
+  Future<bool> rezervisi({
+    required int korisnikId,
+    required int serviserId,
+    required DateTime datumRezervacije,
+  }) async {
+    try {
+      await _addAuthorizationHeader();
+
+      // Kreiraj JSON tijelo zahtjeva
+      final data = {
+        "korisnikId": korisnikId,
+        "serviserId": serviserId,
+        "datumRezervacije": datumRezervacije.toIso8601String(),
+      };
+
+      // Pošalji POST zahtjev
+      final response = await _dio.post(
+        '${HelperService.baseUrl}/RezervacijaServisa',
+        data: data,
+        options: Options(
+          headers: {
+            'accept': 'application/json',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        logger.i('Rezervacija uspješno kreirana');
+        return true;
+      } else {
+        throw Exception('Failed to create rezervacija');
+      }
+    } catch (e) {
+      logger.e('Greška: $e');
+      return false;
+    }
+  }
 }
