@@ -1,4 +1,3 @@
-// ignore: file_names
 import 'package:bikehub_desktop/services/korisnik/korisnik_service.dart';
 import 'package:bikehub_desktop/services/ostalo/helper_service.dart';
 import 'package:dio/dio.dart';

@@ -74,7 +74,10 @@ namespace BikeHub.Services
                 NoviQuery = NoviQuery.Where(x => x.KategorijaId == search.KategorijaId);
             }
 
-            NoviQuery = NoviQuery.Include(x => x.SlikeBiciklis);
+            if (search.isSlikaIncluded==true)
+            {
+             NoviQuery = NoviQuery.Include(x => x.SlikeBiciklis);
+            }
 
             return NoviQuery;
         }

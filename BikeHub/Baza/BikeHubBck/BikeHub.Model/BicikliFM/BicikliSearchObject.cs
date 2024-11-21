@@ -24,5 +24,6 @@ namespace BikeHub.Model.BicikliFM
         public int? KorisnikId { get; set; }
 
         public int? Kolicina { get; set; }
+        public bool? isSlikaIncluded { get; set; }
     }
 }

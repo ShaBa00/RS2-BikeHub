@@ -19,7 +19,7 @@ namespace BikeHubBck.Controllers
         public PromocijaBicikliController(IPromocijaBicikliService service, BikeHubDbContext context, FunctionHelper functionHelper) 
         : base(service, context) { _functionHelper = functionHelper; _context = context; }
         [AllowAnonymous]
-        public override PagedResult<    BikeHub.Model.PromocijaFM.PromocijaBicikli> GetList([FromQuery] PromocijaBicikliSearchObject searchObject)
+        public override PagedResult<BikeHub.Model.PromocijaFM.PromocijaBicikli> GetList([FromQuery] PromocijaBicikliSearchObject searchObject)
         {
             return base.GetList(searchObject);
 

@@ -59,6 +59,7 @@ class DijeloviService {
 
   // ignore: non_constant_identifier_names
   final ValueNotifier<List<Map<String, dynamic>>> lista_ucitanih_dijelova = ValueNotifier([]);
+  List<dynamic> listaDijelova = [];
   int count=0;
   Future<List<Map<String, dynamic>>> getDijelovi({
     String? naziv,
@@ -95,6 +96,7 @@ class DijeloviService {
       );
 
       if (response.statusCode == 200) {
+        listaDijelova= response.data['resultsList'] ?? [];
         count = response.data['count'];
         List<Map<String, dynamic>> dijelovi = List<Map<String, dynamic>>.from(response.data['resultsList']);
           if (korisniciId != null && korisniciId.isNotEmpty) {

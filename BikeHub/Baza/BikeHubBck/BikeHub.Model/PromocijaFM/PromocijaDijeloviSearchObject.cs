@@ -9,7 +9,7 @@ namespace BikeHub.Model.PromocijaFM
     {
         //public int? PromocijaDijeloviId { get; set; }
 
-        //public int? DijeloviId { get; set; }
+        public int? DijeloviId { get; set; }
 
         //public DateTime? DatumPocetka { get; set; }
 

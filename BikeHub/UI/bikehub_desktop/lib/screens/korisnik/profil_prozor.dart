@@ -10,6 +10,7 @@ import 'package:bikehub_desktop/screens/prijava/log_in_prozor.dart';
 import 'package:bikehub_desktop/screens/serviser/serviser_profil.dart';
 import 'package:bikehub_desktop/services/korisnik/korisnik_info_service.dart';
 import 'package:bikehub_desktop/services/korisnik/korisnik_service.dart';
+import 'package:bikehub_desktop/screens/administracija/administracija_p1_prozor.dart';
 import 'package:flutter/material.dart';
 
 class ProfilProzor extends StatefulWidget {
@@ -344,7 +345,10 @@ class _ProfilProzorState extends State<ProfilProzor> {
                                   const SizedBox(height: 20),
                                   ElevatedButton(
                                     onPressed: () {
-                                      // Za sada dugme ne radi ništa
+                                       Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => const AdministracijaP1Prozor()),
+                                      );
                                     },
                                     child: const Text("Administracije"),
                                   ),

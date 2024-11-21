@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_null_comparison
+
 import 'package:bikehub_desktop/modeli/bicikli/bicikl_model.dart';
 import 'package:bikehub_desktop/services/korisnik/korisnik_service.dart';
 import 'package:dio/dio.dart';
@@ -12,6 +14,7 @@ class BiciklService {
 
   // ignore: non_constant_identifier_names
   final ValueNotifier<List<Map<String, dynamic>>> lista_ucitanih_bicikala = ValueNotifier([]);
+  List<dynamic> listaBicikala = [];
   int count=0;
   Future<List<Map<String, dynamic>>> getBicikli({
     String? naziv,
@@ -25,8 +28,9 @@ class BiciklService {
     int? brojBrzina,
     int? kategorijaId,
     List<int>? korisniciId,
-    int page = 0,
-    int pageSize = 10,
+    int? page =0,
+    int? pageSize =10,
+    bool isSlikaIncluded=true,
   }) async {
     try {
       final queryParameters = <String, dynamic>{};
@@ -42,6 +46,7 @@ class BiciklService {
       if (brojBrzina != null) queryParameters['BrojBrzina'] = brojBrzina;
       if (kategorijaId != null) queryParameters['KategorijaId'] = kategorijaId;
       if (korisniciId != null) queryParameters['korisniciId'] = korisniciId;
+      if (isSlikaIncluded != null) queryParameters['isSlikaIncluded'] = isSlikaIncluded;
 
       queryParameters['Page'] = page;
       queryParameters['PageSize'] = pageSize;
@@ -53,6 +58,7 @@ class BiciklService {
 
       if (response.statusCode == 200) {
         count = response.data['count'];
+        listaBicikala = response.data['resultsList'] ?? [];
         List<Map<String, dynamic>> bicikli = List<Map<String, dynamic>>.from(response.data['resultsList']);
         if (korisniciId != null && korisniciId.isNotEmpty) {
           final filteredBicikli = bicikli.where((bicikl) {

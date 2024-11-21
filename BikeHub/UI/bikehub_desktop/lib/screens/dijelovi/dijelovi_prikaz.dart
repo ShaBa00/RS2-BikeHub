@@ -384,7 +384,11 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => BiciklPrikaz(biciklId: biciklId, korisnikId: korisnikId),
+                                            builder: (context) => BiciklPrikaz(
+                                             biciklId: biciklId,
+                                             korisnikId: korisnikId,
+                                             userProfile:false,
+                                             ),
                                           ),
                                         );
                                       },

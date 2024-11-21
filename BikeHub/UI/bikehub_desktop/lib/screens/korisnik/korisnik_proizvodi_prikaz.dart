@@ -62,7 +62,11 @@ Widget _buildBicikliList(List<Map<String, dynamic>> bicikli) {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => BiciklPrikaz(biciklId: biciklId, korisnikId: korisnikId),
+                            builder: (context) => BiciklPrikaz(
+                              biciklId: biciklId, 
+                              korisnikId: korisnikId,
+                              userProfile:true,
+                              ),
                           ),
                         );
                       },

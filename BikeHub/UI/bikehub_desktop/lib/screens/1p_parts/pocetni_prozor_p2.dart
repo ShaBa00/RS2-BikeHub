@@ -65,6 +65,7 @@ class PocetniProzorP2 extends StatelessWidget {
                     builder: (context) => BiciklPrikaz(
                       biciklId: item['biciklId'],
                       korisnikId: item['korisnikId'],
+                      userProfile:false,
                     ),
                   ),
                 );

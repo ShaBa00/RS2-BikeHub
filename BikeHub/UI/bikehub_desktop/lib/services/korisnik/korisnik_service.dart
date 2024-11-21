@@ -10,8 +10,50 @@ class KorisnikService {
   final logger = Logger();
   final _storage = const FlutterSecureStorage();
 
+  List<dynamic> listaKorisnika = [];
+  int countKorisnika = 0;
+  List<dynamic> listaAdministratora = [];
+  Future<void> getKorisniks({String? status, int? page, int? pageSize}) async {
+    try {
+      final queryParams = <String, dynamic>{};
+
+      // Dodavanje query parametara samo ako su uneseni
+      if (status != null && status.isNotEmpty) {
+        queryParams['status'] = status;
+      }
+      if (page != null) {
+        queryParams['Page'] = page;
+      }
+      if (pageSize != null) {
+        queryParams['PageSize'] = pageSize;
+      }
+
+      final response = await _dio.get(
+        '${HelperService.baseUrl}/Korisnik',
+        queryParameters: queryParams,
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+
+        // Postavljanje rezultata u varijable
+        listaKorisnika = data['resultsList'] ?? [];
+        countKorisnika = data['count'] ?? 0;
+
+        listaAdministratora= data['resultsList'].where((korisnik) => korisnik['isAdmin'] == true)
+        .toList();
+
+        logger.i("Uspješno preuzeti korisnici: $listaKorisnika");
+      } else {
+        logger.e("Neuspješan zahtjev: ${response.statusCode}");
+      }
+    } catch (e) {
+      logger.e("Greška pri preuzimanju korisnika: $e");
+    }
+  }
+
   Future<Response> _getWithBasicAuth(String url) async {
-    final credentials = await _getCredentials();
+    final credentials = await getCredentials();
     final username = credentials['username'];
     final password = credentials['password'];
 
@@ -126,7 +168,7 @@ class KorisnikService {
 
 
 
-  Future<Map<String, String?>> _getCredentials() async {
+  Future<Map<String, String?>> getCredentials() async {
     final username = await _storage.read(key: 'username');
     final password = await _storage.read(key: 'password');
     return {'username': username, 'password': password};

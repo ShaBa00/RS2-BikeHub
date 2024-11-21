@@ -363,7 +363,7 @@ class _BiciklProzorState extends State<BiciklProzor> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => BiciklPrikaz(biciklId: biciklId, korisnikId: korisnikId),
+                                          builder: (context) => BiciklPrikaz(biciklId: biciklId, korisnikId: korisnikId, userProfile:false),
                                         ),
                                       );
                                     },

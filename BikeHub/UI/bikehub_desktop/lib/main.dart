@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; 
+import 'package:provider/provider.dart';
 import 'screens/pocetni_prozor.dart';
 import 'services/bicikli/bicikl_notifier.dart'; 
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+
+
   runApp(
     MultiProvider(
       providers: [
