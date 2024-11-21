@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_null_comparison
+
 import 'package:bikehub_desktop/modeli/dijelovi/dijelovi_model.dart';
 import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
@@ -71,8 +73,9 @@ class DijeloviService {
     String? opis,
     int? kategorijaId,
     List<int>? korisniciId,
-    int page = 0,
-    int pageSize = 10,
+    int? page = 0,
+    int? pageSize = 10,
+    bool isSlikaIncluded=true,
   }) async {
     try {
       final queryParameters = <String, dynamic>{};
@@ -86,6 +89,7 @@ class DijeloviService {
       if (opis != null) queryParameters['Opis'] = opis;
       if (kategorijaId != null) queryParameters['KategorijaId'] = kategorijaId;
       if (korisniciId != null) queryParameters['korisniciId'] = korisniciId;
+      if (isSlikaIncluded != null) queryParameters['isSlikaIncluded'] = isSlikaIncluded;
 
       queryParameters['Page'] = page;
       queryParameters['PageSize'] = pageSize;

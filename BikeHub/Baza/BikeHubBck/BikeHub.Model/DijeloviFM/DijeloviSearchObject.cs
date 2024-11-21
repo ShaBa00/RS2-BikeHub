@@ -15,5 +15,6 @@ namespace BikeHub.Model.DijeloviFM
         public int? KategorijaId { get; set; }
         public int? Kolicina { get; set; }
         public int? KorisnikId { get; set; }
+        public bool? isSlikaIncluded { get; set; }
     }
 }

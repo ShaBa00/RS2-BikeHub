@@ -76,7 +76,7 @@ namespace BikeHub.Services
 
             if (search.isSlikaIncluded==true)
             {
-             NoviQuery = NoviQuery.Include(x => x.SlikeBiciklis);
+                 NoviQuery = NoviQuery.Include(x => x.SlikeBiciklis);
             }
 
             return NoviQuery;

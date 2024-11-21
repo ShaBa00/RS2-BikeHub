@@ -27,6 +27,7 @@ dependencies:
   webview_flutter_wkwebview: 3.14.0
   flutter_webview_plugin: ^0.4.0
   flutter_paypal_payment: ^1.0.6
+  auto_size_text: ^3.0.0
 
 dev_dependencies:
   flutter_test:

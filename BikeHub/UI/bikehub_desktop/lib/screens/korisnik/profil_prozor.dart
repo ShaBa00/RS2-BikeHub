@@ -407,7 +407,7 @@ class _ProfilProzorState extends State<ProfilProzor> {
       ),
     );
   }
-    Widget _buildDetailContainer(String label, dynamic value) {
+  Widget _buildDetailContainer(String label, dynamic value) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.15,
       padding: const EdgeInsets.all(8.0),
