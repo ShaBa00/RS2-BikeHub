@@ -1,4 +1,5 @@
 class Bicikl {
+  int biciklId;
   String naziv;
   double cijena;
   String velicinaRama;
@@ -7,6 +8,8 @@ class Bicikl {
   int kategorijaId;
   int kolicina;
   int korisnikId;
+  int ak;
+  String stanje;
 
   Bicikl({
     required this.naziv,
@@ -17,6 +20,9 @@ class Bicikl {
     required this.kategorijaId,
     required this.kolicina,
     required this.korisnikId,
+    required this.biciklId,
+    required this.stanje,
+    required this.ak,
   });
 
   factory Bicikl.fromJson(Map<String, dynamic> json) {
@@ -29,6 +35,9 @@ class Bicikl {
       kategorijaId: json['kategorijaId'] as int,
       kolicina: json['kolicina'] as int,
       korisnikId: json['korisnikId'] as int,
+      biciklId: json['biciklId'] as int,
+      stanje: json['aktivacija'] ?? false,
+      ak: json['ak'] ?? 0,
     );
   }
 
@@ -42,6 +51,9 @@ class Bicikl {
       'kategorijaId': kategorijaId,
       'kolicina': kolicina,
       'korisnikId': korisnikId,
+      'biciklId': biciklId,
+      'stanje': stanje,
+      'ak': ak,
     };
   }
 }

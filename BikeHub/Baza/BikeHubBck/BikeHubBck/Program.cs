@@ -21,6 +21,7 @@ using BikeHubBck.Filters;
 using BikeHubBck;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.OpenApi.Models;
+using Microsoft.Data.SqlClient;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +46,8 @@ builder.Services.AddTransient<IKategorijaService, KategorijaService>();
 builder.Services.AddTransient<IRecommendedKategorijaService, RecommendedKategorijaService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<FunctionHelper>();
+builder.Services.AddScoped<DataSeeder>();
+
 
 builder.Services.AddHostedService<DailyServiceUpdate>();
 
@@ -73,6 +76,7 @@ builder.Services.AddControllers(x =>
 {
     x.Filters.Add<ExceptionFilter>();
 });
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -128,11 +132,33 @@ builder.Services.AddAuthentication("BasicAuthentication")
     .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<BikeHubDbContext>();
+
+    // Provjera da li baza podataka postoji
+    var databaseExists = dbContext.Database.CanConnect();
+
+    if (!databaseExists)
+    {
+        // Kreiranje baze podataka ako ne postoji
+        dbContext.Database.EnsureCreated();
+
+        // Primjena svih migracija kako bi se dodale tablice i fieldovi
+        dbContext.Database.Migrate();
+
+        DataSeeder.Seed(dbContext);
+
+    }
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
 
 app.UseHttpsRedirection();
 

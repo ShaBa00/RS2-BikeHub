@@ -201,12 +201,15 @@ class _BiciklDodajProzorState extends State<BiciklDodajProzor> {
     final korisnikId = int.parse(korisnikInfo['korisnikId'] ?? '0');
     // ignore: unused_local_variable
     Bicikl bicikl = Bicikl(
+      biciklId: 0,
       naziv: naziv,
       cijena: cijena,
       velicinaRama: selectedVelicinaRama ?? "M", 
       velicinaTocka: selectedVelicinaTocka ?? "26",
       brojBrzina: brojBrzina,
       kategorijaId: selectedKategorijaId ?? 1,
+      stanje: "",
+      ak:0,
       kolicina: kolicina,
       korisnikId: korisnikId, // Dodajte odgovarajući korisnik ID
     );

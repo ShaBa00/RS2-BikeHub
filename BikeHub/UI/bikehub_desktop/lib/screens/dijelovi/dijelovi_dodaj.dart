@@ -186,6 +186,9 @@ class _DijeloviDodajProzorState extends State<DijeloviDodajProzor > {
     final korisnikId = int.parse(korisnikInfo['korisnikId'] ?? '0');
     // ignore: unused_local_variable
     Dijelovi dijelovi = Dijelovi(
+      dijeloviId: 0,
+      ak: 0,
+      stanje: "",
       naziv: naziv,
       cijena: cijena,
       opis: opis,

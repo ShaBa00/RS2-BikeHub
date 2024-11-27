@@ -7,6 +7,7 @@ class KorisnikModel {
   String email="";
   String stanje;
   int ak;
+  bool isAdmin=false;
 
   KorisnikModel({
     required this.korisnikId,
@@ -17,6 +18,7 @@ class KorisnikModel {
     required this.email,
     required this.stanje,
     required this.ak,
+    required this.isAdmin,
   });
   factory KorisnikModel.fromJson(Map<String, dynamic> json) {
     return KorisnikModel(
@@ -27,6 +29,7 @@ class KorisnikModel {
       lozinkaPotvrda: json['lozinkaPotvrda'] ?? '',
       email: json['email'] ?? '',
       stanje: json['aktivacija'] ?? false,
+      isAdmin: json['isAdmin'] ?? false,
       ak: json['ak'] ?? 0,
     );
   }
@@ -40,6 +43,7 @@ class KorisnikModel {
       'email': email,
       'stanje': stanje,
       'ak': ak,
+      'isAdmin': isAdmin,
     };
   }
 }

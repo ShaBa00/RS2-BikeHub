@@ -164,4 +164,52 @@ class DijeloviService {
     }
   }
 
+  Future<void> upravljanjeDijelom(Dijelovi dijeloviModel) async {
+    try {
+      await _addAuthorizationHeader();
+
+      if (dijeloviModel.ak == 1) {
+        if (dijeloviModel.stanje == "aktivan") {
+          final response = await _dio.put(
+            '${HelperService.baseUrl}/Dijelovi/aktivacija/${dijeloviModel.dijeloviId}',
+            queryParameters: {'aktivacija': true},
+            options: Options(headers: {'accept': 'application/json'}),
+          );
+
+          if (response.statusCode == 200) {
+            logger.i('Dijelovi uspješno aktiviran');
+          } else {
+            throw Exception('Greška pri aktivaciji Dijelova');
+          }
+        } else if (dijeloviModel.stanje == "vracen") {
+          final response = await _dio.put(
+            '${HelperService.baseUrl}/Dijelovi/aktivacija/${dijeloviModel.dijeloviId}',
+            queryParameters: {'aktivacija': false},
+            options: Options(headers: {'accept': 'application/json'}),
+          );
+
+          if (response.statusCode == 200) {
+            logger.i('Dijelovi uspješno vraćeni');
+          } else {
+            throw Exception('Greška pri vraćanju Dijelova');
+          }
+        } else if (dijeloviModel.stanje == "obrisan") {
+          final response = await _dio.delete(
+            '${HelperService.baseUrl}/Dijelovi/${dijeloviModel.dijeloviId}',
+            options: Options(headers: {'accept': 'application/json'}),
+          );
+
+          if (response.statusCode == 200) {
+            logger.i('Dijelovi uspješno obrisani');
+          } else {
+            throw Exception('Greška pri brisanju Dijelova');
+          }
+        }
+      } 
+    } catch (e) {
+      logger.e('Greška: $e');
+      // ignore: use_rethrow_when_possible
+      throw e;
+    }
+  }
 }

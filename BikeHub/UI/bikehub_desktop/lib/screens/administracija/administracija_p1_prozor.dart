@@ -1,11 +1,17 @@
-// ignore_for_file: library_private_types_in_public_api, prefer_const_constructors, unused_element, sized_box_for_whitespace, prefer_const_literals_to_create_immutables, prefer_final_fields, unused_field, no_leading_underscores_for_local_identifiers, unnecessary_null_comparison, unused_local_variable
+// ignore_for_file: library_private_types_in_public_api, prefer_const_constructors, unused_element, sized_box_for_whitespace, prefer_const_literals_to_create_immutables, prefer_final_fields, unused_field, no_leading_underscores_for_local_identifiers, unnecessary_null_comparison, unused_local_variable, use_build_context_synchronously
 
 
+import 'package:bikehub_desktop/modeli/bicikli/bicikl_model.dart';
+import 'package:bikehub_desktop/modeli/dijelovi/dijelovi_model.dart';
+import 'package:bikehub_desktop/modeli/korisnik/korisnik_model.dart';
+import 'package:bikehub_desktop/modeli/serviseri/serviser_model.dart';
 import 'package:bikehub_desktop/screens/administracija/dodatno/image_carousel.dart';
 import 'package:bikehub_desktop/services/bicikli/bicikl_service.dart';
 import 'package:bikehub_desktop/services/dijelovi/dijelovi_service.dart';
 import 'package:bikehub_desktop/services/korisnik/korisnik_service.dart';
+import 'package:bikehub_desktop/screens/ostalo/poruka_helper.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:bikehub_desktop/services/serviser/serviser_service.dart';
 import 'package:flutter/material.dart';
 
 class AdministracijaP1Prozor extends StatefulWidget {
@@ -52,10 +58,19 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
   List _listaDijelova = [];
   int _countDijelovi = 0;
 
+  List _prikazaniServiseri = [];
+  int _currentPageServisera = 0;
+  int _pageSizeServisera = 5;
+  int _brojPrikazanihServisera = 0;
+  String _selectedStatusServisera = 'Kreirani';
+  List _listaServisera = [];
+  int _countServisera = 0;
+
   String _username="";
   final KorisnikService _korisnikService = KorisnikService();
   final BiciklService _bicikliService = BiciklService();
   final DijeloviService _dijeloviService = DijeloviService();
+  final ServiserService _serviserService = ServiserService();
 
   @override
   void initState() {
@@ -69,6 +84,7 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
     await _korisnikService.getKorisniks(status: '');
     await _bicikliService.getBicikli(status: '',isSlikaIncluded: false, page: null, pageSize: null);
     await _dijeloviService.getDijelovi(status: '', isSlikaIncluded: false, page: null, pageSize: null);
+    await _serviserService.getServiseriDTO(status: '', page: null, pageSize: null);
     setState(() {
       _listaKorisnika = _korisnikService.listaKorisnika;
       _countKorisnik = _korisnikService.countKorisnika;
@@ -78,11 +94,14 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
       _countDijelovi = _dijeloviService.count;
       _listaAdministratora = _korisnikService.listaAdministratora;
       _countAdministratora = _listaAdministratora.length;
+      _listaServisera = _serviserService.listaServisra;
+      _countAdministratora = _listaServisera.length;
       _isLoading = false;
     });    
     await _filterKorisnici("Kreirani");
     await _filterBicikli("Kreirani");
     await _filterDijelovi("Kreirani");
+    await _filterServiseri("Kreirani");
   }
 
   void _loadAdministratori(int page) {
@@ -180,6 +199,37 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
       _brojPrikazanihDijelova = _prikazaniDijelovi.length;
     });
   }
+  
+  _filterServiseri(String status) async{
+    String _status;
+    _currentPageServisera=0;
+    switch (status) {
+      case 'Kreirani':
+        _status = 'kreiran';
+        break;
+      case 'Izmijenjeni':
+        _status = 'izmijenjen';
+        break;
+      case 'Aktivni':
+        _status = 'aktivan';
+        break;
+      case 'Obrisani':
+        _status = 'obrisan';
+        break;
+      case 'Vraceni':
+        _status = 'vracen';
+        break;
+      default:
+        _status = '';
+    }
+
+    setState(() {
+      _selectedStatusServisera = status;
+      _prikazaniServiseri = _listaServisera.where((serviser) => serviser['status'] == _status).toList();
+      _brojPrikazanihServisera = _prikazaniServiseri.length;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -276,6 +326,8 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                       _buildNavButton('Bicikli'),
                       SizedBox(height: 15),
                       _buildNavButton('Dijelovi'),
+                      SizedBox(height: 15),
+                      _buildNavButton('Serviseri'),
                       SizedBox(height: 15),
                       _buildNavButton('Dodaj Administratora'),
                     ],
@@ -490,6 +542,10 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
         return _buildBicikliInfo();
       case 'Dijelovi info':
         return _buildDijeloviInfo();
+      case 'Serviseri':
+        return _buildServiseri();
+      case 'Serviser info':
+        return _buildServiserInfo();
       default:
         return _buildHome();
     }
@@ -757,7 +813,7 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                             child: Row(
                               children: [
                                 Icon(
-                                  Icons.pedal_bike,
+                                  Icons.supervised_user_circle_rounded,
                                   size: 24,
                                   color: Colors.grey[700],
                                 ),
@@ -1053,7 +1109,7 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                             child: Row(
                               children: [
                                 Icon(
-                                  Icons.pedal_bike,
+                                  Icons.construction,
                                   size: 24,
                                   color: Colors.grey[700],
                                 ),
@@ -1132,13 +1188,439 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
     );
   }
 
+  Widget _buildServiseri() {
+    int startIndex = _currentPageServisera * _pageSizeServisera;
+    int endIndex = startIndex + _pageSizeServisera;
+    List currentServiser = _prikazaniServiseri.sublist(
+      startIndex,
+      endIndex > _prikazaniServiseri.length ? _prikazaniServiseri.length : endIndex,
+    );
+    return Column(
+      children: [
+        Expanded(
+          flex: 15,
+          child: Container(
+            width: double.infinity,
+            color: Colors.grey[200], 
+            child: 
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                      'Serviseri',
+                      style: TextStyle(fontSize: 24, color: Colors.black),
+                    ),
+                    _buildStatusButtonServiseri('Kreirani'),
+                    _buildStatusButtonServiseri('Izmijenjeni'),
+                    _buildStatusButtonServiseri('Aktivni'),
+                    _buildStatusButtonServiseri('Obrisani'),
+                    _buildStatusButtonServiseri('Vraceni'),
+                  ],
+                ),
+          ),
+        ),
+        Expanded(
+          flex: 85,
+          child: Container(
+            width: double.infinity,
+            color: Colors.grey[300], 
+          child: Column(
+            children: [
+              Container(
+                width: double.infinity,
+                height: MediaQuery.of(context).size.height * 0.05,
+                color: const Color.fromARGB(0, 33, 149, 243),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 16.0),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  physics: ClampingScrollPhysics(),
+                  itemCount: currentServiser.length,
+                  itemBuilder: (context, index) {
+                    final serviseri = currentServiser[index];
+                    final backgroundColor = Color.fromARGB(255, 235, 237, 237);
+
+                    return Column(
+                      children: [
+                        if (index != 0) SizedBox(height: 10),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(15),
+                          child: Container(
+                            color: backgroundColor,
+                            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                            width: MediaQuery.of(context).size.width * 0.6,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.miscellaneous_services,
+                                  size: 24,
+                                  color: Colors.grey[700],
+                                ),
+                                SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    serviseri['username'],
+                                    style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 0, 0, 0)),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    serviseri['grad'],
+                                    style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 0, 0, 0)),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    serviseri['status'],
+                                    style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 0, 0, 0)),
+                                    textAlign: TextAlign.end,
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      odabraniId=serviseri['serviserId'];
+                                      _selectedSection = "Serviser info";
+                                    });
+                                  },
+                                  child: Text('Više informacija'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: _currentPageServisera > 0
+                        ? () {
+                            setState(() {
+                              _currentPageServisera--;
+                            });
+                          }
+                        : null,
+                    child: Text('<'),
+                  ),
+                  SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: endIndex < _prikazaniServiseri.length
+                        ? () {
+                            setState(() {
+                              _currentPageServisera++;
+                            });
+                          }
+                        : null,
+                    child: Text('>'),
+                  ),
+                ],
+              ),
+              SizedBox(height: 2),
+            ],
+          ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  final _usernameController = TextEditingController();
+  final _lozinkaController = TextEditingController();
+  final _lozinkaPotvrdaController = TextEditingController();
+  final _emailController = TextEditingController();
+  
+  void dodajAdministratora() async {
+    if (_usernameController.text.isEmpty) {
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati username");
+      return;
+    }
+    if (_lozinkaController.text.isEmpty) {
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati lozinku");
+      return;
+    }
+    if (_lozinkaPotvrdaController.text.isEmpty) {
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati potvrdenu lozinku");
+      return;
+    }
+    if (_lozinkaController.text != _lozinkaPotvrdaController.text) {
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Lozinka i potvrdena lozinka moraju biti iste");
+      return;
+    }
+    if (_emailController.text.isEmpty) {
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati email");
+      return;
+    }
+
+    KorisnikModel noviAdministrator = KorisnikModel(
+      korisnikId: 0,
+      username: _usernameController.text,
+      staraLozinka: "",
+      lozinka: _lozinkaController.text,
+      lozinkaPotvrda: _lozinkaPotvrdaController.text,
+      email: _emailController.text,
+      stanje: "",
+      ak: 0,
+      isAdmin: true,
+    );
+
+    try {
+      final responseMessage = await _korisnikService.postAdmina(noviAdministrator);
+      if (responseMessage == "Administrator uspješno dodan") {
+        PorukaHelper.prikaziPorukuUspjeha(context, responseMessage!);
+        _usernameController.clear();
+        _lozinkaController.clear();
+        _lozinkaPotvrdaController.clear();
+        _emailController.clear();
+      } else {
+        PorukaHelper.prikaziPorukuUpozorenja(context, responseMessage ?? "Došlo je do greške prilikom dodavanja administratora");
+      }
+    } catch (e) {
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Došlo je do greške: $e");
+    }
+}
+
   Widget _buildDodajAdministratora() {
-    return Center(
-      child: Text(
-        'Dodaj Administratora',
-        style: TextStyle(fontSize: 24, color: Colors.black),
+    return Container(
+      width: double.infinity,
+      height: MediaQuery.of(context).size.height * 0.553,
+      child: Column(
+        children: [
+          Expanded(
+            flex: 15,
+            child: Container(
+              width: double.infinity,
+              color: const Color.fromARGB(0, 33, 149, 243), // Dodajte boju za vizualizaciju
+              child: Center(
+                child: Text(
+                  'Dodavanje novog administratora',
+                  style: TextStyle(fontSize: 24, color: Colors.black),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 85,
+            child: Container(
+              width: double.infinity,
+              color: const Color.fromARGB(0, 76, 175, 79), // Dodajte boju za vizualizaciju
+              child: Center(
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.25,
+                  height: MediaQuery.of(context).size.height * 0.4,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [
+                        Color.fromARGB(255, 82, 205, 210),
+                        Color.fromARGB(255, 7, 161, 235),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        height: MediaQuery.of(context).size.height * 0.07, 
+                        width: MediaQuery.of(context).size.width * 0.18, // Smanjena širina TextField-a
+                        child: TextField(
+                          controller: _usernameController,
+                          decoration: InputDecoration(
+                            labelText: 'Username',
+                            labelStyle: TextStyle(color: Colors.white),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                          ),
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      Container(
+                        height: MediaQuery.of(context).size.height * 0.07, 
+                        width: MediaQuery.of(context).size.width * 0.18, // Smanjena širina TextField-a
+                        child: TextField(
+                          controller: _lozinkaController,
+                          decoration: InputDecoration(
+                            labelText: 'Lozinka',
+                            labelStyle: TextStyle(color: Colors.white),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                          ),
+                          obscureText: true,
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      Container(
+                        height: MediaQuery.of(context).size.height * 0.07, 
+                        width: MediaQuery.of(context).size.width * 0.18, // Smanjena širina TextField-a
+                        child: TextField(
+                          controller: _lozinkaPotvrdaController,
+                          decoration: InputDecoration(
+                            labelText: 'Potvrda Lozinke',
+                            labelStyle: TextStyle(color: Colors.white),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                          ),
+                          obscureText: true,
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      Container(
+                        height: MediaQuery.of(context).size.height * 0.07, 
+                        width: MediaQuery.of(context).size.width * 0.18, // Smanjena širina TextField-a
+                        child: TextField(
+                          controller: _emailController,
+                          decoration: InputDecoration(
+                            labelText: 'Email',
+                            labelStyle: TextStyle(color: Colors.white),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                          ),
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: dodajAdministratora,
+                        child: Text('Dodaj'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  promjeniStatus(String status, String objekat)async{
+    String _status;
+
+    switch (status) {
+      case "Aktiviraj":
+        _status = "aktivan";
+        break;
+      case "Vrati":
+        _status = "vracen";
+        break;
+      case "Obrisi":
+        _status = "obrisan";
+        break;
+      default:
+        return;
+    }
+    if(objekat=="Korisnik"){
+      KorisnikModel korisnik = KorisnikModel(
+        korisnikId: odabraniId,
+        username: '',
+        staraLozinka: '',
+        lozinka: '',
+        lozinkaPotvrda: '',
+        email: '',
+        stanje: _status,
+        ak: 1,
+        isAdmin: false,
+      );
+      try {
+        await _korisnikService.upravljanjeKorisnikom(korisnik);
+        PorukaHelper.prikaziPorukuUspjeha(context, "Korisnik uspješno azuriran.");
+        await _fetchPodatci();  
+      } catch (e) {
+        PorukaHelper.prikaziPorukuGreske(context, "Greška pri azuriranju korisnika: $e");
+      }
+    }
+    if(objekat=="Bicikl"){
+        Bicikl bicikl = Bicikl(
+        biciklId:odabraniId,
+        naziv:"",
+        cijena:0,
+        velicinaRama: "",
+        velicinaTocka: "",
+        brojBrzina: 0,
+        kategorijaId: 0,
+        kolicina: 0,
+        korisnikId: 0,
+        stanje: _status,
+        ak: 1,
+      );
+      try {
+        await _bicikliService.upravljanjeBiciklom(bicikl);
+        PorukaHelper.prikaziPorukuUspjeha(context, "Bicikl uspješno azuriran.");
+        await _fetchPodatci();  
+      } catch (e) {
+        PorukaHelper.prikaziPorukuGreske(context, "Greška pri azuriranju bicikla: $e");
+      }
+    }
+    if(objekat=="Dijelovi"){
+        Dijelovi dijelovi = Dijelovi(
+        dijeloviId:odabraniId,
+        naziv:"",
+        cijena:0,
+        opis: "",
+        kategorijaId: 0,
+        kolicina: 0,
+        korisnikId: 0,
+        stanje: _status,
+        ak: 1,
+      );
+      try {
+        await _dijeloviService.upravljanjeDijelom(dijelovi);
+        PorukaHelper.prikaziPorukuUspjeha(context, "Dijelovi uspješno azurirani.");
+        await _fetchPodatci();  
+      } catch (e) {
+        PorukaHelper.prikaziPorukuGreske(context, "Greška pri azuriranju Dijelova: $e");
+      }
+    }
+    if(objekat=="Serviser"){
+      ServiserModel serviser = ServiserModel(
+        korisnikId: 0,
+        username: '',
+        stanje: _status,
+        ak: 1, 
+        serviserId: odabraniId, 
+        brojServisa: 0, 
+        cijena: 0, 
+        ukupnaOcjena: 0, 
+        grad: '',
+      );
+      try {
+        await _serviserService.upravljanjeServiserom(serviser);
+        PorukaHelper.prikaziPorukuUspjeha(context, "Serviser uspješno azuriran.");
+        await _fetchPodatci();  
+      } catch (e) {
+        PorukaHelper.prikaziPorukuGreske(context, "Greška pri azuriranju servisera: $e");
+      }
+    }
   }
 
   Widget _buildKorisnikInfo() {
@@ -1165,7 +1647,9 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
           );
         } else {
           var korisnik = snapshot.data as Map;
-          var korisnikInfo = korisnik['korisnikInfos'][0];
+          var korisnikInfo = korisnik['korisnikInfos'] != null && korisnik['korisnikInfos'].isNotEmpty
+          ? korisnik['korisnikInfos'][0]
+          : {};
           return Center(
             child: Container(
               width: double.infinity,
@@ -1218,13 +1702,13 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    _buildDetailContainer('Username', korisnik['username']),
+                                    _buildDetailContainer('Username', korisnik['username'] ?? 'null'),
                                     SizedBox(height: MediaQuery.of(context).size.height *0.008,),
-                                    _buildDetailContainer('User ID', korisnik['korisnikId']),
+                                    _buildDetailContainer('User ID', korisnik['korisnikId'] ?? 'null'),
                                     SizedBox(height: MediaQuery.of(context).size.height *0.008,),
                                     _buildDetailContainer('Admin', korisnik['isAdmin'] ? 'True' : 'False'),
                                     SizedBox(height: MediaQuery.of(context).size.height *0.008,),
-                                    _buildDetailContainer('', korisnik['email']),
+                                    _buildDetailContainer('', korisnik['email'] ?? 'null'),
                                   ],
                                 ),
                               ),
@@ -1274,13 +1758,13 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    _buildDetailContainer('Broj Proizvoda', korisnik['brojProizvoda']),
+                                    _buildDetailContainer('Broj Proizvoda', korisnik['brojProizvoda'] ?? 'null'),
                                     SizedBox(height: MediaQuery.of(context).size.height *0.008,),
-                                    _buildDetailContainer('Broj Rezervacija', korisnik['brojRezervacija']),
+                                    _buildDetailContainer('Broj Rezervacija', korisnik['brojRezervacija'] ?? 'null'),
                                     SizedBox(height: MediaQuery.of(context).size.height *0.008,),
-                                    _buildDetailContainer('Serviser', korisnik['jeServiser'] ? 'True' : 'False'),
+                                    _buildDetailContainer('Serviser', korisnik['jeServiser'] ?? false ? 'True' : 'False'),
                                     SizedBox(height: MediaQuery.of(context).size.height *0.008,),
-                                    _buildDetailContainer('Status korisnika', korisnik['status']),
+                                    _buildDetailContainer('Status korisnika', korisnik['status'] ?? 'null'),
                                   ],
                                 ),
                               ),
@@ -1288,19 +1772,32 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                           ),
                         ),
                       ),
+                      //dugmici
                       Container(
                         width: double.infinity,
                         height: MediaQuery.of(context).size.height * 0.15 * 0.45,
                         decoration: BoxDecoration(
-                          color: Color.fromARGB(255, 76, 175, 79), // Pozadina za "DonjiDio"
+                          color: Color.fromARGB(0, 76, 175, 0), // Pozadina za "DonjiDio"
                           borderRadius: BorderRadius.vertical(
                             bottom: Radius.circular(15), // Zaobljene donje ivice
                           ),
                         ),
                         child: Center(
-                          child: Text(
-                            "Dodatne informacije",
-                            style: TextStyle(fontSize: 18, color: Colors.black),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (korisnik['status'] == "kreiran" || korisnik['status'] == "izmijenjen") ...[
+                                _buildSetStatusButton("Aktiviraj", "Korisnik"),
+                                SizedBox(width: 10),
+                              ],
+                              if (korisnik['status'] != "obrisan") ...[
+                                if (korisnik['status'] != "vracen") ...[
+                                  _buildSetStatusButton("Vrati", "Korisnik"),
+                                  SizedBox(width: 10),
+                                ],
+                                _buildSetStatusButton("Obrisi", "Korisnik"),
+                              ],
+                            ],
                           ),
                         ),
                       ),
@@ -1417,12 +1914,12 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                                   borderRadius: BorderRadius.circular(15),
                                 ),
                                 child:  Container(
-                                                          width: MediaQuery.of(context).size.width * 0.25,
-                                                          child: ImageCarousel(
-                                                            slikeBiciklis: slikeBiciklis,
-                                                            initialIndex: 0,
-                                                          ),
-                                                        ),
+                                  width: MediaQuery.of(context).size.width * 0.25,
+                                  child: ImageCarousel(
+                                    slikeBiciklis: slikeBiciklis,
+                                    initialIndex: 0,
+                                  ),
+                                ),
                               ),
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.2,
@@ -1459,15 +1956,27 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                         width: double.infinity,
                         height: MediaQuery.of(context).size.height * 0.15 * 0.45,
                         decoration: BoxDecoration(
-                          color: Color.fromARGB(255, 76, 175, 79), // Pozadina za "DonjiDio"
+                          color: Color.fromARGB(0, 76, 175, 79), // Pozadina za "DonjiDio"
                           borderRadius: BorderRadius.vertical(
                             bottom: Radius.circular(15), // Zaobljene donje ivice
                           ),
                         ),
                         child: Center(
-                          child: Text(
-                            "Dodatne informacije",
-                            style: TextStyle(fontSize: 18, color: Colors.black),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (bicikl['status'] == "kreiran" || bicikl['status'] == "izmijenjen") ...[
+                                _buildSetStatusButton("Aktiviraj", "Bicikl"),
+                                SizedBox(width: 10),
+                              ],
+                              if (bicikl['status'] != "obrisan") ...[
+                                if (bicikl['status'] != "vracen") ...[
+                                  _buildSetStatusButton("Vrati", "Bicikl"),
+                                  SizedBox(width: 10),
+                                ],
+                                _buildSetStatusButton("Obrisi", "Bicikl"),
+                              ],
+                            ],
                           ),
                         ),
                       ),
@@ -1620,15 +2129,184 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                         width: double.infinity,
                         height: MediaQuery.of(context).size.height * 0.15 * 0.45,
                         decoration: BoxDecoration(
-                          color: Color.fromARGB(255, 76, 175, 79), // Pozadina za "DonjiDio"
+                          color: Color.fromARGB(0, 76, 175, 79), // Pozadina za "DonjiDio"
                           borderRadius: BorderRadius.vertical(
                             bottom: Radius.circular(15), // Zaobljene donje ivice
                           ),
                         ),
                         child: Center(
-                          child: Text(
-                            "Dodatne informacije",
-                            style: TextStyle(fontSize: 18, color: Colors.black),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (dio['status'] == "kreiran" || dio['status'] == "izmijenjen") ...[
+                                _buildSetStatusButton("Aktiviraj", "Dijelovi"),
+                                SizedBox(width: 10),
+                              ],
+                              if (dio['status'] != "obrisan") ...[
+                                if (dio['status'] != "vracen") ...[
+                                  _buildSetStatusButton("Vrati", "Dijelovi"),
+                                  SizedBox(width: 10),
+                                ],
+                                _buildSetStatusButton("Obrisi", "Dijelovi"),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  Widget _buildServiserInfo() {
+    return FutureBuilder(
+      future: _serviserService.getServiserDtoByKorisnikId(serviserId:  odabraniId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text(
+              'Greska prilikom pronalazenja servisera',
+              style: TextStyle(fontSize: 24, color: Colors.black),
+            ),
+          );
+        } else if (!snapshot.hasData || snapshot.data == null) {
+          return Center(
+            child: Text(
+              'Serviser nije pronađen',
+              style: TextStyle(fontSize: 24, color: Colors.black),
+            ),
+          );
+        } else {
+          var serviser = snapshot.data as Map;
+          return Center(
+            child: Container(
+              width: double.infinity,
+              height: double.infinity,
+              color: Colors.transparent,
+              child: Center(
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.72,
+                  height: MediaQuery.of(context).size.height * 0.50,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color.fromARGB(255, 236, 230, 230),
+                        Color.fromARGB(255, 188, 188, 188),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(15)), // Zaobljene ivice za cijeli dio
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: MediaQuery.of(context).size.height * 0.54 * 0.8,
+                        decoration: BoxDecoration(
+                          color: Color.fromARGB(0, 33, 149, 243), // Pozadina za "GorniDio"
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(15), // Zaobljene gornje ivice
+                          ),
+                        ),
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.22,
+                                height: MediaQuery.of(context).size.height * 0.45 * 0.8,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color.fromARGB(255, 82, 205, 210),
+                                      Color.fromARGB(255, 7, 161, 235),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    _buildDetailContainer('Username', serviser['username'] ?? 'null'),
+                                    SizedBox(height: MediaQuery.of(context).size.height *0.008,),
+                                    _buildDetailContainer('Serviser Id', serviser['serviserId'] ?? 'null'),
+                                    SizedBox(height: MediaQuery.of(context).size.height *0.008,),
+                                    _buildDetailContainer('User ID', serviser['korisnikId'] ?? 'null'),
+                                    SizedBox(height: MediaQuery.of(context).size.height *0.008,),
+                                    _buildDetailContainer('Grad', serviser['grad'] ?? 'null'),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.22,
+                                height: MediaQuery.of(context).size.height * 0.45 * 0.8,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color.fromARGB(255, 82, 205, 210),
+                                      Color.fromARGB(255, 7, 161, 235),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    _buildDetailContainer('Cijena', serviser['cijena'] ?? 'null'),
+                                    SizedBox(height: MediaQuery.of(context).size.height *0.008,),
+                                    _buildDetailContainer('Broj servisa', serviser['brojServisa'] ?? 'null'),
+                                    SizedBox(height: MediaQuery.of(context).size.height *0.008,),
+                                    _buildDetailContainer('Ukupna ocjena', serviser['ukupnaOcjena']),
+                                    SizedBox(height: MediaQuery.of(context).size.height *0.008,),
+                                    _buildDetailContainer('Status servisera', serviser['status'] ?? 'null'),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      //dugmici
+                      Container(
+                        width: double.infinity,
+                        height: MediaQuery.of(context).size.height * 0.15 * 0.45,
+                        decoration: BoxDecoration(
+                          color: Color.fromARGB(0, 76, 175, 0), // Pozadina za "DonjiDio"
+                          borderRadius: BorderRadius.vertical(
+                            bottom: Radius.circular(15), // Zaobljene donje ivice
+                          ),
+                        ),
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (serviser['status'] == "kreiran" || serviser['status'] == "izmijenjen") ...[
+                                _buildSetStatusButton("Aktiviraj", "Serviser"),
+                                SizedBox(width: 10),
+                              ],
+                              if (serviser['status'] != "obrisan") ...[
+                                if (serviser['status'] != "vracen") ...[
+                                  _buildSetStatusButton("Vrati", "Serviser"),
+                                  SizedBox(width: 10),
+                                ],
+                                _buildSetStatusButton("Obrisi", "Serviser"),
+                              ],
+                            ],
                           ),
                         ),
                       ),
@@ -1703,6 +2381,29 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
     );
   }
 
+  Widget _buildSetStatusButton(String status, String objekat) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.07,
+      height: MediaQuery.of(context).size.height * 0.04,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: _selectedSection == status
+              ? Color.fromARGB(255, 87, 202, 255)
+              : const Color.fromARGB(255, 242, 242, 242),
+        ),
+        onPressed: () async {
+          await promjeniStatus(status,objekat);
+        },
+        child: Text(
+          status,
+          style: TextStyle(
+            color: _selectedSection == status ? Colors.white : Colors.blue,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildStatusButton(String title) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.1,
@@ -1766,6 +2467,29 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
           title,
           style: TextStyle(
             color: _selectedStatusDijelova == title ? Colors.white : Colors.blue,
+          ),
+        ),
+      ),
+    );
+  }
+
+    Widget _buildStatusButtonServiseri(String title) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.1,
+      height: MediaQuery.of(context).size.height * 0.05,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: _selectedStatusServisera == title
+              ? Color.fromARGB(255, 87, 202, 255)
+              : const Color.fromARGB(255, 242, 242, 242),
+        ),
+        onPressed: () {
+          _filterServiseri(title);
+        },
+        child: Text(
+          title,
+          style: TextStyle(
+            color: _selectedStatusServisera == title ? Colors.white : Colors.blue,
           ),
         ),
       ),

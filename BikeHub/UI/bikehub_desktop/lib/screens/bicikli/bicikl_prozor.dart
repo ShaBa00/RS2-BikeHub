@@ -31,7 +31,7 @@ class _BiciklProzorState extends State<BiciklProzor> {
 
   
   int _currentPage = 0;
-  final int _pageSize = 10;
+  final int _pageSize = 12;
 
   @override
   void initState() {
@@ -65,6 +65,7 @@ class _BiciklProzorState extends State<BiciklProzor> {
       pageSize: _pageSize,
       kategorijaId: selectedKategorijaId,
       korisniciId: korisniciId, 
+      status: "aktivan"
     );
     biciklService.lista_ucitanih_bicikala.value = bicikli;
   }

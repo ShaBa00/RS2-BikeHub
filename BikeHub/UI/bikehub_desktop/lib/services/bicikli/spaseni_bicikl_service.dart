@@ -134,55 +134,55 @@ class SpaseniBicikliService {
     }
   }
   
-Future<bool> addSpaseniBicikl(BuildContext context, int biciklID, int korisnikId) async {
-  String trenutniDatum = DateTime.now().toIso8601String().split('T').first;
-  var spaseniBicikli = await getSpaseniBicikli(
-    korisnikId: korisnikId,
-    status: "obrisan",
-    biciklId: biciklID,
-  );
-
-  bool postojiBicikl = spaseniBicikli.any((bicikl) =>
-      bicikl['biciklId'] == biciklID && bicikl['status'] == 'obrisan');
-  if (postojiBicikl) {
-    int idSpasenogBicikla = spaseniBicikli[0]['spaseniBicikliId'];
-    await updateSpaseniBicikl(idSpasenogBicikla, biciklID, trenutniDatum, korisnikId);
-    PorukaHelper.prikaziPorukuUspjeha(context, 'Bicikl uspješno sačuvan.');
-    return true;
-  }
-
-  try {
-    await _addAuthorizationHeader();
-    final data = {
-      'biciklId': biciklID,
-      'datumSpasavanja': trenutniDatum,
-      'korisnikId': korisnikId,
-    };
-    final response = await _dio.post(
-      '${HelperService.baseUrl}/SpaseniBicikli',
-      data: data,
+  Future<bool> addSpaseniBicikl(BuildContext context, int biciklID, int korisnikId) async {
+    String trenutniDatum = DateTime.now().toIso8601String().split('T').first;
+    var spaseniBicikli = await getSpaseniBicikli(
+      korisnikId: korisnikId,
+      status: "obrisan",
+      biciklId: biciklID,
     );
 
-    if (response.statusCode == 200) {
-      logger.i('Bicikl uspješno sačuvan.');
+    bool postojiBicikl = spaseniBicikli.any((bicikl) =>
+        bicikl['biciklId'] == biciklID && bicikl['status'] == 'obrisan');
+    if (postojiBicikl) {
+      int idSpasenogBicikla = spaseniBicikli[0]['spaseniBicikliId'];
+      await updateSpaseniBicikl(idSpasenogBicikla, biciklID, trenutniDatum, korisnikId);
       PorukaHelper.prikaziPorukuUspjeha(context, 'Bicikl uspješno sačuvan.');
-      return true; // Uspješno
-    } else {
-      throw Exception('Neuspješno čuvanje bicikla.');
+      return true;
     }
-  } catch (e) {
-    String errorMessage = 'Došlo je do greške pri čuvanja bicikla.';
-    if (e is DioError && e.response != null && e.response!.data != null) {
-      var errorData = e.response!.data;
-      if (errorData['errors'] != null && errorData['errors']['userError'] != null) {
-        errorMessage = errorData['errors']['userError'][0];
+
+    try {
+      await _addAuthorizationHeader();
+      final data = {
+        'biciklId': biciklID,
+        'datumSpasavanja': trenutniDatum,
+        'korisnikId': korisnikId,
+      };
+      final response = await _dio.post(
+        '${HelperService.baseUrl}/SpaseniBicikli',
+        data: data,
+      );
+
+      if (response.statusCode == 200) {
+        logger.i('Bicikl uspješno sačuvan.');
+        PorukaHelper.prikaziPorukuUspjeha(context, 'Bicikl uspješno sačuvan.');
+        return true; // Uspješno
+      } else {
+        throw Exception('Neuspješno čuvanje bicikla.');
       }
+    } catch (e) {
+      String errorMessage = 'Došlo je do greške pri čuvanja bicikla.';
+      if (e is DioError && e.response != null && e.response!.data != null) {
+        var errorData = e.response!.data;
+        if (errorData['errors'] != null && errorData['errors']['userError'] != null) {
+          errorMessage = errorData['errors']['userError'][0];
+        }
+      }
+      
+      logger.e('Greška pri čuvanju bicikla: $errorMessage');
+      PorukaHelper.prikaziPorukuGreske(context, errorMessage); // Prikazuje grešku korisniku
+      return false; // Neuspješno
     }
-    
-    logger.e('Greška pri čuvanju bicikla: $errorMessage');
-    PorukaHelper.prikaziPorukuGreske(context, errorMessage); // Prikazuje grešku korisniku
-    return false; // Neuspješno
   }
-}
 
 }

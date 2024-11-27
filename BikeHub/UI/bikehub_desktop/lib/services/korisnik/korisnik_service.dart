@@ -166,7 +166,44 @@ class KorisnikService {
     }
   }
 
+Future<String?> postAdmina(KorisnikModel korisnikModel) async {
+  try {
+    await _addAuthorizationHeader();
 
+    final response = await _dio.post(
+      '${HelperService.baseUrl}/Korisnik/NoviAdmin',
+      options: Options(
+        headers: {
+          'accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      ),
+      data: korisnikModel,
+    );
+
+    if (response.statusCode == 200) {
+      return "Administrator uspješno dodan";
+    } else {
+      final errors = response.data['errors'];
+      if (errors != null && errors['userError'] != null) {
+        return errors['userError'].join(', ');
+      } else {
+        return 'Došlo je do greške prilikom dodavanja administratora';
+      }
+    }
+  } on DioException catch (dioError) {
+    if (dioError.response != null && dioError.response?.data != null) {
+      final errors = dioError.response?.data['errors'];
+      if (errors != null && errors['userError'] != null) {
+        return errors['userError'].join(', ');
+      }
+    }
+    return 'Došlo je do greške: ${dioError.message}';
+  } catch (e) {
+    logger.e('Greška: $e');
+    return e.toString();
+  }
+}
 
   Future<Map<String, String?>> getCredentials() async {
     final username = await _storage.read(key: 'username');

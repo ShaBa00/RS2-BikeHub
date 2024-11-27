@@ -11,5 +11,6 @@ namespace BikeHub.Model.KorisnikFM
 
         public string? LozinkaHash { get; set; }
         public string Email { get; set; }
+        public bool IsAdmin { get; set; }
     }
 }

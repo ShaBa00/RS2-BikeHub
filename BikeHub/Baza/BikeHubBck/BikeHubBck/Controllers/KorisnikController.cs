@@ -62,6 +62,22 @@ namespace BikeHubBck.Controllers
             return base.SoftDelete(id);
         }
 
+        [HttpPost("NoviAdmin")]
+        public IActionResult DodajNovogAdmina(KorisniciInsertR korisnik)
+        {
+            var currentUsername = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (currentUsername == null)
+            {
+                return Unauthorized("Samo administratori mogu izvršiti aktivaciju.");
+            }
+            var currentUser = _context.Korisniks.FirstOrDefault(x => x.Username == currentUsername);
+            if(currentUser.IsAdmin == false)
+            {
+                return Unauthorized("Samo administratori mogu izvršiti aktivaciju.");
+            }
+            return (_service as IKorisnikService).DodajNovogAdmina(korisnik);
+        }
+
         [HttpPost("login")]
         [AllowAnonymous]
         public BikeHub.Model.KorisnikFM.Korisnik Login(string username, string password)

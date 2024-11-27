@@ -28,7 +28,7 @@ class _DijeloviProzorState extends State<DijeloviProzor> {
   int? selectedGradId;
 
   int _currentPage = 0;
-  final int _pageSize = 10;
+  final int _pageSize = 12;
 
   @override
   void initState() {
@@ -59,6 +59,7 @@ class _DijeloviProzorState extends State<DijeloviProzor> {
       pageSize: _pageSize,
       kategorijaId: selectedKategorijaId,
       korisniciId: korisniciId, 
+      status: "aktivan"
     );
     dijeloviService.lista_ucitanih_dijelova.value = dijelovi;
   }

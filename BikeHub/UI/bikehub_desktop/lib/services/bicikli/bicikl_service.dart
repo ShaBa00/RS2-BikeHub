@@ -168,6 +168,55 @@ class BiciklService {
     }
   }
 
+  Future<void> upravljanjeBiciklom(Bicikl biciklModel) async {
+    try {
+      await _addAuthorizationHeader();
+
+      if (biciklModel.ak == 1) {
+        if (biciklModel.stanje == "aktivan") {
+          final response = await _dio.put(
+            '${HelperService.baseUrl}/Bicikli/aktivacija/${biciklModel.biciklId}',
+            queryParameters: {'aktivacija': true},
+            options: Options(headers: {'accept': 'application/json'}),
+          );
+
+          if (response.statusCode == 200) {
+            logger.i('Bicikl uspješno aktiviran');
+          } else {
+            throw Exception('Greška pri aktivaciji Bicikla');
+          }
+        } else if (biciklModel.stanje == "vracen") {
+          final response = await _dio.put(
+            '${HelperService.baseUrl}/Bicikli/aktivacija/${biciklModel.biciklId}',
+            queryParameters: {'aktivacija': false},
+            options: Options(headers: {'accept': 'application/json'}),
+          );
+
+          if (response.statusCode == 200) {
+            logger.i('Bicikl uspješno vraćen');
+          } else {
+            throw Exception('Greška pri vraćanju Bicikla');
+          }
+        } else if (biciklModel.stanje == "obrisan") {
+          final response = await _dio.delete(
+            '${HelperService.baseUrl}/Bicikli/${biciklModel.biciklId}',
+            options: Options(headers: {'accept': 'application/json'}),
+          );
+
+          if (response.statusCode == 200) {
+            logger.i('Bicikl uspješno obrisan');
+          } else {
+            throw Exception('Greška pri brisanju Bicikla');
+          }
+        }
+      } 
+    } catch (e) {
+      logger.e('Greška: $e');
+      // ignore: use_rethrow_when_possible
+      throw e;
+    }
+  }
+
   Future<Map<String, dynamic>?> getBiciklById(int biciklId) async {
     try {
       final response = await _dio.get(

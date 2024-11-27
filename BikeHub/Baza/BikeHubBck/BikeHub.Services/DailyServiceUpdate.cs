@@ -26,9 +26,31 @@ namespace BikeHub.Services
                 {
                     var context = scope.ServiceProvider.GetRequiredService<BikeHubDbContext>();
 
+
+                    while (!context.Database.CanConnect())
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(55), stoppingToken);
+                    }
+
+                    if (!context.PromocijaBiciklis.Any() && !context.PromocijaDijelovis.Any() && !context.RezervacijaServisas.Any())
+                    {
+                        // Ako baza ne sadrži podatke, čekaj 24 sata i nastavi
+                        await Task.Delay(TimeSpan.FromDays(1), stoppingToken);
+                        continue;
+                    }
+
+                    // Provjeri da li je baza već kreirana
+                    if (context == null || !context.PromocijaBiciklis.Any() || !context.PromocijaDijelovis.Any() || !context.RezervacijaServisas.Any())
+                    {
+                        // Ako je baza prazna, preskoči izvršavanje i čekaj sljedeći interval
+                        await Task.Delay(TimeSpan.FromDays(1), stoppingToken);
+                        continue;
+                    }
+
                     var expiredPromotions = context.PromocijaBiciklis
                                                     .Where(p => p.DatumZavrsetka < DateTime.Now && p.Status != "zavrseno")
                                                     .ToList();
+                    
                     foreach (var promocija in expiredPromotions)
                     {
                         promocija.Status = "zavrseno";

@@ -278,7 +278,7 @@ Widget _buildDijeloviList(List<Map<String, dynamic>> dijelovi) {
     final korisnikId = int.parse(korisnikInfo['korisnikId'] ?? '0');
 
     // Dohvatimo listu spasenih dijelova
-    final spaseniDijeloviList = await spaseniDijeloviService.getSpaseniDijelovi(korisnikId: korisnikId);
+    final spaseniDijeloviList = await spaseniDijeloviService.getSpaseniDijelovi(korisnikId: korisnikId,status: "",dijeloviId: 0);
     // Dohvatimo listu spasenih bicikala
     final spaseniBicikliList = await spaseniBicikliService.getSpaseniBicikli(korisnikId: korisnikId,status: "",biciklId: 0);
 

@@ -62,12 +62,6 @@ class _BiciklPrikazState extends State<BiciklPrikaz> {
     }
   }
 
-  orderProduct() async {
-    if(!isLoggedIn){
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je prijaviti se da bi mogli narucili proizvod");
-    }
-  }
-
   Future<void> fetchData() async {
     final fetchedKorisnik = await KorisnikService().getKorisnikByID(widget.korisnikId);
     final fetchedBicikl = await BiciklService().getBiciklById(widget.biciklId);
@@ -224,49 +218,44 @@ class _BiciklPrikazState extends State<BiciklPrikaz> {
                             ),
                         // Middle Panel (SP)
                         Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (getCurrentImageBytes() != null)
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(16.0), // Zaobljenje ivica
-                                child: Image.memory(
-                                  getCurrentImageBytes()!,
-                                  width: MediaQuery.of(context).size.width * 0.4, // širine ekrana
-                                  height: MediaQuery.of(context).size.width * 0.32, // širine ekrana za kvadratne slike
-                                  fit: BoxFit.cover,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (getCurrentImageBytes() != null)
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(16.0), // Zaobljenje ivica
+                                  child: Image.memory(
+                                    getCurrentImageBytes()!,
+                                    width: MediaQuery.of(context).size.width * 0.4, // širine ekrana
+                                    height: MediaQuery.of(context).size.width * 0.32, // širine ekrana za kvadratne slike
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.arrow_back),
+                                    onPressed: showPreviousImage,
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.arrow_forward),
+                                    onPressed: showNextImage,
+                                  ),
+                                ],
                               ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.arrow_back),
-                                  onPressed: showPreviousImage,
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.arrow_forward),
-                                  onPressed: showNextImage,
-                                ),
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                ElevatedButton(
-                                  onPressed: saveProduct,
-                                  child: const Text('Sačuvaj'),
-                                ),
-                                const SizedBox(width: 16.0),
-                                ElevatedButton(
-                                  onPressed: orderProduct,
-                                  child: const Text('Naruči'),
-                                ),
-                              ],
-                            ),
-                          ],
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: saveProduct,
+                                    child: const Text('Sačuvaj'),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
                         // Right Panel (DP)
                         Expanded(
                               child: Center(
@@ -378,14 +367,6 @@ class _BiciklPrikazState extends State<BiciklPrikaz> {
             _buildDetailContainer('Broj Brzina:', bicikl?['brojBrzina']?.toString() ?? 'Broj brzina nije pronađen'),
             // ignore: collection_methods_unrelated_type
             _buildDetailContainer('', isPromovisan? 'Artikal promovisan' : 'Artikal nije promovisan'),
-              if(widget.userProfile)
-                ElevatedButton(
-                    onPressed: () {
-                      _showPromocijaProizvoda(context);
-                    },
-                    // ignore: prefer_const_constructors
-                    child: Text('Promocija'),
-                  ),
           ],
         ),
       ],
@@ -501,199 +482,6 @@ class _BiciklPrikazState extends State<BiciklPrikaz> {
   }
   
 
-  
-  void zahtjevPlacanja(int cijena, int brojDana, String email, String ime, String prezime) async {
-    if (email.isEmpty) {
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je upisati email");
-      return;
-    }
-    if (ime.isEmpty) {
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je upisati ime");
-      return;
-    }
-    if (prezime.isEmpty) {
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je upisati prezime");
-      return;
-    }
-
-  }
-
-
-
-void _showPromocijaProizvoda(BuildContext context) {
-  bool _isFirstPage = true;
-  int _brojDana = 1;
-  final int _cijena = 20;
-  String _email = '';
-  String _ime = '';
-  String _prezime = '';
-
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return StatefulBuilder(
-        builder: (BuildContext context, StateSetter setState) {
-          return AlertDialog(
-            content: Container(
-              width: MediaQuery.of(context).size.width * 0.4,
-              height: MediaQuery.of(context).size.height * 0.55,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [
-                    Color.fromARGB(255, 92, 225, 230),
-                    Color.fromARGB(255, 7, 181, 255),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Center(
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.36,
-                  height: MediaQuery.of(context).size.height * 0.5,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        height: MediaQuery.of(context).size.height * 0.4325,
-                        width: MediaQuery.of(context).size.width * 0.36,
-                        child: Center(
-                          child: _isFirstPage
-                              ? Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    _buildDetailContainer2(
-                                      'Broj dana:',
-                                      DropdownButton(
-                                        value: _brojDana,
-                                        items: List.generate(10, (index) {
-                                          return DropdownMenuItem(
-                                            value: index + 1,
-                                            child: Text('${index + 1}'),
-                                          );
-                                        }),
-                                        onChanged: (int? newValue) {
-                                          setState(() {
-                                            _brojDana = newValue!;
-                                          });
-                                        },
-                                      ), 0.16,
-                                    ),
-                                    const SizedBox(height: 10),
-                                    _buildDetailContainer2('Cijena:', '20 EUR',0.16),
-                                    const SizedBox(height: 10),
-                                    _buildDetailContainer2(
-                                      'Ukupna cijena:',
-                                      '${_brojDana * _cijena} EUR',0.16
-                                    ),
-                                  ],
-                                )
-                              : Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    _buildDetailContainer2(
-                                      'Ukupna cijena:',
-                                      '${_brojDana * _cijena} EUR',0.16
-                                    ),
-                                    const SizedBox(height: 10),
-                                    _buildDetailContainer2(
-                                      'Email:',
-                                      TextField(
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _email = value;
-                                          });
-                                        },
-                                        decoration: const InputDecoration(
-                                          border: OutlineInputBorder(),
-                                          hintText: 'Unesite email',
-                                        ),
-                                      ),0.2
-                                    ),
-                                    const SizedBox(height: 10),
-                                    _buildDetailContainer2(
-                                      'Ime:',
-                                      TextField(
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _ime = value;
-                                          });
-                                        },
-                                        decoration: const InputDecoration(
-                                          border: OutlineInputBorder(),
-                                          hintText: 'Unesite ime',
-                                        ),
-                                      ),0.2
-                                    ),
-                                    const SizedBox(height: 10),
-                                    _buildDetailContainer2(
-                                      'Prezime:',
-                                      TextField(
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _prezime = value;
-                                          });
-                                        },
-                                        decoration: const InputDecoration(
-                                          border: OutlineInputBorder(),
-                                          hintText: 'Unesite prezime',
-                                        ),
-                                      ),0.2
-                                    ),
-                                  ],
-                                ),
-                        ),
-                      ),
-                      Container(
-                        height: MediaQuery.of(context).size.height * 0.0675,
-                        width: MediaQuery.of(context).size.width * 0.36,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                if (_isFirstPage) {
-                                  Navigator.of(context).pop();
-                                } else {
-                                  setState(() {
-                                    _isFirstPage = true;
-                                  });
-                                }
-                              },
-                              child: Text(_isFirstPage ? 'Nazad' : 'Nazad na Prvu Stranicu'),
-                            ),
-                            ElevatedButton(
-                              onPressed: () {
-                                if (_isFirstPage) {
-                                  setState(() {
-                                    _isFirstPage = false;
-                                  });
-                                } else {
-                                  zahtjevPlacanja(_cijena, _brojDana, _email, _ime, _prezime);
-                                }
-                              },
-                              child: Text(_isFirstPage ? 'Placanje' : 'Plati'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-      );
-    },
-  );
-}
-
-  
   Widget _buildDetailContainer(String label, dynamic value) {
     return Container(
       padding: const EdgeInsets.all(8.0),
@@ -720,44 +508,5 @@ void _showPromocijaProizvoda(BuildContext context) {
       ),
     );
   }
-  Widget _buildDetailContainer2(String label, dynamic value, double sirina) {
-    bool isDropdown = value is DropdownButton;
-
-    return Container(
-      padding:  EdgeInsets.all(MediaQuery.of(context).size.height * 0.009),
-      width: MediaQuery.of(context).size.width * sirina,
-      height: MediaQuery.of(context).size.height * 0.08,
-      decoration: BoxDecoration(
-        border: Border(
-          left: BorderSide(color: Colors.blue.shade900, width: 2.0),
-          bottom: BorderSide(color: Colors.blue.shade900, width: 2.0),
-          right: BorderSide(color: Colors.blue.shade900, width: 2.0),
-        ),
-        borderRadius: BorderRadius.circular(16.0), 
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            '$label ',
-            style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(width: 20),
-          isDropdown
-              ? Container(
-                  width: MediaQuery.of(context).size.width * 0.035, 
-                  child: value,
-                )
-              : value is Widget
-                  ? Expanded(child: value)
-                  : Text(
-                      '$value',
-                      style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-                      textAlign: TextAlign.center,
-                    ),
-        ],
-      ),
-    );
-  }
+  
 }

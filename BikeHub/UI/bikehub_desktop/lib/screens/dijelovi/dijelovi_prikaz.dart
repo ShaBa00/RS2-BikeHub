@@ -1,5 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:bikehub_desktop/screens/bicikli/bicikl_prikaz.dart';
+import 'package:bikehub_desktop/screens/ostalo/poruka_helper.dart';
 import 'package:bikehub_desktop/services/dijelovi/dijelovi_service.dart';
+import 'package:bikehub_desktop/services/dijelovi/spaseni_dijelovi_service.dart';
 import 'package:bikehub_desktop/services/kategorije/recommended_kategorije_service.dart';
 import 'package:flutter/material.dart';
 import '../../services/adresa/adresa_service.dart';
@@ -23,13 +27,32 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
   Map<String, dynamic>? dio;
   Map<String, dynamic>? adresa;
   int currentImageIndex = 0;  
+  bool isLoggedIn=false;
   final RecommendedKategorijaService recommendedKategorijaService = RecommendedKategorijaService();
+  final KorisnikService korisnikService = KorisnikService();
+  final SpaseniDijeloviService spaseniDijeloviService = SpaseniDijeloviService();
 
   @override
   void initState() {
     super.initState();
     recommendedKategorijaService.getRecommendedBiciklList(widget.dioId);
     fetchData();
+  }
+
+  loggedIn() async {
+    isLoggedIn = await korisnikService.isLoggedIn();
+    setState(() {});
+  }
+
+  saveProduct() async {
+    if(!isLoggedIn){
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je prijaviti se da bi mogli sacuvati proizvod");
+    }
+    final userInfo = await korisnikService.getUserInfo();
+    final int? idKorisnika = int.tryParse(userInfo['korisnikId'] ?? '');
+    if (dio != null && korisnik != null) {
+      await spaseniDijeloviService.addSpaseniDijelovi(context,dio?['dijeloviId'], idKorisnika!);
+    }
   }
 
   Future<void> fetchData() async {
@@ -42,6 +65,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
       dio = fetchedDijelovi;
       adresa = fetchedAdresa;
     });
+    await loggedIn();
   }
   Uint8List? getCurrentImageBytes() {
     if (dio != null &&
@@ -173,36 +197,45 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                         ),
                       ),
                     // Middle Panel (SP)
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (getCurrentImageBytes() != null)
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(16.0), 
-                                child: Image.memory(
-                                  getCurrentImageBytes()!,
-                                  width: MediaQuery.of(context).size.width * 0.4,
-                                  height: MediaQuery.of(context).size.width * 0.32, 
-                                  fit: BoxFit.cover, 
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (getCurrentImageBytes() != null)
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(16.0), // Zaobljenje ivica
+                                  child: Image.memory(
+                                    getCurrentImageBytes()!,
+                                    width: MediaQuery.of(context).size.width * 0.4, // širine ekrana
+                                    height: MediaQuery.of(context).size.width * 0.32, // širine ekrana za kvadratne slike
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.arrow_back),
+                                    onPressed: showPreviousImage,
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.arrow_forward),
+                                    onPressed: showNextImage,
+                                  ),
+                                ],
                               ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.arrow_back),
-                                  onPressed: showPreviousImage,
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.arrow_forward),
-                                  onPressed: showNextImage,
-                                ),
-                              ],
-                            ),
-                          ],
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: saveProduct,
+                                    child: const Text('Sačuvaj'),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
                           // Right Panel (DP)
                           Expanded(
                           child: Center(

@@ -13,5 +13,7 @@ namespace BikeHub.Services
     public interface IKorisnikService : ICRUDService<Model.KorisnikFM.Korisnik, KorisniciSearchObject, Model.KorisnikFM.KorisniciInsertR, Model.KorisnikFM.KorisniciUpdateR>
     {
         public BikeHub.Model.KorisnikFM.Korisnik Login(string username, string password);
+
+        public IActionResult DodajNovogAdmina(KorisniciInsertR korisnik);
     }
 }

@@ -4,6 +4,7 @@ using BikeHub.Model.KorisnikFM;
 using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
 using MapsterMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -97,8 +98,9 @@ namespace BikeHub.Services
             int ukupnaKolicina = ukupnaKolicinaBicikala + ukupnaKolicinaDijelova;
             int brojRezervacija = result.RezervacijaServisas.Where(b=>b.KorisnikId==id).ToList().Count;
 
+            var serviserStatus = result.Servisers.FirstOrDefault(s => s.KorisnikId == id);
             // Provjera da li je korisnik serviser
-            bool jeServiser = result.Servisers.Where(b => b.Status == "aktivan").ToList().Any();
+            string jeServiser = serviserStatus?.Status ?? null;
             var mappedKorisnik = Mapper.Map<Model.KorisnikFM.Korisnik>(result);
             mappedKorisnik.BrojRezervacija = brojRezervacija;
             mappedKorisnik.BrojProizvoda = brojProizvoda;
@@ -140,6 +142,11 @@ namespace BikeHub.Services
             {
                 throw new UserException("Username mora biti unesen");
             }
+            var usernameP = _context.Korisniks.FirstOrDefault(s => s.Username == request.Username);
+            if (usernameP != null)
+            {
+                throw new UserException("Username je zauzet");
+            }
             if (request.Email.IsNullOrEmpty())
             {
                 throw new UserException("Email mora biti unesen");
@@ -161,6 +168,7 @@ namespace BikeHub.Services
             var entity = Mapper.Map<Database.Korisnik>(request);
             BeforeInsert(request, entity);
             var state = _basePrvaGrupaState.CreateState("kreiran");
+            entity.IsAdmin = false;
             var noviRequest = Mapper.Map<KorisniciInsertRHS>(entity);
             return state.Insert(noviRequest);
         }
@@ -286,6 +294,48 @@ namespace BikeHub.Services
             {
                 korisnikInfo.Status = status;
                 _context.Update(korisnikInfo);
+            }
+        }
+
+        public IActionResult DodajNovogAdmina(KorisniciInsertR request)
+        {
+            try
+            {
+                var entity = Mapper.Map<Database.Korisnik>(request);
+                BeforeInsert(request, entity);
+                entity.IsAdmin = true;
+
+                var state = _basePrvaGrupaState.CreateState("kreiran");
+                var noviRequest = Mapper.Map<KorisniciInsertRHS>(entity);
+                state.Insert(noviRequest);
+
+                // Vraća uspješnu poruku
+                return new OkObjectResult(new { message = "Novi admin je uspješno dodan." });
+            }
+            catch (UserException ex)
+            {
+                // Vraća grešku s porukom korisnika
+                return new BadRequestObjectResult(new
+                {
+                    errors = new
+                    {
+                        userError = new[] { ex.Message }
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                // Vraća neočekivanu grešku
+                return new ObjectResult(new
+                {
+                    errors = new
+                    {
+                        serverError = new[] { "Došlo je do neočekivane greške.", ex.Message }
+                    }
+                })
+                {
+                    StatusCode = 500
+                };
             }
         }
     }
