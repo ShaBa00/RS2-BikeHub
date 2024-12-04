@@ -9,6 +9,7 @@ namespace BikeHub.Model.ServisFM
         public int KorisnikId { get; set; }
 
         public decimal Cijena { get; set; }
+        public decimal? UkupnaOcjena { get; set; }
 
         //public int BrojServisa { get; set; }
 

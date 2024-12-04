@@ -13,7 +13,8 @@ import '../serviser/servis_prozor.dart';
 import '../../services/korisnik/korisnik_service.dart';
 
 class PocetniProzorP1 extends StatefulWidget {
-  const PocetniProzorP1({super.key, required this.onToggleDisplay, required this.showBicikli});
+  const PocetniProzorP1(
+      {super.key, required this.onToggleDisplay, required this.showBicikli});
 
   final VoidCallback onToggleDisplay;
   final bool showBicikli;
@@ -21,40 +22,44 @@ class PocetniProzorP1 extends StatefulWidget {
   @override
   // ignore: library_private_types_in_public_api
   _PocetniProzorP1State createState() => _PocetniProzorP1State();
-  }
-  class _PocetniProzorP1State extends State<PocetniProzorP1> {
-    final KorisnikService korisnikService = KorisnikService();
-    bool isLoggedIn = false;
-    int korisnikId=0;
-    @override
-    void initState() {
-      super.initState();
-      _checkLoginStatus();
-    }
-    @override
-    void didUpdateWidget(covariant PocetniProzorP1 oldWidget) {
-      super.didUpdateWidget(oldWidget);
-      _checkLoginStatus();
-    }
-    Future<void> _checkLoginStatus() async {
-      isLoggedIn = await korisnikService.isLoggedIn();
-      if (isLoggedIn) {
-        var korisnik = await korisnikService.getUserInfo();
-        korisnikId = int.parse(korisnik['korisnikId'] as String); // Pretvara String u int
-      }
-      else{
-        isLoggedIn=false;
-      }
-      setState(() {});
-    }
+}
 
-    Future<void> _logout() async {
-      await korisnikService.logout();
-      setState(() {
-        isLoggedIn = false;
-      });
-      PorukaHelper.prikaziPorukuUspjeha(context, 'Uspješno ste se odjavili!');
+class _PocetniProzorP1State extends State<PocetniProzorP1> {
+  final KorisnikService korisnikService = KorisnikService();
+  bool isLoggedIn = false;
+  int korisnikId = 0;
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  @override
+  void didUpdateWidget(covariant PocetniProzorP1 oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    isLoggedIn = await korisnikService.isLoggedIn();
+    if (isLoggedIn) {
+      var korisnik = await korisnikService.getUserInfo();
+      korisnikId =
+          int.parse(korisnik['korisnikId'] as String); // Pretvara String u int
+    } else {
+      isLoggedIn = false;
     }
+    setState(() {});
+  }
+
+  Future<void> _logout() async {
+    await korisnikService.logout();
+    setState(() {
+      isLoggedIn = false;
+    });
+    PorukaHelper.prikaziPorukuUspjeha(context, 'Uspješno ste se odjavili!');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -95,22 +100,26 @@ class PocetniProzorP1 extends StatefulWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: isLoggedIn
                                 ? [
-                                    _buildResponsiveButton3(context, 'Sign out', _logout),
+                                    _buildResponsiveButton3(
+                                        context, 'Sign out', _logout),
                                   ]
                                 : [
-                                    _buildResponsiveButton3(context, 'Log in', () async {
+                                    _buildResponsiveButton3(context, 'Log in',
+                                        () async {
                                       // Navigiraj ka ekranu za prijavu
                                       await Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => LogInProzor(
-                                            onLogin: _checkLoginStatus, // Osvježava status kad je login uspješan
+                                            onLogin:
+                                                _checkLoginStatus, // Osvježava status kad je login uspješan
                                           ),
                                         ),
                                       );
                                       _checkLoginStatus();
                                     }),
-                                    _buildResponsiveButton3(context, 'Sign up', () {
+                                    _buildResponsiveButton3(context, 'Sign up',
+                                        () {
                                       // Logika za "Sign up"
                                     }),
                                   ],
@@ -132,9 +141,9 @@ class PocetniProzorP1 extends StatefulWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 _buildResponsiveButton(context, 'Bicikl'),
-                const SizedBox(width: 10), 
+                const SizedBox(width: 10),
                 _buildResponsiveButton(context, 'Dijelovi'),
-                const SizedBox(width: 10), 
+                const SizedBox(width: 10),
                 _buildResponsiveButton(context, 'Serviseri'),
               ],
             ),
@@ -153,25 +162,81 @@ class PocetniProzorP1 extends StatefulWidget {
     ];
   }
 
-Widget _buildIconButton(BuildContext context, IconData icon) {
-  if (icon == Icons.add) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 9, 72, 138),
-        borderRadius: BorderRadius.circular(24.0),
-      ),
-      child: PopupMenuButton<String>(
-        icon: Icon(icon, color: Colors.white),
-        onSelected: (String result) async {
+  Widget _buildIconButton(BuildContext context, IconData icon) {
+    if (icon == Icons.add) {
+      return Container(
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(255, 9, 72, 138),
+          borderRadius: BorderRadius.circular(24.0),
+        ),
+        child: PopupMenuButton<String>(
+          icon: Icon(icon, color: Colors.white),
+          onSelected: (String result) async {
+            final isLoggedIn = await KorisnikService().isLoggedIn();
+            if (result == 'Bicikl') {
+              if (isLoggedIn) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const BiciklDodajProzor()),
+                );
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LogInProzor(
+                      onLogin: _checkLoginStatus,
+                    ),
+                  ),
+                );
+              }
+            } else if (result == 'Dijelovi') {
+              if (isLoggedIn) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const DijeloviDodajProzor()),
+                );
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LogInProzor(
+                      onLogin: _checkLoginStatus,
+                    ),
+                  ),
+                );
+              }
+            }
+          },
+          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+            const PopupMenuItem<String>(
+              value: 'Bicikl',
+              child: Text('Bicikl'),
+            ),
+            const PopupMenuItem<String>(
+              value: 'Dijelovi',
+              child: Text('Dijelovi'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      return IconButton(
+        icon: Icon(icon),
+        color: Colors.white,
+        onPressed: () async {
           final isLoggedIn = await KorisnikService().isLoggedIn();
-          if (result == 'Bicikl') {
+
+          if (icon == Icons.person) {
             if (isLoggedIn) {
-              Navigator.push(
+              await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const BiciklDodajProzor()),
+                MaterialPageRoute(
+                    builder: (context) => ProfilProzor(korisnikId: korisnikId)),
               );
             } else {
-              Navigator.push(
+              await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => LogInProzor(
@@ -180,14 +245,15 @@ Widget _buildIconButton(BuildContext context, IconData icon) {
                 ),
               );
             }
-          } else if (result == 'Dijelovi') {
+          } else if (icon == Icons.bookmark) {
             if (isLoggedIn) {
-              Navigator.push(
+              await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const DijeloviDodajProzor()),
+                MaterialPageRoute(
+                    builder: (context) => const SacuvaniProizvodiProzor()),
               );
             } else {
-              Navigator.push(
+              await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => LogInProzor(
@@ -198,113 +264,60 @@ Widget _buildIconButton(BuildContext context, IconData icon) {
             }
           }
         },
-        itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-          const PopupMenuItem<String>(
-            value: 'Bicikl',
-            child: Text('Bicikl'),
-          ),
-          const PopupMenuItem<String>(
-            value: 'Dijelovi',
-            child: Text('Dijelovi'),
-          ),
-        ],
-      ),
-    );
-  } else {
-    return IconButton(
-      icon: Icon(icon),
-      color: Colors.white,
-      onPressed: () async {
-        final isLoggedIn = await KorisnikService().isLoggedIn();
+        iconSize: MediaQuery.of(context).size.width * 0.018,
+        padding: EdgeInsets.zero,
+        splashRadius: MediaQuery.of(context).size.width * 0.004,
+        splashColor: Colors.white.withOpacity(0.2),
+        constraints: BoxConstraints(
+          minWidth: MediaQuery.of(context).size.width * 0.0265,
+          minHeight: MediaQuery.of(context).size.width * 0.0265,
+        ),
+        style: IconButton.styleFrom(
+          backgroundColor: icon == Icons.home
+              ? const Color.fromARGB(255, 7, 181, 255)
+              : const Color.fromARGB(255, 9, 72, 138),
+        ),
+      );
+    }
+  }
 
-        if (icon == Icons.person) {
-          if (isLoggedIn) {
-            await Navigator.push(
+  Widget _buildResponsiveButton(BuildContext context, String label) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.09,
+      height: MediaQuery.of(context).size.height * 0.035,
+      child: ElevatedButton(
+        onPressed: () {
+          // Navigacija na osnovu oznake dugmeta
+          if (label == 'Bicikl') {
+            Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => ProfilProzor(korisnikId: korisnikId)),
+              MaterialPageRoute(builder: (context) => const BiciklProzor()),
             );
-          } else {
-            await Navigator.push(
+          } else if (label == 'Dijelovi') {
+            Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) => LogInProzor(
-                  onLogin: _checkLoginStatus,
-                ),
-              ),
+              MaterialPageRoute(builder: (context) => const DijeloviProzor()),
             );
-          }
-        } else if (icon == Icons.bookmark) {
-          if (isLoggedIn) {
-            await Navigator.push(
+          } else if (label == 'Serviseri') {
+            Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const SacuvaniProizvodiProzor()),
-            );
-          } else {
-            await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => LogInProzor(
-                  onLogin: _checkLoginStatus,
-                ),
-              ),
+              MaterialPageRoute(builder: (context) => const ServiserProzor()),
             );
           }
-        }
-      },
-      iconSize: MediaQuery.of(context).size.width * 0.018,
-      padding: EdgeInsets.zero,
-      splashRadius: MediaQuery.of(context).size.width * 0.004,
-      splashColor: Colors.white.withOpacity(0.2),
-      constraints: BoxConstraints(
-        minWidth: MediaQuery.of(context).size.width * 0.0265,
-        minHeight: MediaQuery.of(context).size.width * 0.0265,
-      ),
-      style: IconButton.styleFrom(
-        backgroundColor: icon == Icons.home
-            ? const Color.fromARGB(255, 7, 181, 255)
-            : const Color.fromARGB(255, 9, 72, 138),
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color.fromARGB(255, 9, 72, 138),
+        ),
+        child: Text(label, style: const TextStyle(color: Colors.white)),
       ),
     );
   }
-}
 
-Widget _buildResponsiveButton(BuildContext context, String label) {
-  return SizedBox(
-    width: MediaQuery.of(context).size.width * 0.09, 
-    height: MediaQuery.of(context).size.height * 0.035,
-    child: ElevatedButton(
-      onPressed: () {
-        // Navigacija na osnovu oznake dugmeta
-        if (label == 'Bicikl') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const BiciklProzor()),
-          );
-        } else if (label == 'Dijelovi') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const DijeloviProzor()),
-          );
-        } else if (label == 'Serviseri') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const ServiserProzor()),
-          );
-        }
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color.fromARGB(255, 9, 72, 138),
-      ),
-      child: Text(label, style: const TextStyle(color: Colors.white)),
-    ),
-  );
-}
-
-
-  Widget _buildResponsiveButton3(BuildContext context, String label, VoidCallback onPressed) {
+  Widget _buildResponsiveButton3(
+      BuildContext context, String label, VoidCallback onPressed) {
     return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.066,
-      height: MediaQuery.of(context).size.height * 0.035,
+      width: MediaQuery.of(context).size.width * 0.086,
+      height: MediaQuery.of(context).size.height * 0.065,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(

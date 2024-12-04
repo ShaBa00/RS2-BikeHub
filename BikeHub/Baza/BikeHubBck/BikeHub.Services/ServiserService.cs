@@ -75,6 +75,7 @@ namespace BikeHub.Services
         {
             var entity = new Database.Serviser();
             BeforeInsert(request, entity);
+            request.UkupnaOcjena = 0;
             var state = _basePrvaGrupaState.CreateState("kreiran");
             return state.Insert(request);
         }
@@ -171,14 +172,23 @@ namespace BikeHub.Services
             // Paginacija ručno
             var totalCount = query.Count();
 
-            // Provera da li su Page i PageSize postavljeni, sa podrazumevanim vrednostima ako nisu
-            var page = Math.Max(searchObject.Page ?? 1, 1);  // Osiguraj da je page >= 1
-            var pageSize = searchObject.PageSize ?? 10;
+            List<Model.Ostalo.ServiserDto> resultsList;
+            if (searchObject.Page == null || searchObject.PageSize == null)
+            {
+                // Ako su Page i PageSize null, vrati sve rezultate
+                resultsList = query.ToList();
+            }
+            else
+            {
+                // Ako nisu null, primeni paginaciju
+                var page = Math.Max(searchObject.Page.Value, 1); // Osiguraj da je page >= 1
+                var pageSize = searchObject.PageSize.Value;
 
-            var resultsList = query
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
+                resultsList = query
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+            }
 
             return new PagedResult<Model.Ostalo.ServiserDto>
             {

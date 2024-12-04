@@ -40,8 +40,9 @@ class KorisnikService {
         listaKorisnika = data['resultsList'] ?? [];
         countKorisnika = data['count'] ?? 0;
 
-        listaAdministratora= data['resultsList'].where((korisnik) => korisnik['isAdmin'] == true)
-        .toList();
+        listaAdministratora = data['resultsList']
+            .where((korisnik) => korisnik['isAdmin'] == true)
+            .toList();
 
         logger.i("Uspješno preuzeti korisnici: $listaKorisnika");
       } else {
@@ -62,15 +63,18 @@ class KorisnikService {
     }
 
     final authHeader = encodeBasicAuth(username, password);
-    _dio.options.headers['Authorization'] = authHeader; // Dodavanje Basic Auth headera
+    _dio.options.headers['Authorization'] =
+        authHeader; // Dodavanje Basic Auth headera
 
     return await _dio.get(url);
   }
+
   Future<bool> isLoggedIn() async {
     final username = await _storage.read(key: 'username');
     final password = await _storage.read(key: 'password');
     return username != null && password != null;
   }
+
   Future<void> _addAuthorizationHeader() async {
     // Provjera da li je korisnik prijavljen
     final loggedInStatus = await isLoggedIn();
@@ -88,7 +92,7 @@ class KorisnikService {
     }
     // Generiraj Authorization header
     final authHeader = encodeBasicAuth(username, password);
-    _dio.options.headers['Authorization'] = authHeader; 
+    _dio.options.headers['Authorization'] = authHeader;
   }
 
   Future<void> upravljanjeKorisnikom(KorisnikModel korisnik) async {
@@ -133,10 +137,11 @@ class KorisnikService {
           }
         }
       } else {
-        if (korisnik.username.isNotEmpty || korisnik.email.isNotEmpty || 
-            (korisnik.staraLozinka.isNotEmpty && korisnik.lozinka.isNotEmpty
-             && korisnik.lozinkaPotvrda.isNotEmpty)) {
-          
+        if (korisnik.username.isNotEmpty ||
+            korisnik.email.isNotEmpty ||
+            (korisnik.staraLozinka.isNotEmpty &&
+                korisnik.lozinka.isNotEmpty &&
+                korisnik.lozinkaPotvrda.isNotEmpty)) {
           final korisniciUpdateR = {
             'Username': korisnik.username,
             'StaraLozinka': korisnik.staraLozinka,
@@ -166,44 +171,44 @@ class KorisnikService {
     }
   }
 
-Future<String?> postAdmina(KorisnikModel korisnikModel) async {
-  try {
-    await _addAuthorizationHeader();
+  Future<String?> postAdmina(KorisnikModel korisnikModel) async {
+    try {
+      await _addAuthorizationHeader();
 
-    final response = await _dio.post(
-      '${HelperService.baseUrl}/Korisnik/NoviAdmin',
-      options: Options(
-        headers: {
-          'accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-      ),
-      data: korisnikModel,
-    );
+      final response = await _dio.post(
+        '${HelperService.baseUrl}/Korisnik/NoviAdmin',
+        options: Options(
+          headers: {
+            'accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+        ),
+        data: korisnikModel,
+      );
 
-    if (response.statusCode == 200) {
-      return "Administrator uspješno dodan";
-    } else {
-      final errors = response.data['errors'];
-      if (errors != null && errors['userError'] != null) {
-        return errors['userError'].join(', ');
+      if (response.statusCode == 200) {
+        return "Administrator uspješno dodan";
       } else {
-        return 'Došlo je do greške prilikom dodavanja administratora';
+        final errors = response.data['errors'];
+        if (errors != null && errors['userError'] != null) {
+          return errors['userError'].join(', ');
+        } else {
+          return 'Došlo je do greške prilikom dodavanja administratora';
+        }
       }
-    }
-  } on DioException catch (dioError) {
-    if (dioError.response != null && dioError.response?.data != null) {
-      final errors = dioError.response?.data['errors'];
-      if (errors != null && errors['userError'] != null) {
-        return errors['userError'].join(', ');
+    } on DioException catch (dioError) {
+      if (dioError.response != null && dioError.response?.data != null) {
+        final errors = dioError.response?.data['errors'];
+        if (errors != null && errors['userError'] != null) {
+          return errors['userError'].join(', ');
+        }
       }
+      return 'Došlo je do greške: ${dioError.message}';
+    } catch (e) {
+      logger.e('Greška: $e');
+      return e.toString();
     }
-    return 'Došlo je do greške: ${dioError.message}';
-  } catch (e) {
-    logger.e('Greška: $e');
-    return e.toString();
   }
-}
 
   Future<Map<String, String?>> getCredentials() async {
     final username = await _storage.read(key: 'username');
@@ -221,7 +226,7 @@ Future<String?> postAdmina(KorisnikModel korisnikModel) async {
     final username = await _storage.read(key: 'username');
     final password = await _storage.read(key: 'password');
     final isAdmin = await _storage.read(key: 'isAdmin');
-    
+
     return {
       'korisnikId': korisnikId,
       'username': username,
@@ -236,7 +241,8 @@ Future<String?> postAdmina(KorisnikModel korisnikModel) async {
 
   Future<Map<String, dynamic>?> getKorisnikInfo() async {
     try {
-      final response = await _getWithBasicAuth('${HelperService.baseUrl}/Korisnik/info');
+      final response =
+          await _getWithBasicAuth('${HelperService.baseUrl}/Korisnik/info');
       if (response.statusCode == 200) {
         return response.data;
       } else {
@@ -281,10 +287,15 @@ Future<String?> postAdmina(KorisnikModel korisnikModel) async {
         final Map<String, dynamic> korisnik = response.data;
         // Pohrani korisničke podatke u secure storage
         await _storage.write(key: 'username', value: korisnik['username']);
-        await _storage.write(key: 'password', value: password);  // Pohranjujemo lozinku
-        await _storage.write(key: 'korisnikId', value: korisnik['korisnikId'].toString());
-        await _storage.write(key: 'isAdmin', value: korisnik['isAdmin'].toString());
-        await _storage.write(key: 'token', value: korisnik['token']);  // Možeš pohraniti token ako je potrebno
+        await _storage.write(
+            key: 'password', value: password); // Pohranjujemo lozinku
+        await _storage.write(
+            key: 'korisnikId', value: korisnik['korisnikId'].toString());
+        await _storage.write(
+            key: 'isAdmin', value: korisnik['isAdmin'].toString());
+        await _storage.write(
+            key: 'token',
+            value: korisnik['token']); // Možeš pohraniti token ako je potrebno
         return korisnik;
       } else {
         throw Exception('Failed to login');
