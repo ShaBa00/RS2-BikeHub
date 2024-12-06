@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, prefer_const_constructors, prefer_const_literals_to_create_immutables, unused_field, prefer_final_fields, unused_element, no_leading_underscores_for_local_identifiers, avoid_print, unnecessary_const, use_build_context_synchronously
+// ignore_for_file: library_private_types_in_public_api, prefer_const_constructors, prefer_const_literals_to_create_immutables, unused_field, prefer_final_fields, unused_element, no_leading_underscores_for_local_identifiers, avoid_print, unnecessary_const, use_build_context_synchronously, sort_child_properties_last
 
 import 'package:bikehub_mobile/screens/administracija/image_carousel.dart';
 import 'package:bikehub_mobile/screens/ostalo/poruka_helper.dart';
@@ -64,6 +64,11 @@ class _AdministracijaPageState extends State<AdministracijaPage>
   int _brojPrikazanihDijelovi = 0;
   String _selectedStatusDijelovi = 'Kreirani';
 
+  List _listaAdministratora = [];
+  int _countAdministratora = 0;
+  int _currentPageAdministrator = 0;
+  int _pageSizeAdministrator = 4;
+
   late AnimationController _controller;
   late Animation<Offset> _offsetAnimation;
 
@@ -98,6 +103,8 @@ class _AdministracijaPageState extends State<AdministracijaPage>
     setState(() {
       _listaKorisnika = _korisnikService.listaKorisnika;
       _countKorisnik = _korisnikService.countKorisnika;
+      _listaAdministratora = _korisnikService.listaAdministratora;
+      _countAdministratora = _listaAdministratora.length;
       _listaServisera = _serviserService.listaServisera;
       _countServisera = _serviserService.countServisera;
       _listaBicikala = _biciklService.listaBicikala;
@@ -186,33 +193,66 @@ class _AdministracijaPageState extends State<AdministracijaPage>
       appBar: AppBar(
         title: Text(
           'Administracija',
-          style: TextStyle(color: Colors.white), // Postavljen tekst bijele boje
+          style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.blueAccent, // Postavljena pozadina za AppBar
-        iconTheme: IconThemeData(
-            color: Colors.white), // Postavljena bijela boja za ikone
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(255, 205, 238, 239),
-              Color.fromARGB(255, 165, 196, 210),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: _isLoading
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : Column(
-                children: <Widget>[
-                  centralniDio(context),
-                  adminNavBar(context),
-                ],
+        backgroundColor: Colors.blueAccent,
+        iconTheme: IconThemeData(color: Colors.white),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                activeTitle = "adminD";
+              });
+            },
+            child: Text(
+              "Dodatno",
+              style: TextStyle(
+                color: Colors.blue, // Plavi tekst
               ),
+            ),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.white, // Bijela boja dugmeta
+            ),
+          ),
+          SizedBox(width: 10),
+        ],
+      ),
+      body: GestureDetector(
+        onTap: () {
+          // Skloni tastaturu kada korisnik klikne izvan inputa
+          FocusScope.of(context).unfocus();
+        },
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              child: Container(
+                height: MediaQuery.of(context).size.height,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color.fromARGB(255, 205, 238, 239),
+                      Color.fromARGB(255, 165, 196, 210),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: Column(
+                  children: <Widget>[
+                    centralniDio(context),
+                    SizedBox(height: 60),
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: adminNavBar(context),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -261,15 +301,466 @@ class _AdministracijaPageState extends State<AdministracijaPage>
         return biciklPrikaz(context);
       case 'dijeloviP':
         return dijeloviPrikaz(context);
+      case 'adminD':
+        return adminDodatno(context);
       default:
         return homeDio(context);
+    }
+  }
+
+  bool showNewContainer = false;
+
+  Widget adminDodatno(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.757,
+      width: MediaQuery.of(context).size.width,
+      color: Colors.blueAccent, // Postavljena pozadina
+      child: Column(
+        children: [
+          Container(
+            height: MediaQuery.of(context).size.height * 0.1,
+            width: MediaQuery.of(context).size.width,
+            color: const Color.fromARGB(0, 244, 67, 54), // Bilo koja pozadina
+            child: Row(
+              children: [
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.1,
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  color: const Color.fromARGB(
+                      0, 33, 149, 243), // Bilo koja pozadina za prvi dio
+                  child: Center(
+                    child: Text(
+                      _username,
+                      style: TextStyle(
+                        color: Color.fromARGB(
+                            255, 255, 255, 255), // Plava boja teksta
+                        fontSize: 18.0,
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.1,
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  color: const Color.fromARGB(
+                      0, 76, 175, 79), // Bilo koja pozadina za drugi dio
+                  child: Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          showNewContainer = !showNewContainer;
+                        });
+                      },
+                      child: Text(
+                        "Dodaj novog",
+                        style: TextStyle(
+                          color: Colors.blue, // Plava boja teksta
+                        ),
+                      ),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white, // Bijela boja dugmeta
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          showNewContainer
+              ? adminNewContainer(context)
+              : adminListContainer(context),
+        ],
+      ),
+    );
+  }
+
+  Widget adminListContainer(BuildContext context) {
+    int startIndex = _currentPageAdministrator * _pageSizeAdministrator;
+    int endIndex = startIndex + _pageSizeAdministrator;
+    List currentAdmini = _listaAdministratora.sublist(
+      startIndex,
+      endIndex > _listaAdministratora.length
+          ? _listaAdministratora.length
+          : endIndex,
+    );
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.657,
+      width: MediaQuery.of(context).size.width,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color.fromARGB(255, 205, 238, 239),
+            Color.fromARGB(255, 165, 196, 210)
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(50.0),
+          topRight: Radius.circular(50.0),
+        ), // Zaobljene gornje ivice
+      ),
+      child: Column(
+        children: [
+          Container(
+            height: MediaQuery.of(context).size.height * 0.59,
+            width: MediaQuery.of(context).size.width,
+            color:
+                const Color.fromARGB(0, 244, 67, 54), // Pozadina prvog dijela
+            child: ListView.builder(
+              itemCount: currentAdmini.length,
+              itemBuilder: (context, index) {
+                final korisnik = currentAdmini[index];
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      ucitanZapis = false;
+                      _odabraniId = korisnik['korisnikId'];
+                      activeTitle = "korisniciP";
+                    });
+                    print('Kliknut red broj $index');
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                        top: index == 0 ? 25.0 : 8.0, bottom: 8.0),
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.95,
+                        height: MediaQuery.of(context).size.height * 0.05,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              height: MediaQuery.of(context).size.height * 0.05,
+                              width: MediaQuery.of(context).size.width * 0.15,
+                              color: const Color.fromARGB(
+                                  0, 244, 67, 54), // Promijeni boju po želji
+                              child: Center(
+                                child: Icon(
+                                  Icons.person,
+                                  color: Colors.blueAccent,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              height: MediaQuery.of(context).size.height * 0.05,
+                              width: MediaQuery.of(context).size.width * 0.65,
+                              color: const Color.fromARGB(
+                                  0, 76, 175, 79), // Promijeni boju po želji
+                              child: Center(
+                                child: Text(
+                                  korisnik['username'],
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              height: MediaQuery.of(context).size.height * 0.05,
+                              width: MediaQuery.of(context).size.width * 0.15,
+                              color: const Color.fromARGB(
+                                  0, 33, 149, 243), // Promijeni boju po želji
+                              child: Center(
+                                child: _buildInfoButton(
+                                    korisnik['korisnikId'], "korisniciP"),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          Container(
+            height: MediaQuery.of(context).size.height * 0.06,
+            width: MediaQuery.of(context).size.width,
+            color:
+                const Color.fromARGB(0, 76, 175, 79), // Pozadina drugog dijela
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: _currentPageKorisnik > 0
+                      ? () {
+                          setState(() {
+                            _currentPageKorisnik--;
+                          });
+                        }
+                      : null,
+                  child: Text('<'),
+                ),
+                SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: endIndex < _prikazaniKorisnici.length
+                      ? () {
+                          setState(() {
+                            _currentPageKorisnik++;
+                          });
+                        }
+                      : null,
+                  child: Text('>'),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  final _usernameController = TextEditingController();
+  final _lozinkaController = TextEditingController();
+  final _lozinkaPotvrdaController = TextEditingController();
+  final _emailController = TextEditingController();
+
+  Widget adminNewContainer(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.657,
+      width: MediaQuery.of(context).size.width,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color.fromARGB(255, 251, 251, 251),
+            Color.fromARGB(255, 128, 255, 253)
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(50.0),
+          topRight: Radius.circular(50.0),
+        ), // Zaobljene gornje ivice
+      ),
+      child: Center(
+        child: Container(
+          height: MediaQuery.of(context).size.height * 0.5,
+          width: MediaQuery.of(context).size.width * 0.9,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color.fromARGB(255, 110, 255, 253),
+                Color.fromARGB(255, 255, 255, 255)
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius:
+                BorderRadius.all(Radius.circular(10.0)), // Zaobljene ivice
+          ),
+          child: Column(
+            children: [
+              Container(
+                height: MediaQuery.of(context).size.height * 0.44,
+                width: MediaQuery.of(context).size.width * 0.9,
+                color: const Color.fromARGB(0, 158, 158, 158),
+                child: Column(
+                  children: [
+                    buildCustomInput(
+                      context: context,
+                      title: "Username",
+                      controller: _usernameController,
+                      isPassword: false,
+                    ),
+                    buildCustomInput(
+                      context: context,
+                      title: "Lozinka",
+                      controller: _lozinkaController,
+                      isPassword: true,
+                    ),
+                    buildCustomInput(
+                      context: context,
+                      title: "Potvrda lozinke",
+                      controller: _lozinkaPotvrdaController,
+                      isPassword: true,
+                    ),
+                    buildCustomInput(
+                      context: context,
+                      title: "Email",
+                      controller: _emailController,
+                      isPassword: false,
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                height: MediaQuery.of(context).size.height * 0.06,
+                width: MediaQuery.of(context).size.width * 0.9,
+                color:
+                    const Color.fromARGB(0, 96, 125, 139), // Bilo koja pozadina
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            showNewContainer = false;
+                          });
+                        },
+                        child: Text(
+                          "Nazad",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold, // Boldiraj tekst
+                            fontSize: 18.0, // Povećaj font teksta
+                            color: Color.fromARGB(
+                                255, 255, 255, 255), // Plava boja teksta
+                          ),
+                        ),
+                        style: TextButton.styleFrom(
+                          backgroundColor: Color.fromARGB(
+                              255, 87, 202, 255), // Bijela boja dugmeta
+                        ),
+                      ),
+                      SizedBox(width: 10), // Razmak između dugmadi
+                      ElevatedButton(
+                        onPressed: () {
+                          dodajAdministratora();
+                        },
+                        child: Text(
+                          "Dodaj",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold, // Boldiraj tekst
+                            fontSize: 18.0, // Povećaj font teksta
+                            color: Color.fromARGB(
+                                255, 255, 255, 255), // Plava boja teksta
+                          ),
+                        ),
+                        style: TextButton.styleFrom(
+                          backgroundColor: Color.fromARGB(
+                              255, 87, 202, 255), // Bijela boja dugmeta
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildCustomInput({
+    required BuildContext context,
+    required String title,
+    required TextEditingController controller,
+    bool isPassword = false,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey[800],
+          ),
+        ),
+        const SizedBox(height: 6),
+        Container(
+          width: MediaQuery.of(context).size.width * 0.8,
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.3),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: TextField(
+            controller: controller,
+            obscureText: isPassword,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: title == "Lozinka" || title == "Potvrda lozinke"
+                  ? "Unesite $title"
+                  : null,
+              hintStyle: TextStyle(color: Colors.grey[500], fontSize: 12),
+            ),
+            style: const TextStyle(fontSize: 14),
+          ),
+        ),
+        const SizedBox(height: 10),
+      ],
+    );
+  }
+
+  void dodajAdministratora() async {
+    if (_usernameController.text.isEmpty) {
+      PorukaHelper.prikaziPorukuUpozorenja(
+          context, "Potrebno je dodati username");
+      return;
+    }
+    if (_lozinkaController.text.isEmpty) {
+      PorukaHelper.prikaziPorukuUpozorenja(
+          context, "Potrebno je dodati lozinku");
+      return;
+    }
+    if (_lozinkaPotvrdaController.text.isEmpty) {
+      PorukaHelper.prikaziPorukuUpozorenja(
+          context, "Potrebno je dodati potvrdenu lozinku");
+      return;
+    }
+    if (_lozinkaController.text != _lozinkaPotvrdaController.text) {
+      PorukaHelper.prikaziPorukuUpozorenja(
+          context, "Lozinka i potvrdena lozinka moraju biti iste");
+      return;
+    }
+    if (_emailController.text.isEmpty) {
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati email");
+      return;
+    }
+
+    try {
+      final responseMessage = await _korisnikService.postAdmina(
+        _usernameController.text,
+        _lozinkaController.text,
+        _lozinkaPotvrdaController.text,
+        _emailController.text,
+      );
+      if (responseMessage == "Administrator uspješno dodan") {
+        PorukaHelper.prikaziPorukuUspjeha(context, responseMessage!);
+        _usernameController.clear();
+        _lozinkaController.clear();
+        _lozinkaPotvrdaController.clear();
+        _emailController.clear();
+        await _korisnikService.getKorisniks(status: '');
+        setState(() {
+          _listaAdministratora = _korisnikService.listaAdministratora;
+          _countAdministratora = _listaAdministratora.length;
+          showNewContainer = false;
+        });
+      } else {
+        PorukaHelper.prikaziPorukuUpozorenja(
+            context,
+            responseMessage ??
+                "Došlo je do greške prilikom dodavanja administratora");
+      }
+    } catch (e) {
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Došlo je do greške: $e");
     }
   }
 
   Widget korisniciDio(BuildContext context) {
     int startIndex = _currentPageKorisnik * _pageSizeKorisnik;
     int endIndex = startIndex + _pageSizeKorisnik;
-    List currentKorisnici = _prikazaniKorisnici.sublist(
+    List currentKorisnik = _prikazaniKorisnici.sublist(
       startIndex,
       endIndex > _prikazaniKorisnici.length
           ? _prikazaniKorisnici.length
@@ -333,9 +824,9 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                       color: const Color.fromARGB(
                           0, 244, 67, 54), // Pozadina prvog dijela
                       child: ListView.builder(
-                        itemCount: currentKorisnici.length,
+                        itemCount: currentKorisnik.length,
                         itemBuilder: (context, index) {
-                          final korisnik = currentKorisnici[index];
+                          final korisnik = currentKorisnik[index];
                           return GestureDetector(
                             onTap: () {
                               setState(() {

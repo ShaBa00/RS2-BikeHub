@@ -1,4 +1,4 @@
-// ignore_for_file: unused_field, use_rethrow_when_possible, prefer_const_declarations
+// ignore_for_file: unused_field, use_rethrow_when_possible, prefer_const_declarations, unnecessary_null_comparison, unnecessary_type_check
 
 import 'dart:async';
 import 'dart:convert';
@@ -147,6 +147,7 @@ class KorisnikServis {
   }
 
   List<dynamic> listaKorisnika = [];
+  List<dynamic> listaAdministratora = [];
   int countKorisnika = 0;
 
   Future<void> getKorisniks({String? status, int? page, int? pageSize}) async {
@@ -183,6 +184,10 @@ class KorisnikServis {
 
         listaKorisnika = data['resultsList'] ?? [];
         countKorisnika = data['count'] ?? 0;
+
+        listaAdministratora = data['resultsList']
+            .where((korisnik) => korisnik['isAdmin'] == true)
+            .toList();
 
         logger.i("Uspješno preuzeti korisnici: $listaKorisnika");
       } else {
@@ -243,6 +248,210 @@ class KorisnikServis {
     } catch (e) {
       logger.e("Greška pri ažuriranju statusa: $e");
       throw e;
+    } finally {
+      httpClient.close();
+    }
+  }
+
+  Future<String?> postAdmina(String username, String lozinka,
+      String lozinkaPotvrda, String email) async {
+    final String baseUrl = '${HelperService.baseUrl}/Korisnik';
+    Uri uri;
+
+    HttpClient httpClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+
+    try {
+      await _addAuthorizationHeader();
+
+      uri = Uri.parse('$baseUrl/NoviAdmin');
+
+      final request = await httpClient.postUrl(uri);
+      request.headers.set('accept', 'application/json');
+      request.headers.set('Content-Type', 'application/json');
+      request.headers
+          .set('Authorization', _dio.options.headers['Authorization']);
+
+      request.write(jsonEncode({
+        'username': username,
+        'lozinka': lozinka,
+        'lozinkaPotvrda': lozinkaPotvrda,
+        'email': email,
+      }));
+
+      final response = await request.close();
+
+      if (response.statusCode == 200) {
+        return "Administrator uspješno dodan";
+      } else {
+        final responseBody = await response.transform(utf8.decoder).join();
+        final decodedResponse = jsonDecode(responseBody);
+        final errors = decodedResponse['errors'];
+        if (errors != null && errors['userError'] != null) {
+          return errors['userError'].join(', ');
+        } else {
+          return 'Došlo je do greške prilikom dodavanja administratora';
+        }
+      }
+    } on HttpException catch (httpError) {
+      if (httpError is HttpException && httpError.message != null) {
+        return 'Došlo je do greške: ${httpError.message}';
+      }
+      return 'Došlo je do greške: ${httpError.toString()}';
+    } catch (e) {
+      logger.e('Greška: $e');
+      return e.toString();
+    } finally {
+      httpClient.close();
+    }
+  }
+
+  Future<String?> izmjeniKorisnika(
+      String? email, String? username, int korisnikId) async {
+    final String baseUrl = '${HelperService.baseUrl}/Korisnik';
+    Uri uri;
+
+    HttpClient httpClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+
+    try {
+      // Provjeri da li je poslan korisnikId
+      if (korisnikId == 0) {
+        return "Korisnik ID je obavezan";
+      }
+
+      // Provjeri da li je poslan barem jedan zapis za izmjenu
+      if ((email == null || email.isEmpty) &&
+          (username == null || username.isEmpty)) {
+        return "Potrebno je izmjenuti barem jedan zapis";
+      }
+
+      // Dodavanje Authorization header-a
+      await _addAuthorizationHeader();
+
+      // Priprema body za slanje
+      final body = <String, String>{};
+      if (email != null && email.isNotEmpty) {
+        body['email'] = email;
+      }
+      if (username != null && username.isNotEmpty) {
+        body['username'] = username;
+      }
+
+      uri = Uri.parse('$baseUrl/$korisnikId');
+
+      final request = await httpClient.putUrl(uri);
+      request.headers.set('accept', 'application/json');
+      request.headers.set('Content-Type', 'application/json');
+      request.headers
+          .set('Authorization', _dio.options.headers['Authorization']);
+
+      request.write(jsonEncode(body));
+
+      final response = await request.close();
+
+      if (response.statusCode == 200) {
+        return "Korisnik uspješno izmjenjen";
+      } else {
+        final responseBody = await response.transform(utf8.decoder).join();
+        final decodedResponse = jsonDecode(responseBody);
+        final errors = decodedResponse['errors'];
+        if (errors != null && errors['userError'] != null) {
+          return errors['userError'].join(', ');
+        } else {
+          return 'Greška prilikom izmjene korisnika';
+        }
+      }
+    } on HttpException catch (httpError) {
+      if (httpError is HttpException && httpError.message != null) {
+        return 'Greška prilikom izmjene korisnika: ${httpError.message}';
+      }
+      return 'Greška prilikom izmjene korisnika: ${httpError.toString()}';
+    } catch (e) {
+      logger.e('Greška prilikom izmjene korisnika: $e');
+      return e.toString();
+    } finally {
+      httpClient.close();
+    }
+  }
+
+  Future<String?> izmjeniLozinkuKorisnika(String? staraLozinka, String? lozinka,
+      String? lozinkaPotvrda, int korisnikId) async {
+    final String baseUrl = '${HelperService.baseUrl}/Korisnik';
+    Uri uri;
+
+    HttpClient httpClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+
+    try {
+      if (korisnikId == 0) {
+        return "Korisnik ID je obavezan";
+      }
+
+      // Provjeri da li je poslan barem jedan zapis za izmjenu
+      if ((lozinka == null || lozinka.isEmpty) ||
+          (lozinkaPotvrda == null || lozinkaPotvrda.isEmpty) ||
+          (staraLozinka == null || staraLozinka.isEmpty)) {
+        return "Za promjenu lozinke potrebno je unjeti sve podatke";
+      }
+
+      if (lozinka != lozinkaPotvrda) {
+        return "Nova lozinka i potvrda moraju biti iste";
+      }
+
+      if (lozinka == staraLozinka) {
+        return "Nova lozinka i stara lozinka moraju biti razlicite";
+      }
+
+      await _addAuthorizationHeader();
+
+      // Priprema body za slanje
+      final body = <String, String>{};
+      if (lozinka != null && lozinka.isNotEmpty) {
+        body['lozinka'] = lozinka;
+      }
+      if (lozinkaPotvrda != null && lozinkaPotvrda.isNotEmpty) {
+        body['lozinkaPotvrda'] = lozinkaPotvrda;
+      }
+      if (staraLozinka != null && staraLozinka.isNotEmpty) {
+        body['staraLozinka'] = staraLozinka;
+      }
+
+      uri = Uri.parse('$baseUrl/$korisnikId');
+
+      final request = await httpClient.putUrl(uri);
+      request.headers.set('accept', 'application/json');
+      request.headers.set('Content-Type', 'application/json');
+      request.headers
+          .set('Authorization', _dio.options.headers['Authorization']);
+
+      request.write(jsonEncode(body));
+
+      final response = await request.close();
+
+      if (response.statusCode == 200) {
+        return "Lozinka uspješno izmjenjena";
+      } else {
+        final responseBody = await response.transform(utf8.decoder).join();
+        final decodedResponse = jsonDecode(responseBody);
+        final errors = decodedResponse['errors'];
+        if (errors != null && errors['userError'] != null) {
+          return errors['userError'].join(', ');
+        } else {
+          return 'Greška prilikom izmjene lozinke';
+        }
+      }
+    } on HttpException catch (httpError) {
+      if (httpError is HttpException && httpError.message != null) {
+        return 'Greška prilikom izmjene korisnika: ${httpError.message}';
+      }
+      return 'Greška prilikom izmjene korisnika: ${httpError.toString()}';
+    } catch (e) {
+      logger.e('Greška prilikom izmjene korisnika: $e');
+      return e.toString();
     } finally {
       httpClient.close();
     }

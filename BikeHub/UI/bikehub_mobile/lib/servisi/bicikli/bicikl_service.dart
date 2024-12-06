@@ -17,7 +17,7 @@ class BiciklService {
   final logger = Logger();
   final _storage = const FlutterSecureStorage();
   final KorisnikServis _korisnikService = KorisnikServis();
-
+//
   BiciklService() : _dio = Dio() {
     configureDio(_dio);
   }

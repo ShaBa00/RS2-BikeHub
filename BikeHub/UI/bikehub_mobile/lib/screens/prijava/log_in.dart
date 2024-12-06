@@ -49,7 +49,10 @@ class _LogInState extends State<LogIn> {
         context,
         MaterialPageRoute(builder: (context) => const GlavniProzor()),
       );
-    } else {}
+    } else {
+      PorukaHelper.prikaziPorukuUpozorenja(
+          context, 'Greska prilikom prijave, pokusajte ponovo');
+    }
   }
 
   String _currentScreen = 'Prijava';

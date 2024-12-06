@@ -104,6 +104,56 @@ class ServiserService {
     }
   }
 
+  Future<Map<String, dynamic>?> getServiseriDTOByKorisnikId({
+    int? korisnikId,
+  }) async {
+    final Map<String, dynamic> queryParams = {};
+
+    if (korisnikId != null) queryParams['korisnikId'] = korisnikId.toString();
+
+    Uri uri = Uri.parse('${HelperService.baseUrl}/Serviser/GetServiserDTOList');
+    uri = uri.replace(queryParameters: queryParams);
+
+    final String url = uri.toString();
+
+    final HttpClient httpClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+
+    final IOClient ioClient = IOClient(httpClient);
+
+    try {
+      final http.Response response = await ioClient
+          .get(Uri.parse(url))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        var serviseri = data['resultsList'] ?? [];
+
+        logger.i("Uspješno preuzeti serviseri: $serviseri");
+
+        // Vrati prvi zapis iz liste
+        if (serviseri.isNotEmpty) {
+          return serviseri.first;
+        } else {
+          return null;
+        }
+      } else {
+        logger.e("Neuspješan zahtjev: ${response.statusCode}");
+        return null;
+      }
+    } on TimeoutException catch (_) {
+      throw Exception('Failed to load users: Server is not available');
+    } catch (e) {
+      logger.e("Greška pri preuzimanju servisera: $e");
+      return null;
+    } finally {
+      ioClient.close();
+    }
+  }
+
   Future<void> getServiseriDTO({
     String? username,
     String? status, //="aktivan",
@@ -239,6 +289,50 @@ class ServiserService {
       throw e;
     } finally {
       httpClient.close();
+    }
+  }
+
+  Future<List<int>> getSlobodniDani({
+    required int serviserId,
+    required int mjesec,
+    required int godina,
+  }) async {
+    final Map<String, dynamic> queryParams = {};
+
+    queryParams['serviserId'] = serviserId.toString();
+    queryParams['mjesec'] = mjesec.toString();
+    queryParams['godina'] = godina.toString();
+
+    Uri uri =
+        Uri.parse('${HelperService.baseUrl}/RezervacijaServisa/slobodni-dani');
+    uri = uri.replace(queryParameters: queryParams);
+
+    final String url = uri.toString();
+
+    final HttpClient httpClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+
+    final IOClient ioClient = IOClient(httpClient);
+
+    try {
+      final http.Response response = await ioClient
+          .get(Uri.parse(url))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> responseData = jsonDecode(response.body);
+        final List<int> slobodniDani = List<int>.from(responseData);
+        return slobodniDani;
+      } else {
+        throw Exception('Failed to load slobodni dani');
+      }
+    } on TimeoutException catch (_) {
+      throw Exception('Failed to load users: Server is not available');
+    } catch (e) {
+      throw Exception('Failed to load slobodni dani');
+    } finally {
+      ioClient.close();
     }
   }
 }

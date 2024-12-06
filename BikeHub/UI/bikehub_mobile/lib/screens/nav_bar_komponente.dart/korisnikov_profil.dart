@@ -1,11 +1,13 @@
-// ignore_for_file: use_key_in_widget_constructors, library_private_types_in_public_api, prefer_const_constructors, prefer_const_literals_to_create_immutables, unnecessary_const, unnecessary_null_comparison
+// ignore_for_file: use_key_in_widget_constructors, library_private_types_in_public_api, prefer_const_constructors, prefer_const_literals_to_create_immutables, unnecessary_const, unnecessary_null_comparison, prefer_final_fields, unused_field, sort_child_properties_last, avoid_print, sized_box_for_whitespace
 
 import 'package:bikehub_mobile/screens/administracija/administracija.dart';
 import 'package:bikehub_mobile/screens/glavni_prozor.dart';
 import 'package:bikehub_mobile/screens/nav_bar.dart';
 import 'package:bikehub_mobile/screens/ostalo/poruka_helper.dart';
 import 'package:bikehub_mobile/screens/prijava/log_in.dart';
+import 'package:bikehub_mobile/screens/servis/korisnikov_servis.dart';
 import 'package:bikehub_mobile/servisi/korisnik/adresa_service.dart';
+import 'package:bikehub_mobile/servisi/korisnik/korisnik_info_service.dart';
 import 'package:flutter/material.dart';
 import 'package:bikehub_mobile/servisi/korisnik/korisnik_service.dart';
 
@@ -18,6 +20,11 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
   int korisnikId = 0;
   Future<Map<String, dynamic>?>? futureKorisnik = Future.value(null);
   Map<String, dynamic>? adresa;
+  Map<String, dynamic>? korisnik;
+  String activeTitleP = 'home';
+  final KorisnikServis _korisnikService = KorisnikServis();
+  final AdresaServis _adresaService = AdresaServis();
+  final KorisnikInfoServis _korisnikInfoServis = KorisnikInfoServis();
 
   @override
   initState() {
@@ -27,14 +34,14 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
 
   Future<void> _initialize() async {
     setState(() {
-      futureKorisnik = KorisnikServis().isLoggedIn().then((isLoggedIn) async {
+      futureKorisnik = _korisnikService.isLoggedIn().then((isLoggedIn) async {
         if (isLoggedIn) {
           Map<String, String?> userInfo = await KorisnikServis().getUserInfo();
           korisnikId = int.parse(userInfo['korisnikId']!);
-          final korisnik = await KorisnikServis().getKorisnikById(korisnikId);
+          korisnik = await _korisnikService.getKorisnikById(korisnikId);
 
           if (korisnik != null) {
-            adresa = await AdresaServis().getAdresa(korisnikId: korisnikId);
+            adresa = await _adresaService.getAdresa(korisnikId: korisnikId);
           }
           return korisnik;
         }
@@ -47,13 +54,21 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Colors.blueAccent, // Bilo koja pozadina
+        color: Colors.blueAccent,
         child: Column(
           children: <Widget>[
             prviDio(context),
-            drugiDio(context),
-            // navBar
-            const NavBar(),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    getActiveWidget(context),
+                    // NavBar unutar Expanded da se tastatura može prikazati preko njega
+                    const NavBar(),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -116,11 +131,13 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                     height: MediaQuery.of(context).size.height *
                         0.07, // 7% visine ekrana
                     color: Color.fromARGB(
-                        0, 255, 6, 6), // Zamijenite s bojom po želj
+                        0, 255, 6, 6), // Zamijenite s bojom po želji
                     child: Center(
-                      child: _buildButton('Uredi profil'),
+                      child: activeTitleP == 'home'
+                          ? _buildButton('Uredi profil')
+                          : _buildButton('Nazad'),
                     ),
-                  ),
+                  )
                 ],
               ),
             ),
@@ -131,6 +148,16 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
     );
   }
 
+  Widget getActiveWidget(BuildContext context) {
+    switch (activeTitleP) {
+      case 'home':
+        return drugiDio(context);
+      case 'urediP':
+        return urediProfil(context);
+      default:
+        return drugiDio(context);
+    }
+  }
 //DIO ZA PRIKAZIVANJE PODATAKA
 
   Widget drugiDio(BuildContext context) {
@@ -183,6 +210,459 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
     );
   }
 
+  String izmjeneNad = "Lozinku";
+
+  Widget buildButton(String title) {
+    return ElevatedButton(
+      onPressed: () {
+        setState(() {
+          izmjeneNad = title;
+        });
+      },
+      child: Text(
+        title,
+        style: TextStyle(
+          color: title == izmjeneNad ? Colors.white : Colors.lightBlue,
+          fontSize: 16,
+        ),
+      ),
+      style: TextButton.styleFrom(
+        backgroundColor: title == izmjeneNad
+            ? Color.fromARGB(255, 87, 202, 255)
+            : Color.fromARGB(255, 255, 255, 255),
+      ),
+    );
+  }
+
+  Widget izmjeneNadWidget(String title) {
+    switch (title) {
+      case "Lozinku":
+        return lozinkaWidget();
+      case "Adresu":
+        return adresaWidget();
+      case "Osnovne":
+        return osnovneWidget();
+      default:
+        return lozinkaWidget();
+    }
+  }
+
+  Widget lozinkaWidget() {
+    return Container(
+      width: double.infinity,
+      height: MediaQuery.of(context).size.height * 0.66,
+      color: const Color.fromARGB(0, 33, 149, 243),
+      child: Center(
+          child: Container(
+        height: MediaQuery.of(context).size.height * 0.5,
+        width: MediaQuery.of(context).size.width * 0.9,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color.fromARGB(255, 110, 255, 253),
+              Color.fromARGB(255, 255, 255, 255)
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.all(
+            Radius.circular(20.0),
+          ),
+        ),
+        child: Column(
+          children: [
+            Container(
+              height: MediaQuery.of(context).size.height * 0.04,
+              width: MediaQuery.of(context).size.width * 0.9,
+              color: Color.fromARGB(0, 255, 235, 59),
+            ),
+            Container(
+              height: MediaQuery.of(context).size.height * 0.39,
+              width: MediaQuery.of(context).size.width * 0.9,
+              color: Color.fromARGB(
+                  0, 244, 67, 54), // Bilo koja pozadina za prvi dio
+              child: Center(
+                child: Column(
+                  children: [
+                    createInputField("Stara lozinka", true, staraLozinka),
+                    createInputField("Nova lozinka", true, lozinka),
+                    createInputField("Potvrda lozinke", true, lozinkaPotvrda),
+                  ],
+                ),
+              ),
+            ),
+            Container(
+              height: MediaQuery.of(context).size.height * 0.07,
+              width: MediaQuery.of(context).size.width * 0.9,
+              color: const Color.fromARGB(0, 255, 235, 59),
+              child: Center(
+                child: izmjenaNadButton("Izmjeni", "Lozinku"),
+              ),
+            )
+          ],
+        ),
+      )),
+    );
+  }
+
+  Widget adresaWidget() {
+    return Container(
+      width: double.infinity,
+      height: MediaQuery.of(context).size.height * 0.66,
+      color: const Color.fromARGB(0, 76, 175, 79),
+      child: Center(
+          child: Container(
+        height: MediaQuery.of(context).size.height * 0.5,
+        width: MediaQuery.of(context).size.width * 0.9,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color.fromARGB(255, 110, 255, 253),
+              Color.fromARGB(255, 255, 255, 255)
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.all(
+            Radius.circular(20.0),
+          ),
+        ),
+        child: Column(
+          children: [
+            Container(
+              height: MediaQuery.of(context).size.height * 0.04,
+              width: MediaQuery.of(context).size.width * 0.9,
+              color: Color.fromARGB(0, 255, 235, 59),
+            ),
+            Container(
+              height: MediaQuery.of(context).size.height * 0.39,
+              width: MediaQuery.of(context).size.width * 0.9,
+              color: Color.fromARGB(
+                  0, 244, 67, 54), // Bilo koja pozadina za prvi dio
+              child: Center(
+                child: Column(
+                  children: [
+                    createInputField("Grad", false, grad),
+                    createInputField("Postanski broj", false, postanskiBroj),
+                    createInputField("Ulica", false, ulica),
+                  ],
+                ),
+              ),
+            ),
+            Container(
+              height: MediaQuery.of(context).size.height * 0.07,
+              width: MediaQuery.of(context).size.width * 0.9,
+              color: const Color.fromARGB(0, 255, 235, 59),
+              child: Center(
+                child: izmjenaNadButton("Izmjeni", "Adresu"),
+              ),
+            )
+          ],
+        ),
+      )),
+    );
+  }
+
+  Widget osnovneWidget() {
+    return Container(
+      width: double.infinity,
+      height: MediaQuery.of(context).size.height * 0.66,
+      color: const Color.fromARGB(0, 244, 67, 54),
+      child: Center(
+          child: Container(
+        height: MediaQuery.of(context).size.height * 0.5,
+        width: MediaQuery.of(context).size.width * 0.9,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color.fromARGB(255, 110, 255, 253),
+              Color.fromARGB(255, 255, 255, 255)
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.all(
+            Radius.circular(20.0),
+          ),
+        ),
+        child: Column(
+          children: [
+            Container(
+              height: MediaQuery.of(context).size.height * 0.43,
+              width: MediaQuery.of(context).size.width * 0.9,
+              color: Color.fromARGB(
+                  0, 244, 67, 54), // Bilo koja pozadina za prvi dio
+              child: Center(
+                child: Column(
+                  children: [
+                    createInputField("Username", false, username),
+                    createInputField("Email", false, email),
+                    createInputField("Ime i prezime", false, imePrezime),
+                    createInputField("Telefon", false, telefon),
+                  ],
+                ),
+              ),
+            ),
+            Container(
+              height: MediaQuery.of(context).size.height * 0.07,
+              width: MediaQuery.of(context).size.width * 0.9,
+              color: const Color.fromARGB(0, 255, 235, 59),
+              child: Center(
+                child: izmjenaNadButton("Izmjeni", "Osnovne"),
+              ),
+            )
+          ],
+        ),
+      )),
+    );
+  }
+
+  Widget izmjenaNadButton(String title, String objekt) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.4,
+      child: ElevatedButton(
+        onPressed: () {
+          setState(() {
+            posaljiIzmjene(objekt);
+          });
+        },
+        child: Text(
+          title,
+          style: TextStyle(
+            fontSize: 17.0,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        style: TextButton.styleFrom(
+          backgroundColor: Color.fromARGB(255, 87, 202, 255),
+        ),
+      ),
+    );
+  }
+
+  void posaljiIzmjene(String objekt) {
+    switch (objekt) {
+      case "Lozinku":
+        _korisnikService
+            .izmjeniLozinkuKorisnika(staraLozinka.text, lozinka.text,
+                lozinkaPotvrda.text, korisnik?['korisnikId'])
+            .then((result) {
+          if (result == "Lozinka uspješno izmjenjena") {
+            PorukaHelper.prikaziPorukuUspjeha(context,
+                "Zbog uspjesne promjene lozinke potrebo je logirati se");
+            _korisnikService.logout();
+            lozinka.clear();
+            lozinkaPotvrda.clear();
+            staraLozinka.clear();
+            setState(() {
+              activeTitleP = "home";
+              _initialize();
+            });
+          } else {
+            PorukaHelper.prikaziPorukuGreske(context, result!);
+          }
+        }).catchError((error) {
+          PorukaHelper.prikaziPorukuGreske(context, "Greška: $error");
+        });
+        break;
+      case "Adresu":
+        _adresaService
+            .promjeniAdresu(
+          grad.text,
+          postanskiBroj.text,
+          ulica.text,
+          adresa?['adresaId'],
+        )
+            .then((result) {
+          if (result == "Adresa uspješno izmjenjena") {
+            grad.clear();
+            postanskiBroj.clear();
+            ulica.clear();
+            setState(() {
+              activeTitleP = "home";
+              _initialize();
+            });
+            PorukaHelper.prikaziPorukuUspjeha(context, result!);
+          } else {
+            PorukaHelper.prikaziPorukuGreske(context, result!);
+          }
+        }).catchError((error) {
+          PorukaHelper.prikaziPorukuGreske(context, "Greška: $error");
+        });
+        break;
+      case "Osnovne":
+        if (username.text.isEmpty &&
+            email.text.isEmpty &&
+            imePrezime.text.isEmpty &&
+            telefon.text.isEmpty) {
+          PorukaHelper.prikaziPorukuUpozorenja(
+              context, "Potrebno je izmjenuti barem jedan zapis");
+        } else {
+          if (imePrezime.text.isNotEmpty || telefon.text.isNotEmpty) {
+            _korisnikInfoServis
+                .promjeniKorisnikInfo(imePrezime.text, telefon.text,
+                    korisnik?['korisnikInfos'][0]['korisnikInfoId'])
+                .then((result) {
+              if (result == "Korisnik Info uspješno izmjenjena") {
+                imePrezime.clear();
+                telefon.clear();
+                setState(() {
+                  activeTitleP = "home";
+                  _initialize();
+                });
+
+                PorukaHelper.prikaziPorukuUspjeha(context, result!);
+              } else {
+                PorukaHelper.prikaziPorukuGreske(context, result!);
+              }
+            }).catchError((error) {
+              PorukaHelper.prikaziPorukuGreske(context, "Greška: $error");
+            });
+          }
+          if (username.text.isNotEmpty || email.text.isNotEmpty) {
+            _korisnikService
+                .izmjeniKorisnika(
+                    email.text, username.text, korisnik?['korisnikId'])
+                .then((result) {
+              if (result == "Korisnik uspješno izmjenjen") {
+                if (username.text.isNotEmpty) {
+                  PorukaHelper.prikaziPorukuUspjeha(context,
+                      "Zbog uspjesne promjene username-a potrebo je logirati se");
+                  _korisnikService.logout();
+                  email.clear();
+                  username.clear();
+                  setState(() {
+                    activeTitleP = "home";
+                    _initialize();
+                  });
+                } else {
+                  PorukaHelper.prikaziPorukuUspjeha(context, result!);
+                  setState(() {
+                    activeTitleP = "home";
+                    _initialize();
+                  });
+                }
+              } else {
+                PorukaHelper.prikaziPorukuGreske(context, result!);
+              }
+            }).catchError((error) {
+              PorukaHelper.prikaziPorukuGreske(context, "Greška: $error");
+            });
+          }
+        }
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  final TextEditingController staraLozinka = TextEditingController();
+  final TextEditingController lozinka = TextEditingController();
+  final TextEditingController lozinkaPotvrda = TextEditingController();
+  final TextEditingController username = TextEditingController();
+  final TextEditingController email = TextEditingController();
+  final TextEditingController imePrezime = TextEditingController();
+  final TextEditingController telefon = TextEditingController();
+  final TextEditingController grad = TextEditingController();
+  final TextEditingController postanskiBroj = TextEditingController();
+  final TextEditingController ulica = TextEditingController();
+
+  Widget createInputField(
+      String title, bool isLozinka, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 8.0),
+            Container(
+              width: MediaQuery.of(context).size.width *
+                  0.8, // Smanjena širina inputa
+              child: TextField(
+                controller: controller,
+                obscureText: isLozinka,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
+                ),
+                style: TextStyle(
+                  fontSize: 16.0,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget urediProfil(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: SingleChildScrollView(
+        child: Container(
+          width: double.infinity,
+          height: MediaQuery.of(context).size.height * 0.73,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color.fromARGB(255, 251, 251, 251),
+                Color.fromARGB(255, 128, 255, 253)
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(50.0),
+              topRight: Radius.circular(50.0),
+            ), // Zaobljene gornje ivice
+          ),
+          child: Column(
+            children: [
+              izmjeneNadWidget(izmjeneNad),
+              Container(
+                //dio za prikaz dugmica
+                width: double.infinity,
+                height: MediaQuery.of(context).size.height * 0.07,
+                color:
+                    const Color.fromARGB(0, 76, 175, 79), // Bilo koja pozadina
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    buildButton("Adresu"),
+                    SizedBox(width: 10),
+                    buildButton("Lozinku"),
+                    SizedBox(width: 10),
+                    buildButton("Osnovne"),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget korisnikWidget(BuildContext context, Map<String, dynamic> korisnik) {
     return Container(
       width: double.infinity,
@@ -200,31 +680,64 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                 //samo Ikona korisnik
                 Container(
                   width: double.infinity,
-                  height: MediaQuery.of(context).size.height *
-                      0.12, // 13% visine ekrana
-                  color: Color.fromARGB(
-                      0, 33, 149, 243), // Pozadina za prvi podkontenjer
-                  child: Center(
-                    child: Container(
-                      width: 80, // Širina kruga
-                      height: 80, // Visina kruga
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [
-                            Color.fromARGB(255, 82, 205, 210),
-                            Color.fromARGB(255, 7, 161, 235),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
+                  height: MediaQuery.of(context).size.height * 0.12,
+                  child: Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: MediaQuery.of(context).size.height * 0.09,
+                        color: Color.fromARGB(
+                            0, 33, 149, 243), // Pozadina za prvi podkontenjer
+                        child: Center(
+                          child: Container(
+                            width: 80, // Širina kruga
+                            height: 80, // Visina kruga
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color.fromARGB(255, 82, 205, 210),
+                                  Color.fromARGB(255, 7, 161, 235),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.person, // Ikona koja podsjeća na korisnika
+                              color: Colors.white,
+                              size: 50,
+                            ),
+                          ),
                         ),
-                        shape: BoxShape.circle,
                       ),
-                      child: const Icon(
-                        Icons.person, // Ikona koja podsjeća na korisnika
-                        color: Colors.white,
-                        size: 50,
+                      Container(
+                        width: double.infinity,
+                        height: MediaQuery.of(context).size.height * 0.03,
+                        color: Color.fromARGB(
+                            0, 255, 68, 58), // Pozadina za drugi podkontenjer
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 18.0),
+                            child: InkWell(
+                              onTap: () {
+                                _korisnikService.logout();
+                                setState(() {
+                                  _initialize();
+                                  activeTitleP = "home";
+                                });
+                              },
+                              child: Icon(
+                                Icons.logout,
+                                color: Color.fromARGB(255, 0, 0, 0),
+                                size: 30,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
                 // username
@@ -421,7 +934,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                                 width: 8), // Razmak između ikone i teksta
                             Text(
                               adresa != null
-                                  ? '${adresa?['grad'] ?? 'N/A'}, ${adresa?['ulica'] ?? 'N/A'}'
+                                  ? '${adresa?['grad'] ?? 'N/A'}, ${adresa?['ulica'] ?? 'N/A'}, ${adresa?['postanskiBroj'] ?? 'N/A'}'
                                   : 'N/A',
                               style: const TextStyle(
                                 fontSize: 16,
@@ -449,7 +962,6 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                 GestureDetector(
                   onTap: () {
                     // Ovdje će ići vaša funkcionalnost
-                    // ignore: avoid_print
                     print('Kontejner je kliknut!');
                   },
                   child: Container(
@@ -643,7 +1155,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
 
   Widget _buildButton(String title) {
     return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.34,
+      width: MediaQuery.of(context).size.width * 0.4,
       height: MediaQuery.of(context).size.height * 0.05,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
@@ -674,7 +1186,10 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
       case 'Servis':
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const LogIn()),
+          MaterialPageRoute(
+              builder: (context) => KorisnikovServis(
+                    korisnikId: korisnikId,
+                  )),
         );
         break;
       case 'Zahtjev':
@@ -690,7 +1205,14 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
         );
         break;
       case 'Uredi profil':
-        PorukaHelper.prikaziPorukuUspjeha(context, 'Profil uspješno uređen!');
+        setState(() {
+          activeTitleP = "urediP";
+        });
+        break;
+      case 'Nazad':
+        setState(() {
+          activeTitleP = "home";
+        });
         break;
       default:
         PorukaHelper.prikaziPorukuUpozorenja(context, 'Nepoznata radnja.');
