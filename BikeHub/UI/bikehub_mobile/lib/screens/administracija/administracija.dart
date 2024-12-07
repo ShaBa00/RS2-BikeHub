@@ -490,10 +490,10 @@ class _AdministracijaPageState extends State<AdministracijaPage>
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                  onPressed: _currentPageKorisnik > 0
+                  onPressed: _currentPageAdministrator > 0
                       ? () {
                           setState(() {
-                            _currentPageKorisnik--;
+                            _currentPageAdministrator--;
                           });
                         }
                       : null,
@@ -501,10 +501,10 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                 ),
                 SizedBox(width: 10),
                 ElevatedButton(
-                  onPressed: endIndex < _prikazaniKorisnici.length
+                  onPressed: endIndex < _listaAdministratora.length
                       ? () {
                           setState(() {
-                            _currentPageKorisnik++;
+                            _currentPageAdministrator++;
                           });
                         }
                       : null,

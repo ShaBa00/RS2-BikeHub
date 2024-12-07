@@ -90,14 +90,6 @@ namespace BikeHub.Services
                 }
                 entity.Cijena = request.Cijena.Value;
             }
-            if (request.BrojServisa.HasValue)
-            {
-                if (request.BrojServisa < 0)
-                {
-                    throw new UserException("Broj servisa ne može biti negativan.");
-                }
-                entity.BrojServisa = request.BrojServisa.Value;
-            }
             base.BeforeUpdate(request, entity);
         }
 

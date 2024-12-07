@@ -1,4 +1,4 @@
-// ignore_for_file: unused_field, prefer_const_declarations, use_rethrow_when_possible
+// ignore_for_file: unused_field, prefer_const_declarations, use_rethrow_when_possible, unnecessary_null_comparison, unnecessary_type_check
 
 import 'dart:async';
 import 'dart:convert';
@@ -241,7 +241,8 @@ class ServiserService {
     }
   }
 
-  Future<void> upravljanjeServiserom(String status, int odabraniId) async {
+  Future<HttpClientResponse> upravljanjeServiserom(
+      String status, int odabraniId) async {
     final String baseUrl = '${HelperService.baseUrl}/Serviser';
     Uri uri;
 
@@ -282,6 +283,8 @@ class ServiserService {
       } else {
         logger.e("Neuspješan zahtjev: ${response.statusCode}");
       }
+
+      return response; // Dodana povratna vrijednost
     } on TimeoutException catch (_) {
       throw Exception('Failed to load users: Server is not available');
     } catch (e) {
@@ -333,6 +336,54 @@ class ServiserService {
       throw Exception('Failed to load slobodni dani');
     } finally {
       ioClient.close();
+    }
+  }
+
+  Future<String?> editServiser(double cijena, int serviserId) async {
+    final String baseUrl = HelperService.baseUrl;
+    Uri uri;
+
+    HttpClient httpClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+
+    try {
+      await _addAuthorizationHeader();
+
+      uri = Uri.parse('$baseUrl/Serviser/$serviserId');
+
+      final request = await httpClient.putUrl(uri);
+      request.headers.set('accept', 'application/json');
+      request.headers.set('Content-Type', 'application/json');
+      request.headers
+          .set('Authorization', _dio.options.headers['Authorization']);
+
+      request.write(jsonEncode({'cijena': cijena}));
+
+      final response = await request.close();
+
+      if (response.statusCode == 200) {
+        return "Serviser uspješno izmjenjen";
+      } else {
+        final responseBody = await response.transform(utf8.decoder).join();
+        final decodedResponse = jsonDecode(responseBody);
+        final errors = decodedResponse['errors'];
+        if (errors != null && errors['userError'] != null) {
+          return errors['userError'].join(', ');
+        } else {
+          return 'Došlo je do greške prilikom izmjene servisera';
+        }
+      }
+    } on HttpException catch (httpError) {
+      if (httpError is HttpException && httpError.message != null) {
+        return 'Došlo je do greške: ${httpError.message}';
+      }
+      return 'Došlo je do greške: ${httpError.toString()}';
+    } catch (e) {
+      logger.e('Greška: $e');
+      return e.toString();
+    } finally {
+      httpClient.close();
     }
   }
 }

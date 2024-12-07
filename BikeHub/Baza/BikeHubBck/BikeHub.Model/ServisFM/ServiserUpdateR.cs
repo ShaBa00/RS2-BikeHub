@@ -10,7 +10,5 @@ namespace BikeHub.Model.ServisFM
 
         public decimal? Cijena { get; set; }
 
-        public int? BrojServisa { get; set; }
-
     }
 }
