@@ -238,7 +238,7 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
 
   List<Map<String, dynamic>>? listaRezervacija;
   int _currentPage = 0;
-  int _pageSize = 3;
+  int _pageSize = 10;
   int _odabraniId = 0;
   bool loadingLista = true;
   Future<void> getRezervacije(String status) async {
@@ -316,7 +316,7 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
               itemCount: currentAdmini.length,
               itemBuilder: (context, index) {
                 final zapis = currentAdmini[index];
-                final String datumKreiranja = zapis['datumKreiranja'];
+                final String datumKreiranja = zapis['datumRezervacije'];
                 final DateTime parsedDate = DateTime.parse(datumKreiranja);
                 final String formattedDate =
                     DateFormat('dd/MM/yyyy').format(parsedDate);

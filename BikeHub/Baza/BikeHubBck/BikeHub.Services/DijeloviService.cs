@@ -63,9 +63,24 @@ namespace BikeHub.Services
             {
                 NoviQuery = NoviQuery.Where(x => x.KategorijaId == search.KategorijaId);
             }
+            if (search?.DijeloviId != null)
+            {
+                NoviQuery = NoviQuery.Where(x => x.DijeloviId == search.DijeloviId);
+            }
             if (search.isSlikaIncluded == true)
             {
                 NoviQuery = NoviQuery.Include(x => x.SlikeDijelovis);
+            }
+            if (!string.IsNullOrWhiteSpace(search?.SortOrder))
+            {
+                if (search.SortOrder.ToLower() == "asc")
+                {
+                    NoviQuery = NoviQuery.OrderBy(x => x.Cijena);
+                }
+                else if (search.SortOrder.ToLower() == "desc")
+                {
+                    NoviQuery = NoviQuery.OrderByDescending(x => x.Cijena);
+                }
             }
             return NoviQuery;
         }

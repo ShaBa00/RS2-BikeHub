@@ -13,30 +13,36 @@ class GlavniProzor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: true, // Dodano za izbjegavanje overflow-a
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(255, 205, 238, 239),
-              Color.fromARGB(255, 165, 196, 210),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context)
+            .unfocus(); // Sakrij tastaturu kada se klikne na bilo koji dio prozora
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: true, // Dodano za izbjegavanje overflow-a
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color.fromARGB(255, 205, 238, 239),
+                Color.fromARGB(255, 165, 196, 210),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
           ),
-        ),
-        child: SingleChildScrollView(
-          // Dodano za omogućavanje skrolanja
-          child: Column(
-            children: <Widget>[
-              //glavniDio
-              dioPretrage(context),
-              dioPromovisanih(context),
-              dioNovi(context),
-              //navBar
-              const NavBar(),
-            ],
+          child: SingleChildScrollView(
+            // Dodano za omogućavanje skrolanja
+            child: Column(
+              children: <Widget>[
+                //glavniDio
+                dioPretrage(context),
+                dioPromovisanih(context),
+                dioNovi(context),
+                //navBar
+                const NavBar(),
+              ],
+            ),
           ),
         ),
       ),

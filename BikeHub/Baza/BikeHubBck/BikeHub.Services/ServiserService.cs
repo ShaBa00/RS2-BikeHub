@@ -4,6 +4,7 @@ using BikeHub.Model.ServisFM;
 using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
 using MapsterMapper;
+using PayPal.Api;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,6 +48,17 @@ namespace BikeHub.Services
             if (search?.BrojServisa != null)
             {
                 NoviQuery = NoviQuery.Where(x => x.BrojServisa == search.BrojServisa);
+            }
+            if (!string.IsNullOrWhiteSpace(search?.SortOrder))
+            {
+                if (search.SortOrder.ToLower() == "asc")
+                {
+                    NoviQuery = NoviQuery.OrderBy(x => x.Cijena);
+                }
+                else if (search.SortOrder.ToLower() == "desc")
+                {
+                    NoviQuery = NoviQuery.OrderByDescending(x => x.Cijena);
+                }
             }
             return NoviQuery;
         }
@@ -160,6 +172,18 @@ namespace BikeHub.Services
 
             if (searchObject.PocetnaOcjena != null && searchObject.KrajnjaOcjena != null)
                 query = query.Where(x => x.UkupnaOcjena >= searchObject.PocetnaOcjena && x.UkupnaOcjena <= searchObject.KrajnjaOcjena);
+
+            if (!string.IsNullOrWhiteSpace(searchObject?.SortOrder))
+            {
+                if (searchObject.SortOrder.ToLower() == "asc")
+                {
+                    query = query.OrderBy(x => x.Cijena);
+                }
+                else if (searchObject.SortOrder.ToLower() == "desc")
+                {
+                    query = query.OrderByDescending(x => x.Cijena);
+                }
+            }
 
             // Paginacija ručno
             var totalCount = query.Count();

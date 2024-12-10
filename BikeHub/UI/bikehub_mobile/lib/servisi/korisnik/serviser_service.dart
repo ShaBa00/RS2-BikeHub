@@ -157,21 +157,24 @@ class ServiserService {
   Future<void> getServiseriDTO({
     String? username,
     String? status, //="aktivan",
+    String? sortOrder,
     double? pocetnaCijena,
     double? krajnjaCijena,
     double? pocetnaOcjena,
     double? krajnjaOcjena,
     int? pocetniBrojServisa,
+    int? krajnjiBrojServisa,
     int? korisnikId,
     int? serviserId,
-    int? krajnjiBrojServisa,
     int? page = 1,
     int? pageSize = 5,
   }) async {
     final Map<String, dynamic> queryParams = {};
 
     if (username != null) queryParams['Username'] = username;
+    if (sortOrder != null) queryParams['SortOrder'] = sortOrder;
     if (status != null) queryParams['Status'] = status;
+
     if (pocetnaCijena != null) {
       queryParams['PocetnaCijena'] = pocetnaCijena.toString();
     }

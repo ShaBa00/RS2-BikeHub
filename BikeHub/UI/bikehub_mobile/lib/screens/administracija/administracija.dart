@@ -2733,7 +2733,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
         setState(() {
           _listaServisera = _serviserService.listaServisera;
           _countServisera = _serviserService.countServisera;
-          _filterStatus(_selectedStatusServiseri, 3);
+          _filterStatus(_selectedStatusServiseri, 2);
           activeTitle = "serviseri";
         });
         break;

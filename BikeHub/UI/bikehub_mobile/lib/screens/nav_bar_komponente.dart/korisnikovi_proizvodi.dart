@@ -2,6 +2,8 @@
 
 import 'package:bikehub_mobile/screens/glavni_prozor.dart';
 import 'package:bikehub_mobile/screens/nav_bar.dart';
+import 'package:bikehub_mobile/screens/prijava/log_in.dart';
+import 'package:bikehub_mobile/servisi/korisnik/korisnik_service.dart';
 import 'package:flutter/material.dart';
 
 class KorisnikoviProizvodi extends StatefulWidget {
@@ -10,7 +12,33 @@ class KorisnikoviProizvodi extends StatefulWidget {
 }
 
 class _KorisnikoviProizvodiState extends State<KorisnikoviProizvodi> {
+  final KorisnikServis _korisnikService = KorisnikServis();
+
   String _selectedSection = 'bicikl';
+  Future<Map<String, dynamic>?>? futureKorisnik = Future.value(null);
+  @override
+  void initState() {
+    super.initState();
+    _initialize();
+  }
+
+  int korisnikId = 0;
+  bool isLogged = false;
+  bool isLoading = true;
+
+  Future<void> _initialize() async {
+    final isLoggedIn = await _korisnikService.isLoggedIn();
+    if (isLoggedIn) {
+      final userInfo = await _korisnikService.getUserInfo();
+      korisnikId = int.parse(userInfo['korisnikId']!);
+
+      isLogged = true;
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   void _updateSection(String section) {
     setState(() {
@@ -188,8 +216,8 @@ class _KorisnikoviProizvodiState extends State<KorisnikoviProizvodi> {
       ), // Zamijenite s bojom po želji
       child: Center(
         child: Container(
-          width: MediaQuery.of(context).size.width * 0.9, // 90% širine ekrana
-          height: MediaQuery.of(context).size.height * 0.6, // 50% visine ekrana
+          width: MediaQuery.of(context).size.width * 0.9,
+          height: MediaQuery.of(context).size.height * 0.6,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               colors: [
@@ -199,7 +227,55 @@ class _KorisnikoviProizvodiState extends State<KorisnikoviProizvodi> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(20.0), // Zaobljene ivice
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          child: Center(
+            child: isLoading
+                ? CircularProgressIndicator()
+                : isLogged
+                    ? Container(
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        height: MediaQuery.of(context).size.height * 0.6,
+                        color: const Color.fromARGB(0, 68, 137, 255),
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Potrebno je prijaviti se',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.4,
+                            height: MediaQuery.of(context).size.height * 0.05,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Color.fromARGB(255, 87, 202, 255),
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const LogIn()),
+                                );
+                              },
+                              child: Text(
+                                "Prijava",
+                                style: TextStyle(
+                                  color:
+                                      const Color.fromARGB(255, 255, 255, 255),
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
           ),
         ),
       ),
@@ -222,8 +298,8 @@ class _KorisnikoviProizvodiState extends State<KorisnikoviProizvodi> {
       ), // Zamijenite s bojom po želji
       child: Center(
         child: Container(
-          width: MediaQuery.of(context).size.width * 0.9, // 90% širine ekrana
-          height: MediaQuery.of(context).size.height * 0.6, // 50% visine ekrana
+          width: MediaQuery.of(context).size.width * 0.9,
+          height: MediaQuery.of(context).size.height * 0.6,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               colors: [
@@ -233,7 +309,55 @@ class _KorisnikoviProizvodiState extends State<KorisnikoviProizvodi> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(20.0), // Zaobljene ivice
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          child: Center(
+            child: isLoading
+                ? CircularProgressIndicator()
+                : isLogged
+                    ? Container(
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        height: MediaQuery.of(context).size.height * 0.6,
+                        color: const Color.fromARGB(0, 68, 137, 255),
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Potrebno je prijaviti se',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.4,
+                            height: MediaQuery.of(context).size.height * 0.05,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Color.fromARGB(255, 87, 202, 255),
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const LogIn()),
+                                );
+                              },
+                              child: Text(
+                                "Prijava",
+                                style: TextStyle(
+                                  color:
+                                      const Color.fromARGB(255, 255, 255, 255),
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
           ),
         ),
       ),

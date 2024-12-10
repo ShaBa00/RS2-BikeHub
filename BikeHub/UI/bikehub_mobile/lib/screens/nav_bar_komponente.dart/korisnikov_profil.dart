@@ -3,11 +3,14 @@
 import 'package:bikehub_mobile/screens/administracija/administracija.dart';
 import 'package:bikehub_mobile/screens/glavni_prozor.dart';
 import 'package:bikehub_mobile/screens/nav_bar.dart';
+import 'package:bikehub_mobile/screens/nav_bar_komponente.dart/korisnikove_rezervacije.dart';
+import 'package:bikehub_mobile/screens/nav_bar_komponente.dart/korisnikovi_proizvodi.dart';
 import 'package:bikehub_mobile/screens/ostalo/poruka_helper.dart';
 import 'package:bikehub_mobile/screens/prijava/log_in.dart';
 import 'package:bikehub_mobile/screens/servis/korisnikov_servis.dart';
 import 'package:bikehub_mobile/servisi/korisnik/adresa_service.dart';
 import 'package:bikehub_mobile/servisi/korisnik/korisnik_info_service.dart';
+import 'package:bikehub_mobile/servisi/korisnik/rezervacije_service.dart';
 import 'package:flutter/material.dart';
 import 'package:bikehub_mobile/servisi/korisnik/korisnik_service.dart';
 
@@ -25,6 +28,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
   final KorisnikServis _korisnikService = KorisnikServis();
   final AdresaServis _adresaService = AdresaServis();
   final KorisnikInfoServis _korisnikInfoServis = KorisnikInfoServis();
+  final RezervacijaServis _rezervacijaServis = RezervacijaServis();
 
   @override
   initState() {
@@ -36,7 +40,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
     setState(() {
       futureKorisnik = _korisnikService.isLoggedIn().then((isLoggedIn) async {
         if (isLoggedIn) {
-          Map<String, String?> userInfo = await KorisnikServis().getUserInfo();
+          Map<String, String?> userInfo = await _korisnikService.getUserInfo();
           korisnikId = int.parse(userInfo['korisnikId']!);
           korisnik = await _korisnikService.getKorisnikById(korisnikId);
 
@@ -158,7 +162,6 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
         return drugiDio(context);
     }
   }
-//DIO ZA PRIKAZIVANJE PODATAKA
 
   Widget drugiDio(BuildContext context) {
     return Container(
@@ -980,23 +983,23 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                           BorderRadius.circular(10.0), // Zaobljene ivice
                     ),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          'Broj proizvoda',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white, // Bijela boja za tekst
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.43,
+                          height: MediaQuery.of(context).size.height * 0.095,
+                          color: const Color.fromARGB(
+                              0, 244, 67, 54), // Boja pozadine za prvi dio
+                          child: Center(
+                            child: _buildButton("Proizvodi"),
                           ),
                         ),
-                        Text(
-                          korisnik != null && korisnik['brojProizvoda'] != null
-                              ? korisnik['brojProizvoda'].toString()
-                              : 'N/A',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.43,
+                          height: MediaQuery.of(context).size.height * 0.095,
+                          color: const Color.fromARGB(
+                              0, 33, 149, 243), // Boja pozadine za drugi dio
+                          child: Center(
+                            child: _buildButton("Rezervacije"),
                           ),
                         ),
                       ],
@@ -1181,6 +1184,22 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const LogIn()),
+        );
+        break;
+
+      case 'Rezervacije':
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => RezervacijeKorisnika(
+                    korisnikId: korisnikId,
+                  )),
+        );
+        break;
+      case 'Proizvodi':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => KorisnikoviProizvodi()),
         );
         break;
       case 'Servis':

@@ -22,8 +22,11 @@ namespace BikeHub.Model.BicikliFM
 
         public int? KategorijaId { get; set; }
         public int? KorisnikId { get; set; }
+        public int? BiciklId { get; set; }
 
         public int? Kolicina { get; set; }
         public bool? isSlikaIncluded { get; set; }
+        public string? SortOrder { get; set; } 
+
     }
 }

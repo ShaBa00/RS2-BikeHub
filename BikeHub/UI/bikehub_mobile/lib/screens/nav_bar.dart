@@ -19,8 +19,8 @@ class _NavBarState extends State<NavBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width, // 100% širine ekrana
-      height: MediaQuery.of(context).size.height * 0.12, // 12% visine ekrana
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height * 0.12,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [

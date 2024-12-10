@@ -118,6 +118,93 @@ class RezervacijaServis {
     }
   }
 
+  Future<bool> postRezervacija({
+    required int serviserId,
+    required int korisnikId,
+    required DateTime datumRezervacije,
+  }) async {
+    await _addAuthorizationHeader();
+
+    final DateTime datumKreiranja = DateTime.now();
+
+    final Map<String, dynamic> requestBody = {
+      'korisnikId': korisnikId,
+      'serviserId': serviserId,
+      'datumKreiranja': datumKreiranja.toIso8601String(),
+      'datumRezervacije': datumRezervacije.toIso8601String(),
+    };
+
+    Uri uri = Uri.parse('${HelperService.baseUrl}/RezervacijaServisa');
+
+    try {
+      final response = await _dio
+          .post(
+            uri.toString(),
+            data: jsonEncode(requestBody),
+            options: Options(
+              headers: {
+                'accept': 'application/json',
+                'Content-Type': 'application/json',
+              },
+            ),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        logger.d('Rezervacija uspješno kreirana.');
+        return true;
+      } else {
+        throw Exception('Failed to create reservation: ${response.statusCode}');
+      }
+    } on TimeoutException catch (_) {
+      throw Exception('Failed to create reservation: Server is not available');
+    } catch (e) {
+      logger.e('Greška: $e');
+      throw Exception('Failed to create reservation: $e');
+    }
+  }
+
+  Future<bool> setRezervacija({
+    required int rezervacijaId,
+    required int ocjena,
+  }) async {
+    await _addAuthorizationHeader();
+
+    final Map<String, dynamic> requestBody = {
+      'ocjena': ocjena,
+    };
+
+    Uri uri =
+        Uri.parse('${HelperService.baseUrl}/RezervacijaServisa/$rezervacijaId');
+
+    try {
+      final response = await _dio
+          .put(
+            uri.toString(),
+            data: jsonEncode(requestBody),
+            options: Options(
+              headers: {
+                'accept': 'application/json',
+                'Content-Type': 'application/json',
+              },
+            ),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        logger.d('Rezervacija uspješno kreirana.');
+        return true;
+      } else {
+        throw Exception('Failed to create reservation: ${response.statusCode}');
+      }
+    } on TimeoutException catch (_) {
+      throw Exception('Failed to create reservation: Server is not available');
+    } catch (e) {
+      logger.e('Greška: $e');
+      throw Exception('Failed to create reservation: $e');
+    }
+  }
+
   Future<Map<String, dynamic>> getRezervacijakById(int rezervacijaId) async {
     final String url =
         '${HelperService.baseUrl}/RezervacijaServisa/$rezervacijaId';

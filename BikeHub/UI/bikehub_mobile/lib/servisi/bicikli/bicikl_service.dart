@@ -64,17 +64,52 @@ class BiciklService {
     }
   }
 
-  Future<void> getBiciklis({String? status, int? page, int? pageSize}) async {
+  Future<void> getBiciklis({
+    String? status,
+    int? page,
+    int? pageSize,
+    int? brojBrzina,
+    int? kategorijaId,
+    bool? isSlikaIncluded,
+    String? sortOrder,
+    String? velicinaRama,
+    String? velicinaTocka,
+    double? pocetnaCijena,
+    double? krajnjaCijena,
+  }) async {
     final Map<String, dynamic> queryParams = {};
+
+    if (pocetnaCijena != null) {
+      queryParams['PocetnaCijena'] = pocetnaCijena.toString();
+    }
+    if (krajnjaCijena != null) {
+      queryParams['KrajnjaCijena'] = krajnjaCijena.toString();
+    }
 
     if (status != null && status.isNotEmpty) {
       queryParams['status'] = status;
     }
+    if (velicinaRama != null && velicinaRama.isNotEmpty) {
+      queryParams['velicinaRama'] = velicinaRama;
+    }
+    if (velicinaTocka != null && velicinaTocka.isNotEmpty) {
+      queryParams['velicinaTocka'] = velicinaTocka;
+    }
+    if (sortOrder != null) queryParams['SortOrder'] = sortOrder;
+    if (isSlikaIncluded != null) {
+      queryParams['isSlikaIncluded'] = isSlikaIncluded.toString();
+    }
+    if (kategorijaId != null) {
+      queryParams['kategorijaId'] = kategorijaId.toString();
+    }
+    if (brojBrzina != null && brojBrzina != 0) {
+      queryParams['brojBrzina'] = brojBrzina.toString();
+    }
     if (page != null) {
-      queryParams['Page'] = page;
+      queryParams['Page'] = page.toString();
     }
     if (pageSize != null) {
-      queryParams['PageSize'] = pageSize;
+      queryParams['PageSize'] = pageSize.toString();
     }
 
     Uri uri = Uri.parse('${HelperService.baseUrl}/Bicikli');
@@ -99,7 +134,7 @@ class BiciklService {
         listaBicikala = data['resultsList'] ?? [];
         countBicikala = data['count'] ?? 0;
 
-        logger.i("Uspješno preuzeti bicikli: $listaBicikala");
+        logger.i("Uspješno preuzeti bicikli:");
       } else {
         logger.e("Neuspješan zahtjev: ${response.statusCode}");
       }

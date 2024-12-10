@@ -108,22 +108,6 @@ namespace BikeHub.Services
 
         public override void BeforeUpdate(RezervacijaServisaUpdateR request, Database.RezervacijaServisa entity)
         {
-            if (request.DatumKreiranja.HasValue)
-            {
-                if (request.DatumKreiranja > (request.DatumRezervacije.HasValue ? request.DatumRezervacije : entity.DatumRezervacije))
-                {
-                    throw new UserException("Datum kreiranja ne smije biti veći od datuma rezervacije.");
-                }
-                entity.DatumKreiranja = request.DatumKreiranja.Value;
-            }
-            if (request.DatumRezervacije.HasValue)
-            {
-                if (request.DatumRezervacije < (request.DatumKreiranja.HasValue ? request.DatumKreiranja : entity.DatumKreiranja))
-                {
-                    throw new UserException("Datum rezervacije ne smije biti manji od datuma kreiranja.");
-                }
-                entity.DatumRezervacije = request.DatumRezervacije.Value;
-            }
             if (request.Ocjena.HasValue)
             {
                 if (request.Ocjena < 1 || request.Ocjena > 5)
@@ -143,8 +127,7 @@ namespace BikeHub.Services
             {
                 throw new UserException("Entitet sa datim ID-om ne postoji");
             }
-            if (request.Ocjena.HasValue && request.Ocjena >= 1 && request.Ocjena <= 5 &&
-                request.DatumKreiranja == null && request.DatumRezervacije == null)
+            if (request.Ocjena.HasValue && request.Ocjena >= 1 && request.Ocjena <= 5 )
             {
                 entity.Ocjena = request.Ocjena.Value;
                 _context.Update(entity);

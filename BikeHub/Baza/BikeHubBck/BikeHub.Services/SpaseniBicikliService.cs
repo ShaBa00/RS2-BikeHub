@@ -53,11 +53,11 @@ namespace BikeHub.Services
         {
             if (request.BiciklId <= 0)
             {
-                throw new UserException("BiciklId ne smije biti veći od nule.");
+                throw new UserException("BiciklId ne smije biti manji od nule.");
             }
             if (request.KorisnikId <= 0)
             {
-                throw new UserException("KorisnikId ne smije biti veći od nule.");
+                throw new UserException("KorisnikId ne smije biti manji od nule.");
             }
             var bicikl = _context.Bicikls.Find(request.BiciklId);
             if (bicikl == null)

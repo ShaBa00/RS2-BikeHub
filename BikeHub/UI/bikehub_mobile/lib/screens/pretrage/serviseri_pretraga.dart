@@ -1,5 +1,7 @@
-// ignore_for_file: unused_import, prefer_const_constructors, library_private_types_in_public_api, unused_field, unused_element, prefer_final_fields
+// ignore_for_file: unused_import, prefer_const_constructors, library_private_types_in_public_api, unused_field, unused_element, prefer_final_fields, prefer_const_literals_to_create_immutables, avoid_print, prefer_if_null_operators, sized_box_for_whitespace
 
+import 'package:bikehub_mobile/screens/prikaz/serviser_prikaz.dart';
+import 'package:bikehub_mobile/servisi/korisnik/serviser_service.dart';
 import 'package:flutter/material.dart';
 import 'package:bikehub_mobile/screens/glavni_prozor.dart';
 import 'package:bikehub_mobile/screens/nav_bar.dart';
@@ -17,10 +19,12 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
   bool isPopupVisibleSort = false;
   late AnimationController _controller;
   late Animation<Offset> _offsetAnimation;
+  final ServiserService _serviserService = ServiserService();
 
   @override
   void initState() {
     super.initState();
+    _initialize();
     _controller = AnimationController(
       duration: const Duration(milliseconds: 700),
       vsync: this,
@@ -33,6 +37,46 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
       parent: _controller,
       curve: Curves.easeInOut,
     ));
+  }
+
+  List<dynamic> listaServisera = [];
+  bool loading = true;
+  int _brojServisera = 0;
+  int _trenutnaStranica = 0;
+  final int _velicinaStranice = 1;
+
+  _initialize() async {
+    try {
+      await _serviserService.getServiseriDTO(
+        page: _trenutnaStranica,
+        pageSize: _velicinaStranice,
+        status: "aktivan",
+      ); //)
+      listaServisera = _serviserService.listaServisera;
+      _brojServisera = _serviserService.countServisera;
+    } finally {
+      setState(() {
+        loading = false;
+      });
+    }
+  }
+
+  nextPage() async {
+    if ((_trenutnaStranica + 1) * _velicinaStranice < _brojServisera) {
+      setState(() {
+        _trenutnaStranica++;
+      });
+      getServiseriSort();
+    }
+  }
+
+  previousPage() async {
+    if (_trenutnaStranica > 0) {
+      setState(() {
+        _trenutnaStranica--;
+      });
+      getServiseriSort();
+    }
   }
 
   void _togglePopupFilter() {
@@ -66,29 +110,101 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
     super.dispose();
   }
 
+  //dodatno za prikaz podataka
+  String selectedValue = "";
+  int pocetnaCijena = 0;
+  int krajnjaCijena = 100;
+  int pocetniBrojServisa = 0;
+  int krajnjiBrojServisa = 100;
+  int pocetnaOcjena = 0;
+  int krajnjaOcjena = 5;
+  //---------------------
+
+  getServiseriSort() async {
+    String sortOrder = "";
+
+    switch (selectedValue) {
+      case "":
+        sortOrder = "";
+        break;
+      case "CIJENA RASTUCA":
+        sortOrder = "asc";
+        break;
+      case "CIJENA OPADAJUCA":
+        sortOrder = "desc";
+        break;
+      default:
+        sortOrder = "";
+    }
+    setState(() {
+      loading = true;
+    });
+    try {
+      await _serviserService.getServiseriDTO(
+        page: _trenutnaStranica + 1,
+        pageSize: _velicinaStranice,
+        status: "aktivan",
+        sortOrder: sortOrder,
+        pocetnaCijena: pocetnaCijena.toDouble(),
+        krajnjaCijena: krajnjaCijena.toDouble(),
+        pocetniBrojServisa: pocetniBrojServisa,
+        krajnjiBrojServisa: krajnjiBrojServisa,
+        pocetnaOcjena: pocetnaOcjena.toDouble(),
+        krajnjaOcjena: krajnjaOcjena.toDouble(),
+      );
+      listaServisera = _serviserService.listaServisera;
+      _brojServisera = _serviserService.countServisera;
+    } finally {
+      setState(() {
+        loading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(255, 205, 238, 239),
-              Color.fromARGB(255, 165, 196, 210),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context)
+            .unfocus(); // Sakrij tastaturu kada se klikne na bilo koji dio prozora
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: false, // Dodano svojstvo
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color.fromARGB(255, 205, 238, 239),
+                Color.fromARGB(255, 165, 196, 210),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
           ),
-        ),
-        child: Column(
-          children: <Widget>[
-            // gD
-            gD(context),
-            // dD
-            dD(context),
-            // navBar
-            const NavBar(),
-          ],
+          child: Stack(
+            children: <Widget>[
+              Column(
+                children: <Widget>[
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          // gD
+                          gD(context),
+                          // dD
+                          dD(context),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: const NavBar(), // Postavlja NavBar na dno
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -120,7 +236,7 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
                 const Expanded(
                   child: TextField(
                     decoration: InputDecoration(
-                      hintText: 'Pretrazi proizvode',
+                      hintText: 'Pretrazi servisere',
                       border: InputBorder.none,
                     ),
                   ),
@@ -268,7 +384,161 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
         Container(
           width: double.infinity,
           height: MediaQuery.of(context).size.height * 0.65,
-          color: Color.fromARGB(0, 76, 175, 79), // Zamijenite s bojom po želji
+          color: Color.fromARGB(0, 76, 175, 79),
+          child: loading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : Column(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      height: MediaQuery.of(context).size.height * 0.58,
+                      color: const Color.fromARGB(0, 244, 67, 54),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: listaServisera.map((serviser) {
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ServiserPrikaz(
+                                          serviserId: serviser['serviserId'])),
+                                );
+                              },
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.9,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.06,
+                                margin: EdgeInsets.symmetric(vertical: 5.0),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Color.fromARGB(255, 82, 205, 210),
+                                      Color.fromARGB(255, 7, 161, 235),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.3,
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.06,
+                                      color:
+                                          const Color.fromARGB(0, 33, 149, 243),
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 8.0),
+                                        child: Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            serviser['grad'] != null
+                                                ? serviser['grad']
+                                                : "N/A",
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.3,
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.06,
+                                      color:
+                                          const Color.fromARGB(0, 76, 175, 79),
+                                      child: Center(
+                                        child: Text(
+                                          serviser['username'] != null
+                                              ? serviser['username']
+                                              : "N/A",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.3,
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.06,
+                                      color:
+                                          const Color.fromARGB(0, 255, 153, 0),
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 8.0),
+                                        child: Align(
+                                          alignment: Alignment.centerRight,
+                                          child: Text(
+                                            serviser['cijena'] != null
+                                                ? serviser['cijena'].toString()
+                                                : "N/A",
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: double.infinity,
+                      height: MediaQuery.of(context).size.height * 0.07,
+                      color: const Color.fromARGB(0, 76, 175, 79),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                previousPage();
+                              },
+                              child: Container(
+                                color: const Color.fromARGB(35, 3, 168, 244),
+                                child: Center(
+                                  child: Icon(
+                                    Icons.arrow_back,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                nextPage();
+                              },
+                              child: Container(
+                                color: const Color.fromARGB(35, 3, 168, 244),
+                                child: Center(
+                                  child: Icon(
+                                    Icons.arrow_forward,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
         ),
         // Drugi dio (pop-up)
         _buildPopupFilter(context),
@@ -284,13 +554,213 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
             child: Container(
               width: MediaQuery.of(context).size.width * 0.7,
               height: MediaQuery.of(context).size.height * 0.65,
-              color: const Color.fromARGB(
-                  255, 255, 69, 58), // Zamijenite s bojom po želji
-              child: Center(
-                child: ElevatedButton(
-                  onPressed: _togglePopupFilter,
-                  child: const Text('Primjeni filter'),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [
+                    Color.fromARGB(255, 82, 205, 210),
+                    Color.fromARGB(255, 7, 161, 235),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.7,
+                    height: MediaQuery.of(context).size.height * 0.55,
+                    color: const Color.fromARGB(0, 33, 149, 243),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.6,
+                          height: MediaQuery.of(context).size.height * 0.05,
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.6,
+                          height: MediaQuery.of(context).size.height * 0.1,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10.0),
+                            border: Border(
+                              bottom: BorderSide(color: Colors.white),
+                              left: BorderSide(color: Colors.white),
+                              right: BorderSide(color: Colors.white),
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.6,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.03,
+                                child: Center(
+                                  child: Text(
+                                    "Cijena",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.6,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.06,
+                                child: RangeSlider(
+                                  values: RangeValues(pocetnaCijena.toDouble(),
+                                      krajnjaCijena.toDouble()),
+                                  min: 0,
+                                  max: 100,
+                                  divisions: 100,
+                                  labels: RangeLabels(
+                                    pocetnaCijena.toString(),
+                                    krajnjaCijena.toString(),
+                                  ),
+                                  onChanged: (RangeValues values) {
+                                    setState(() {
+                                      pocetnaCijena = values.start.round();
+                                      krajnjaCijena = values.end.round();
+                                    });
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.6,
+                          height: MediaQuery.of(context).size.height * 0.05,
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.6,
+                          height: MediaQuery.of(context).size.height * 0.1,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10.0),
+                            border: Border(
+                              bottom: BorderSide(color: Colors.white),
+                              left: BorderSide(color: Colors.white),
+                              right: BorderSide(color: Colors.white),
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.6,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.03,
+                                child: Center(
+                                  child: Text(
+                                    "Broj servisa",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.6,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.06,
+                                child: RangeSlider(
+                                  values: RangeValues(
+                                      pocetniBrojServisa.toDouble(),
+                                      krajnjiBrojServisa.toDouble()),
+                                  min: 0,
+                                  max: 100,
+                                  divisions: 100,
+                                  labels: RangeLabels(
+                                    pocetniBrojServisa.toString(),
+                                    krajnjiBrojServisa.toString(),
+                                  ),
+                                  onChanged: (RangeValues values) {
+                                    setState(() {
+                                      pocetniBrojServisa = values.start.round();
+                                      krajnjiBrojServisa = values.end.round();
+                                    });
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.6,
+                          height: MediaQuery.of(context).size.height * 0.05,
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.6,
+                          height: MediaQuery.of(context).size.height * 0.1,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10.0),
+                            border: Border(
+                              bottom: BorderSide(color: Colors.white),
+                              left: BorderSide(color: Colors.white),
+                              right: BorderSide(color: Colors.white),
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.6,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.03,
+                                child: Center(
+                                  child: Text(
+                                    "Ocjena",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.6,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.06,
+                                child: RangeSlider(
+                                  values: RangeValues(pocetnaOcjena.toDouble(),
+                                      krajnjaOcjena.toDouble()),
+                                  min: 0,
+                                  max: 5,
+                                  divisions: 5,
+                                  labels: RangeLabels(
+                                    pocetnaOcjena.toString(),
+                                    krajnjaOcjena.toString(),
+                                  ),
+                                  onChanged: (RangeValues values) {
+                                    setState(() {
+                                      pocetnaOcjena = values.start.round();
+                                      krajnjaOcjena = values.end.round();
+                                    });
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.7,
+                    height: MediaQuery.of(context).size.height * 0.1,
+                    color: const Color.fromARGB(0, 76, 175, 79),
+                    child: Center(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          setState(() {
+                            _trenutnaStranica = 0;
+                          });
+                          await getServiseriSort();
+                          _togglePopupFilter();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: Size(
+                            MediaQuery.of(context).size.width * 0.54,
+                            MediaQuery.of(context).size.height * 0.05,
+                          ),
+                          foregroundColor: Colors.lightBlue,
+                          backgroundColor: Colors.white,
+                        ),
+                        child: const Text('Primjeni filter'),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           )
@@ -304,13 +774,115 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
             child: Container(
               width: MediaQuery.of(context).size.width * 0.7,
               height: MediaQuery.of(context).size.height * 0.65,
-              color: Color.fromARGB(
-                  255, 58, 255, 91), // Zamijenite s bojom po želji
-              child: Center(
-                child: ElevatedButton(
-                  onPressed: _togglePopupSort,
-                  child: const Text('Primjeni sort'),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [
+                    Color.fromARGB(255, 82, 205, 210),
+                    Color.fromARGB(255, 7, 161, 235),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.7,
+                    height: MediaQuery.of(context).size.height * 0.55,
+                    color: const Color.fromARGB(0, 33, 149, 243),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Text(
+                            "Poredaj po cijeni",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Center(
+                            // Centriranje dropdown-a
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width *
+                                  0.5, // Ograničavanje širine
+                              child: DropdownButtonFormField<String>(
+                                value: selectedValue.isNotEmpty
+                                    ? selectedValue
+                                    : null, // Omogućavanje praznog odabira
+                                onChanged: (String? newValue) {
+                                  selectedValue = newValue ??
+                                      ''; // Postavljanje prazne vrijednosti ako je odabrano prazno
+                                },
+                                items: [
+                                  "",
+                                  "CIJENA RASTUCA",
+                                  "CIJENA OPADAJUCA"
+                                ].map<DropdownMenuItem<String>>((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(
+                                      value.isNotEmpty
+                                          ? value.toUpperCase()
+                                          : "Prazno",
+                                      style: TextStyle(
+                                        color: value.isNotEmpty
+                                            ? Colors.black
+                                            : Colors.grey,
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                                decoration: InputDecoration(
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                ),
+                                style: TextStyle(color: Colors.black),
+                                dropdownColor: Colors.white,
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.7,
+                    height: MediaQuery.of(context).size.height * 0.1,
+                    color: const Color.fromARGB(0, 76, 175, 79),
+                    child: Center(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          setState(() {
+                            _trenutnaStranica = 0;
+                          });
+                          await getServiseriSort();
+                          _togglePopupSort();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.lightBlue,
+                          backgroundColor: Colors.white,
+                          minimumSize: Size(
+                            MediaQuery.of(context).size.width * 0.54,
+                            MediaQuery.of(context).size.height * 0.05,
+                          ),
+                        ),
+                        child: const Text('Primjeni sort'),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           )

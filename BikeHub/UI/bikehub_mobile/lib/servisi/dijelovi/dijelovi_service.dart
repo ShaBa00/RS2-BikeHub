@@ -53,7 +53,7 @@ class DijeloviService {
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
-        throw Exception('Failed to load user: ${response.statusCode}');
+        throw Exception('Failed to load user');
       }
     } on TimeoutException catch (_) {
       throw Exception('Failed to load user: Server is not available');
@@ -64,19 +64,42 @@ class DijeloviService {
     }
   }
 
-  Future<void> getDijelovis({String? status, int? page, int? pageSize}) async {
+  Future<void> getDijelovis({
+    String? status,
+    int? page,
+    int? pageSize,
+    bool? isSlikaIncluded,
+    String? sortOrder,
+    double? pocetnaCijena,
+    double? krajnjaCijena,
+    int? kategorijaId,
+  }) async {
     final Map<String, dynamic> queryParams = {};
 
+    if (pocetnaCijena != null) {
+      queryParams['PocetnaCijena'] = pocetnaCijena.toString();
+    }
+    if (krajnjaCijena != null) {
+      queryParams['KrajnjaCijena'] = krajnjaCijena.toString();
+    }
+
+    if (kategorijaId != null) {
+      queryParams['kategorijaId'] = kategorijaId.toString();
+    }
     if (status != null && status.isNotEmpty) {
       queryParams['status'] = status;
     }
+    if (isSlikaIncluded != null) {
+      queryParams['isSlikaIncluded'] = isSlikaIncluded.toString();
+    }
     if (page != null) {
-      queryParams['Page'] = page;
+      queryParams['Page'] = page.toString();
     }
     if (pageSize != null) {
-      queryParams['PageSize'] = pageSize;
+      queryParams['PageSize'] = pageSize.toString();
     }
 
+    if (sortOrder != null) queryParams['SortOrder'] = sortOrder;
     Uri uri = Uri.parse('${HelperService.baseUrl}/Dijelovi');
     uri = uri.replace(queryParameters: queryParams);
 
@@ -99,7 +122,7 @@ class DijeloviService {
         listaDijelova = data['resultsList'] ?? [];
         countDijelova = data['count'] ?? 0;
 
-        logger.i("Uspješno preuzeti dijelovi: $listaDijelova");
+        logger.i("Uspješno preuzeti dijelovi");
       } else {
         logger.e("Neuspješan zahtjev: ${response.statusCode}");
       }
