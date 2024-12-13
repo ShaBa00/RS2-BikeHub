@@ -39,7 +39,7 @@ namespace BikeHub.Services
 
             if (!string.IsNullOrWhiteSpace(search?.Naziv))
             {
-                NoviQuery = NoviQuery.Where(x => x.Naziv.StartsWith(search.Naziv));
+                NoviQuery = NoviQuery.Where(x => x.Naziv.Contains(search.Naziv));
             }
             if (!string.IsNullOrWhiteSpace(search?.Status))
             {

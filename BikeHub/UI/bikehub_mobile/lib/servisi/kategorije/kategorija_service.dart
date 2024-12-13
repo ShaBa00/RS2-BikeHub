@@ -53,14 +53,8 @@ class KategorijaServis {
   List<dynamic> listaKategorija = [];
 
   Future<List<Map<String, dynamic>>?> getKategorije(
-      {String? ulica,
-      String? status,
-      bool? isBikeKategorija,
-      int? page,
-      int? pageSize}) async {
+      {bool? isBikeKategorija, int? page, int? pageSize}) async {
     final Map<String, dynamic> queryParams = {};
-    if (ulica != null) queryParams['ulica'] = ulica;
-    if (status != null) queryParams['status'] = status;
     if (isBikeKategorija != null) {
       queryParams['isBikeKategorija'] = isBikeKategorija.toString();
     }

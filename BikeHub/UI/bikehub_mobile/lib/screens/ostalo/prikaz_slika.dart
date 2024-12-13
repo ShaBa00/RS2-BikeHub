@@ -46,19 +46,30 @@ class _PrikazSlikeState extends State<PrikazSlike> {
                     _nextImage();
                   }
                 },
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height * 0.35,
-                  child: widget.slikeBiciklis.isNotEmpty
-                      ? Image.memory(
-                          base64Decode(
-                              widget.slikeBiciklis[_currentIndex]['slika']),
-                          fit: BoxFit.cover,
-                        )
-                      : Icon(
-                          Icons.image_not_supported,
-                          color: Colors.white,
-                        ),
+                child: AnimatedSwitcher(
+                  duration: Duration(milliseconds: 300),
+                  transitionBuilder:
+                      (Widget child, Animation<double> animation) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: child,
+                    );
+                  },
+                  child: Container(
+                    key: ValueKey<int>(_currentIndex),
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height * 0.35,
+                    child: widget.slikeBiciklis.isNotEmpty
+                        ? Image.memory(
+                            base64Decode(
+                                widget.slikeBiciklis[_currentIndex]['slika']),
+                            fit: BoxFit.cover,
+                          )
+                        : Icon(
+                            Icons.image_not_supported,
+                            color: Colors.white,
+                          ),
+                  ),
                 ),
               ),
             ],

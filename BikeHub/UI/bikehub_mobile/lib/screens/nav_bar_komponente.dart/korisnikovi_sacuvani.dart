@@ -44,6 +44,7 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
     }
   }
 
+//
   int korisnikId = 0;
   bool isLogged = false;
   bool isLoading = true;
@@ -65,6 +66,8 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
 
   List<Map<String, dynamic>> bicikliPodaci = [];
   bool isListaBiciklUcitana = false;
+  int currentPage = 0;
+  int itemsPerPage = 2;
 
   Future<void> getSacuvaniBicikli() async {
     List<int>? biciklIDovi = [];
@@ -99,6 +102,8 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
 
   List<Map<String, dynamic>> dijeloviPodaci = [];
   bool isListaDijeloviUcitana = false;
+  int currentPageDijelovi = 0;
+  int itemsPerPageDijelovi = 2;
 
   Future<void> getSacuvaniDijelovi() async {
     List<int>? dijeloviIDovi = [];
@@ -172,8 +177,7 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
         // Drugi dio
         Container(
           width: double.infinity,
-          height:
-              MediaQuery.of(context).size.height * 0.10, // 10% visine ekrana
+          height: MediaQuery.of(context).size.height * 0.10,
           color: Color.fromARGB(0, 255, 235, 59), // Zamijenite s bojom po želji
           child: Align(
             alignment: Alignment.bottomCenter,
@@ -375,13 +379,10 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
     );
   }
 
-  int currentPage = 0;
-  int itemsPerPage = 2;
-
   Widget _buildlistaZapisa(BuildContext context) {
     if (!isListaBiciklUcitana) {
       return Center(
-        child: Text("Nema sačuvanih zapisa, ili je došlo do greške"),
+        child: Text("Podatci se ucitavaju, ili nemate sacuvanih podataka"),
       );
     }
 
@@ -807,13 +808,10 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
     );
   }
 
-  int currentPageDijelovi = 0;
-  int itemsPerPageDijelovi = 2;
-
   Widget _buildlistaZapisaDijelovi(BuildContext context) {
     if (!isListaDijeloviUcitana) {
       return Center(
-        child: Text("Nema sačuvanih zapisa, ili je došlo do greške"),
+        child: Text("Podatci se ucitavaju, ili nemate sacuvanih podataka"),
       );
     }
 

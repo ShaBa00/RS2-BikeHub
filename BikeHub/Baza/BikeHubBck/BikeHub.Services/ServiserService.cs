@@ -162,7 +162,9 @@ namespace BikeHub.Services
                 query = query.Where(x => x.Status == searchObject.Status);
 
             if (!string.IsNullOrWhiteSpace(searchObject?.Username))
-                query = query.Where(x => x.Username == searchObject.Username);
+            {
+                query = query.Where(x => x.Username.Contains(searchObject.Username));
+            }
 
             if (searchObject.PocetnaCijena != null && searchObject.KrajnjaCijena != null)
                 query = query.Where(x => x.Cijena >= searchObject.PocetnaCijena && x.Cijena <= searchObject.KrajnjaCijena);

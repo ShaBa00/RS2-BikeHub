@@ -68,6 +68,7 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
 
   @override
   void dispose() {
+    _controllerNaziv.dispose();
     _controller
         .dispose(); // Zatvara AnimationController da spriječi curenje memorije
     super.dispose();
@@ -145,10 +146,11 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
             ),
             child: Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: TextField(
+                    controller: _controllerNaziv,
                     decoration: InputDecoration(
-                      hintText: 'Pretrazi proizvode',
+                      hintText: 'Pretraži proizvode',
                       border: InputBorder.none,
                     ),
                   ),
@@ -156,7 +158,7 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
                 IconButton(
                   icon: const Icon(Icons.search),
                   onPressed: () {
-                    // Trenutno na onPressed ne radi ništa
+                    getZapisNaziv();
                   },
                 ),
               ],
@@ -447,6 +449,45 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
       _brojZapisa = _dijeloviService.countDijelova;
     } finally {
       setState(() {
+        loadingZapisi = false;
+      });
+    }
+  }
+
+  TextEditingController _controllerNaziv = TextEditingController();
+
+  getZapisNaziv() async {
+    setState(() {
+      loadingZapisi = true;
+      pocetnaCijena = 0;
+      krajnjaCijena = 2000;
+      selectedRam = "";
+      selectedVelicina = "";
+      brojBrzina = 0;
+    });
+    String naziv = _controllerNaziv.text;
+    if (naziv.isEmpty) {
+      return;
+    }
+    String sortOrder = "";
+    try {
+      setState(() {
+        loadingZapisi = true;
+      });
+      await _dijeloviService.getDijelovis(
+        page: _trenutnaStranica,
+        pageSize: _velicinaStranice,
+        isSlikaIncluded: true,
+        sortOrder: sortOrder,
+        naziv: naziv,
+        pocetnaCijena: pocetnaCijena.toDouble(),
+        krajnjaCijena: krajnjaCijena.toDouble(),
+        //status: "aktivan",
+      );
+    } finally {
+      setState(() {
+        listaZapisa = _dijeloviService.listaDijelova;
+        _brojZapisa = _dijeloviService.countDijelova;
         loadingZapisi = false;
       });
     }

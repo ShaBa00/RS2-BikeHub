@@ -33,6 +33,25 @@ class BiciklService {
     );
   }
 
+  Future<void> _addAuthorizationHeader() async {
+    final loggedInStatus = await _korisnikService.isLoggedIn();
+    if (!loggedInStatus) {
+      throw Exception("User not logged in");
+    }
+
+    // Dohvati korisničke podatke iz secure storage-a
+    final korisnikInfo = await _korisnikService.getUserInfo();
+    final username = korisnikInfo['username'];
+    final password = korisnikInfo['password'];
+
+    if (username == null || password == null) {
+      throw Exception("Missing credentials");
+    }
+    // Generiraj Authorization header
+    final authHeader = _korisnikService.encodeBasicAuth(username, password);
+    _dio.options.headers['Authorization'] = authHeader;
+  }
+
   List<dynamic> listaBicikala = [];
   int countBicikala = 0;
 
@@ -66,9 +85,11 @@ class BiciklService {
 
   Future<void> getBiciklis({
     String? status,
+    String? naziv,
     int? page,
     int? pageSize,
     int? brojBrzina,
+    int? korisnikId,
     int? kategorijaId,
     bool? isSlikaIncluded,
     String? sortOrder,
@@ -86,6 +107,10 @@ class BiciklService {
       queryParams['KrajnjaCijena'] = krajnjaCijena.toString();
     }
 
+    if (naziv != null && naziv.isNotEmpty) {
+      queryParams['naziv'] = naziv;
+    }
+
     if (status != null && status.isNotEmpty) {
       queryParams['status'] = status;
     }
@@ -101,6 +126,9 @@ class BiciklService {
     }
     if (kategorijaId != null) {
       queryParams['kategorijaId'] = kategorijaId.toString();
+    }
+    if (korisnikId != null) {
+      queryParams['korisnikId'] = korisnikId.toString();
     }
     if (brojBrzina != null && brojBrzina != 0) {
       queryParams['brojBrzina'] = brojBrzina.toString();
@@ -126,7 +154,7 @@ class BiciklService {
     try {
       final http.Response response = await ioClient
           .get(Uri.parse(url))
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 40));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -145,25 +173,6 @@ class BiciklService {
     } finally {
       ioClient.close();
     }
-  }
-
-  Future<void> _addAuthorizationHeader() async {
-    final loggedInStatus = await _korisnikService.isLoggedIn();
-    if (!loggedInStatus) {
-      throw Exception("User not logged in");
-    }
-
-    // Dohvati korisničke podatke iz secure storage-a
-    final korisnikInfo = await _korisnikService.getUserInfo();
-    final username = korisnikInfo['username'];
-    final password = korisnikInfo['password'];
-
-    if (username == null || password == null) {
-      throw Exception("Missing credentials");
-    }
-    // Generiraj Authorization header
-    final authHeader = _korisnikService.encodeBasicAuth(username, password);
-    _dio.options.headers['Authorization'] = authHeader;
   }
 
   Future<void> upravljanjeBiciklom(String status, int odabraniId) async {
@@ -212,6 +221,83 @@ class BiciklService {
     } catch (e) {
       logger.e("Greška pri ažuriranju statusa: $e");
       throw e;
+    } finally {
+      httpClient.close();
+    }
+  }
+
+  Future<Map<String, dynamic>> postBicikl({
+    required String naziv,
+    required int cijena,
+    required int kolicina,
+    required String velicinaRama,
+    required String velicinaTocka,
+    required int brojBrzina,
+    required int kategorijaId,
+    required int korisnikId,
+  }) async {
+    // Provjera podataka
+    if (naziv.isEmpty ||
+        cijena <= 0 ||
+        kolicina <= 0 ||
+        velicinaRama.isEmpty ||
+        velicinaTocka.isEmpty ||
+        brojBrzina <= 0 ||
+        kategorijaId <= 0 ||
+        korisnikId <= 0) {
+      return {'poruka': "Pogresni podatci", 'biciklId': null};
+    }
+
+    final String baseUrl = '${HelperService.baseUrl}/Bicikli';
+    final Uri uri = Uri.parse(baseUrl);
+
+    final Map<String, dynamic> requestBody = {
+      'naziv': naziv,
+      'cijena': cijena.toString(),
+      'kolicina': kolicina.toString(),
+      'velicinaRama': velicinaRama,
+      'velicinaTocka': velicinaTocka,
+      'brojBrzina': brojBrzina.toString(),
+      'kategorijaId': kategorijaId.toString(),
+      'korisnikId': korisnikId.toString(),
+    };
+
+    final HttpClient httpClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+
+    try {
+      await _addAuthorizationHeader(); // Dodavanje authorization header-a
+
+      final request = await httpClient.openUrl('POST', uri);
+
+      final String authHeader = _dio.options.headers['Authorization'];
+      request.headers.set('Authorization', authHeader);
+      request.headers.set('Content-Type', 'application/json');
+      request.headers.set('accept', 'application/json');
+
+      request.add(utf8.encode(jsonEncode(requestBody)));
+
+      final response = await request.close();
+      final responseBody = await response.transform(utf8.decoder).join();
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(responseBody);
+        return {
+          'poruka': "Uspjesno dodat bicikl",
+          'biciklId': data['biciklId']
+        };
+      } else {
+        return {'poruka': "Greska prilikom dodavanja", 'biciklId': null};
+      }
+    } on TimeoutException catch (_) {
+      return {
+        'poruka': "Greska prilikom dodavanja: Server nije dostupan",
+        'biciklId': null
+      };
+    } catch (e) {
+      logger.e("Greška pri dodavanju bicikla: $e");
+      return {'poruka': "Greska prilikom dodavanja", 'biciklId': null};
     } finally {
       httpClient.close();
     }

@@ -161,6 +161,41 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
     }
   }
 
+  TextEditingController _controllerNaziv = TextEditingController();
+
+  getZapisNaziv() async {
+    setState(() {
+      loading = true;
+      pocetnaCijena = 0;
+      krajnjaCijena = 100;
+      pocetniBrojServisa = 0;
+      krajnjiBrojServisa = 100;
+      pocetnaOcjena = 0;
+      krajnjaOcjena = 5;
+    });
+    String naziv = _controllerNaziv.text;
+    if (naziv.isEmpty) {
+      return;
+    }
+    try {
+      setState(() {
+        loading = true;
+      });
+      await _serviserService.getServiseriDTO(
+        page: _trenutnaStranica + 1,
+        pageSize: _velicinaStranice,
+        status: "aktivan",
+        username: naziv,
+      );
+    } finally {
+      setState(() {
+        listaServisera = _serviserService.listaServisera;
+        _brojServisera = _serviserService.countServisera;
+        loading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -233,10 +268,11 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
             ),
             child: Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: TextField(
+                    controller: _controllerNaziv,
                     decoration: InputDecoration(
-                      hintText: 'Pretrazi servisere',
+                      hintText: 'Pretraži proizvode',
                       border: InputBorder.none,
                     ),
                   ),
@@ -244,7 +280,7 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
                 IconButton(
                   icon: const Icon(Icons.search),
                   onPressed: () {
-                    // Trenutno na onPressed ne radi ništa
+                    getZapisNaziv();
                   },
                 ),
               ],

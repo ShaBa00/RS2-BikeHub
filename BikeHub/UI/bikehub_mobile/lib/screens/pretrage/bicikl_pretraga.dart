@@ -48,7 +48,7 @@ class _BiciklPretragaState extends State<BiciklPretraga>
   String selectedValue = "";
   int _brojZapisa = 0;
   int _trenutnaStranica = 0;
-  final int _velicinaStranice = 3;
+  final int _velicinaStranice = 10;
 
   _initialize() async {
     try {
@@ -88,13 +88,11 @@ class _BiciklPretragaState extends State<BiciklPretraga>
     }
   }
 
-  //a
   int pocetnaCijena = 0;
   int krajnjaCijena = 2000;
   String selectedRam = "";
   String selectedVelicina = "";
   int brojBrzina = 0;
-  ////čččččč
   getZapisi() async {
     int? kategorijaId = _odabranaKategorija?['kategorijaId'];
 
@@ -139,7 +137,47 @@ class _BiciklPretragaState extends State<BiciklPretraga>
       });
     }
   }
-  //---------------------
+
+  TextEditingController _controllerNaziv = TextEditingController();
+
+  getZapisNaziv() async {
+    setState(() {
+      loadingZapisi = true;
+      pocetnaCijena = 0;
+      krajnjaCijena = 2000;
+      selectedRam = "";
+      selectedVelicina = "";
+      brojBrzina = 0;
+    });
+    String naziv = _controllerNaziv.text;
+    if (naziv.isEmpty) {
+      return;
+    }
+    String sortOrder = "";
+    try {
+      setState(() {
+        loadingZapisi = true;
+      });
+      await _biciklService.getBiciklis(
+        page: _trenutnaStranica,
+        pageSize: _velicinaStranice,
+        isSlikaIncluded: true,
+        sortOrder: sortOrder,
+        naziv: naziv,
+        pocetnaCijena: pocetnaCijena.toDouble(),
+        krajnjaCijena: krajnjaCijena.toDouble(),
+        velicinaRama: selectedRam,
+        velicinaTocka: selectedVelicina,
+        //status: "aktivan",
+      );
+    } finally {
+      setState(() {
+        listaZapisa = _biciklService.listaBicikala;
+        _brojZapisa = _biciklService.countBicikala;
+        loadingZapisi = false;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -191,8 +229,8 @@ class _BiciklPretragaState extends State<BiciklPretraga>
 
   @override
   void dispose() {
-    _controller
-        .dispose(); // Zatvara AnimationController da spriječi curenje memorije
+    _controllerNaziv.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -200,11 +238,10 @@ class _BiciklPretragaState extends State<BiciklPretraga>
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        FocusScope.of(context)
-            .unfocus(); // Sakrij tastaturu kada se klikne na bilo koji dio prozora
+        FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        resizeToAvoidBottomInset: false, // Dodano svojstvo
+        resizeToAvoidBottomInset: false,
         body: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -248,13 +285,10 @@ class _BiciklPretragaState extends State<BiciklPretraga>
   Widget gD(BuildContext context) {
     return Column(
       children: [
-        // Prvi dio
         Container(
           width: double.infinity,
-          height:
-              MediaQuery.of(context).size.height * 0.12, // 10% visine ekrana
-          color: const Color.fromARGB(
-              0, 244, 67, 54), // Zamijenite s bojom po želji
+          height: MediaQuery.of(context).size.height * 0.12,
+          color: const Color.fromARGB(0, 244, 67, 54),
           alignment: Alignment.bottomCenter,
           child: Container(
             width:
@@ -268,10 +302,11 @@ class _BiciklPretragaState extends State<BiciklPretraga>
             ),
             child: Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: TextField(
+                    controller: _controllerNaziv,
                     decoration: InputDecoration(
-                      hintText: 'Pretrazi proizvode',
+                      hintText: 'Pretraži proizvode',
                       border: InputBorder.none,
                     ),
                   ),
@@ -279,7 +314,7 @@ class _BiciklPretragaState extends State<BiciklPretraga>
                 IconButton(
                   icon: const Icon(Icons.search),
                   onPressed: () {
-                    // Trenutno na onPressed ne radi ništa
+                    getZapisNaziv();
                   },
                 ),
               ],

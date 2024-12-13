@@ -317,21 +317,14 @@ class KorisnikServis {
           (X509Certificate cert, String host, int port) => true;
 
     try {
-      // Provjeri da li je poslan korisnikId
       if (korisnikId == 0) {
         return "Korisnik ID je obavezan";
       }
-
-      // Provjeri da li je poslan barem jedan zapis za izmjenu
       if ((email == null || email.isEmpty) &&
           (username == null || username.isEmpty)) {
         return "Potrebno je izmjenuti barem jedan zapis";
       }
-
-      // Dodavanje Authorization header-a
       await _addAuthorizationHeader();
-
-      // Priprema body za slanje
       final body = <String, String>{};
       if (email != null && email.isNotEmpty) {
         body['email'] = email;

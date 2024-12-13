@@ -37,7 +37,7 @@ namespace BikeHub.Services
             var NoviQuery = base.AddFilter(search, query);
             if (!string.IsNullOrWhiteSpace(search?.Naziv))
             {
-                NoviQuery = NoviQuery.Where(x => x.Naziv.StartsWith(search.Naziv));
+                NoviQuery = NoviQuery.Where(x => x.Naziv.Contains(search.Naziv));
             }
             if (search?.KorisnikId != null)
             {
@@ -69,8 +69,9 @@ namespace BikeHub.Services
             }
             if (search.isSlikaIncluded == true)
             {
-                NoviQuery = NoviQuery.Include(x => x.SlikeDijelovis);
+                NoviQuery = NoviQuery.Include(x => x.SlikeDijelovis.Where(s => s.Status != "obrisan"));
             }
+
             if (!string.IsNullOrWhiteSpace(search?.SortOrder))
             {
                 if (search.SortOrder.ToLower() == "asc")
@@ -88,8 +89,9 @@ namespace BikeHub.Services
         public override Model.DijeloviFM.Dijelovi GetById(int id)
         {
             var result = Context.Set<Database.Dijelovi>()
-                    .Include(b => b.SlikeDijelovis)
-                    .FirstOrDefault(b => b.DijeloviId == id);
+                .Include(b => b.SlikeDijelovis.Where(s => s.Status != "obrisan"))
+                .FirstOrDefault(b => b.DijeloviId == id);
+
             if (result == null)
             {
                 return null;
