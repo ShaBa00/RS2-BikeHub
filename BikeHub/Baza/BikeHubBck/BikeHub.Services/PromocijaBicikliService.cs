@@ -53,7 +53,6 @@ namespace BikeHub.Services
             {
                 throw new UserException("Datum početka mora biti unesen.");
             }
-
             if (request.DatumZavrsetka == default(DateTime))
             {
                 throw new UserException("Datum završetka mora biti unesen.");
@@ -62,6 +61,16 @@ namespace BikeHub.Services
             {
                 throw new UserException("Datum početka ne smije biti veći od datuma završetka.");
             }
+
+            var existingPromotion = _context.PromocijaBiciklis
+                .FirstOrDefault(p => p.BiciklId == request.BiciklId &&
+                                     p.DatumPocetka <= request.DatumZavrsetka &&
+                                     p.DatumZavrsetka >= request.DatumPocetka);
+            if (existingPromotion != null)
+            {
+                throw new UserException("Artikal je već promovisan u zadatim datumima.");
+            }
+
             entity.BiciklId = request.BiciklId;
             entity.DatumPocetka = request.DatumPocetka;
             entity.DatumZavrsetka = request.DatumZavrsetka;
@@ -69,6 +78,7 @@ namespace BikeHub.Services
             entity.CijenaPromocije = brojDana * 5;
             base.BeforeInsert(request, entity);
         }
+
 
         public override Model.PromocijaFM.PromocijaBicikli Insert(PromocijaBicikliInsertR request)
         {

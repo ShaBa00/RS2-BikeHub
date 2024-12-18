@@ -56,7 +56,7 @@ class _BiciklPretragaState extends State<BiciklPretraga>
         page: _trenutnaStranica,
         pageSize: _velicinaStranice,
         isSlikaIncluded: true,
-        //status: "aktivan",
+        status: "aktivan",
       );
       await _getKategorije();
       listaZapisa = _biciklService.listaBicikala;
@@ -127,7 +127,7 @@ class _BiciklPretragaState extends State<BiciklPretraga>
         velicinaTocka: selectedVelicina,
         brojBrzina: brojBrzina,
         kategorijaId: kategorijaId,
-        //status: "aktivan",
+        status: "aktivan",
       );
       listaZapisa = _biciklService.listaBicikala;
       _brojZapisa = _biciklService.countBicikala;
@@ -168,7 +168,7 @@ class _BiciklPretragaState extends State<BiciklPretraga>
         krajnjaCijena: krajnjaCijena.toDouble(),
         velicinaRama: selectedRam,
         velicinaTocka: selectedVelicina,
-        //status: "aktivan",
+        status: "aktivan",
       );
     } finally {
       setState(() {

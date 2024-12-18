@@ -5,8 +5,10 @@ import 'dart:convert'; // Dodano za base64Decode
 
 class PrikazSlike extends StatefulWidget {
   final List<Map<String, dynamic>> slikeBiciklis;
+  final bool isPromovisan;
 
-  PrikazSlike({super.key, required this.slikeBiciklis});
+  PrikazSlike(
+      {super.key, required this.slikeBiciklis, required this.isPromovisan});
 
   @override
   _PrikazSlikeState createState() => _PrikazSlikeState();
@@ -55,20 +57,47 @@ class _PrikazSlikeState extends State<PrikazSlike> {
                       child: child,
                     );
                   },
-                  child: Container(
-                    key: ValueKey<int>(_currentIndex),
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height * 0.35,
-                    child: widget.slikeBiciklis.isNotEmpty
-                        ? Image.memory(
-                            base64Decode(
-                                widget.slikeBiciklis[_currentIndex]['slika']),
-                            fit: BoxFit.cover,
-                          )
-                        : Icon(
-                            Icons.image_not_supported,
-                            color: Colors.white,
+                  child: Stack(
+                    children: [
+                      Container(
+                        key: ValueKey<int>(_currentIndex),
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height * 0.35,
+                        child: widget.slikeBiciklis.isNotEmpty
+                            ? Image.memory(
+                                base64Decode(widget.slikeBiciklis[_currentIndex]
+                                    ['slika']),
+                                fit: BoxFit.cover,
+                              )
+                            : Icon(
+                                Icons.image_not_supported,
+                                color: Colors.white,
+                              ),
+                      ),
+                      if (widget.isPromovisan)
+                        Positioned(
+                          top: MediaQuery.of(context).size.height * 0,
+                          left: MediaQuery.of(context).size.width * 0.4,
+                          right: 0,
+                          child: Transform.rotate(
+                            angle: 0,
+                            child: Container(
+                              color: Color.fromARGB(255, 0, 251, 255),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 8.0, horizontal: 16.0),
+                              child: Text(
+                                'Promovisan',
+                                style: TextStyle(
+                                  color: const Color.fromARGB(255, 0, 0, 0),
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
                           ),
+                        ),
+                    ],
                   ),
                 ),
               ),

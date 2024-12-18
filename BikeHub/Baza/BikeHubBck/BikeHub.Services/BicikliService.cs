@@ -245,6 +245,7 @@ namespace BikeHub.Services
             }
             BeforeUpdate(request, entity);
             var state = _basePrvaGrupaState.CreateState(entity.Status);
+            Mapper.Map(entity,request);
             return state.Update(id, request);
         }
 
@@ -288,7 +289,7 @@ namespace BikeHub.Services
         public List<object> GetPromotedItems()
         {
             var promotedBicikli = _context.Bicikls
-                .Where(b => b.PromocijaBiciklis.Any(pb => pb.Status == "aktivan"))
+                .Where(b => b.PromocijaBiciklis.Any(pb => pb.Status != "zavrseno" && pb.Status != "obrisan" && pb.Status != "vracen"))
                 .Select(b => new
                 {
                     b.BiciklId,
@@ -299,12 +300,12 @@ namespace BikeHub.Services
                     Slike = b.SlikeBiciklis.Select(s => new
                     {
                         s.SlikeBicikliId,
-                        s.Slika 
+                        s.Slika
                     }).ToList()
                 }).ToList();
 
             var promotedDijelovi = _context.Dijelovis
-                .Where(d => d.PromocijaDijelovis.Any(pd => pd.Status == "aktivan"))
+                .Where(d => d.PromocijaDijelovis.Any(pd => pd.Status != "zavrseno" && pd.Status != "obrisan" && pd.Status != "vracen"))
                 .Select(d => new
                 {
                     d.DijeloviId,
@@ -315,11 +316,54 @@ namespace BikeHub.Services
                     Slike = d.SlikeDijelovis.Select(s => new
                     {
                         s.SlikeDijeloviId,
-                        s.Slika 
+                        s.Slika
                     }).ToList()
                 }).ToList();
 
+
+            if (!promotedBicikli.Any() && !promotedDijelovi.Any())
+            {
+                var randomBicikli = _context.Bicikls
+                    .Where(b => b.Status == "aktivan")
+                    .OrderBy(b => Guid.NewGuid())
+                    .Take(3)
+                    .Select(b => new
+                    {
+                        b.BiciklId,
+                        b.KorisnikId,
+                        b.Naziv,
+                        b.Cijena,
+                        b.Status,
+                        Slike = b.SlikeBiciklis.Select(s => new
+                        {
+                            s.SlikeBicikliId,
+                            s.Slika
+                        }).ToList()
+                    }).ToList();
+
+                var randomDijelovi = _context.Dijelovis
+                    .Where(d => d.Status == "aktivan")
+                    .OrderBy(d => Guid.NewGuid())
+                    .Take(3)
+                    .Select(d => new
+                    {
+                        d.DijeloviId,
+                        d.KorisnikId,
+                        d.Naziv,
+                        d.Cijena,
+                        d.Status,
+                        Slike = d.SlikeDijelovis.Select(s => new
+                        {
+                            s.SlikeDijeloviId,
+                            s.Slika
+                        }).ToList()
+                    }).ToList();
+
+                return randomBicikli.Cast<object>().Concat(randomDijelovi.Cast<object>()).ToList();
+            }
+
             return promotedBicikli.Cast<object>().Concat(promotedDijelovi.Cast<object>()).ToList();
         }
+
     }
 }

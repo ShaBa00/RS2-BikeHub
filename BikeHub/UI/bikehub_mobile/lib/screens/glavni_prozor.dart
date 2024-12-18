@@ -1,25 +1,58 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, avoid_print, library_private_types_in_public_api, unused_field, unused_element, no_leading_underscores_for_local_identifiers
+
+import 'dart:convert';
 
 import 'package:bikehub_mobile/screens/dodavanje/dodaj_novi.dart';
 import 'package:bikehub_mobile/screens/pretrage/bicikl_pretraga.dart';
 import 'package:bikehub_mobile/screens/pretrage/dijelovi_pretraga.dart';
 import 'package:bikehub_mobile/screens/pretrage/serviseri_pretraga.dart';
+import 'package:bikehub_mobile/screens/prikaz/bicikli_prikaz.dart';
+import 'package:bikehub_mobile/screens/prikaz/dijelovi_prikaz.dart';
+import 'package:bikehub_mobile/servisi/bicikli/bicikl_service.dart';
 import 'package:flutter/material.dart';
 import 'package:bikehub_mobile/screens/nav_bar.dart';
 import 'package:bikehub_mobile/screens/ostalo/poruka_helper.dart';
 
-class GlavniProzor extends StatelessWidget {
+class GlavniProzor extends StatefulWidget {
   const GlavniProzor({super.key});
+
+  @override
+  _GlavniProzorState createState() => _GlavniProzorState();
+}
+
+class _GlavniProzorState extends State<GlavniProzor> {
+  final BiciklService _biciklService = BiciklService();
+
+  List<dynamic> listaZapisa = [];
+  bool loadingZapisi = true;
+
+  _initialize() async {
+    try {
+      listaZapisa = await _biciklService.getPromotedItems();
+    } finally {
+      if (mounted) {
+        setState(() {
+          listaZapisa;
+          loadingZapisi = false;
+        });
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initialize();
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        FocusScope.of(context)
-            .unfocus(); // Sakrij tastaturu kada se klikne na bilo koji dio prozora
+        FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        resizeToAvoidBottomInset: true, // Dodano za izbjegavanje overflow-a
+        resizeToAvoidBottomInset: true,
         body: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -32,14 +65,11 @@ class GlavniProzor extends StatelessWidget {
             ),
           ),
           child: SingleChildScrollView(
-            // Dodano za omogućavanje skrolanja
             child: Column(
               children: <Widget>[
-                //glavniDio
                 dioPretrage(context),
                 dioPromovisanih(context),
                 dioNovi(context),
-                //navBar
                 const NavBar(),
               ],
             ),
@@ -52,42 +82,28 @@ class GlavniProzor extends StatelessWidget {
   Widget dioPretrage(BuildContext context) {
     return Column(
       children: [
-        //gP
         Container(
-          width: MediaQuery.of(context).size.width, // 100% širine ekrana
-          height:
-              MediaQuery.of(context).size.height * 0.13, // 10% visine ekrana
-          color: const Color.fromARGB(
-              0, 255, 235, 59), // Zamijenite s bojom po želji
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height * 0.13,
+          color: const Color.fromARGB(0, 255, 235, 59),
           child: Align(
             alignment: Alignment.bottomCenter,
-            child: Container(
-              width:
-                  MediaQuery.of(context).size.width * 0.85, // 85% širine ekrana
-              height: MediaQuery.of(context).size.height *
-                  0.06, // Smanjena visina search bara
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(25.0),
-              ),
-              child: Row(
-                children: [
-                  const Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Pretrazi proizvode',
-                        border: InputBorder.none,
-                      ),
-                    ),
+            child: GestureDetector(
+              onTap: () {},
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.85,
+                height: MediaQuery.of(context).size.height * 0.06,
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(25.0),
+                ),
+                child: Center(
+                  child: Text(
+                    "Promovisi svoj proizvod",
+                    style: TextStyle(color: Color.fromARGB(255, 0, 191, 255)),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.search),
-                    onPressed: () {
-                      // Trenutno na onPressed ne radi ništa
-                    },
-                  ),
-                ],
+                ),
               ),
             ),
           ),
@@ -112,7 +128,6 @@ class GlavniProzor extends StatelessWidget {
     );
   }
 
-  //dugmici za pretraku Bicikla, dijela i servisera
   Widget customButton(BuildContext context, String title, IconData icon) {
     return Container(
       width: 70.0, // Povećanje veličine dugmića
@@ -172,14 +187,13 @@ class GlavniProzor extends StatelessWidget {
 
   Widget dioPromovisanih(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width, // 100% širine ekrana
-      height: MediaQuery.of(context).size.height * 0.53, // 53% visine ekrana
-      color:
-          const Color.fromARGB(0, 76, 175, 79), // Zamijenite s bojom po želji
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height * 0.53,
+      color: const Color.fromARGB(0, 76, 175, 79),
       child: Center(
         child: Container(
-          width: MediaQuery.of(context).size.width * 0.9, // 90% širine ekrana
-          height: MediaQuery.of(context).size.height * 0.5, // 50% visine ekrana
+          width: MediaQuery.of(context).size.width * 0.9,
+          height: MediaQuery.of(context).size.height * 0.5,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               colors: [
@@ -191,8 +205,170 @@ class GlavniProzor extends StatelessWidget {
             ),
             borderRadius: BorderRadius.circular(20.0), // Zaobljene ivice
           ),
+          child: Center(
+            child: loadingZapisi
+                ? CircularProgressIndicator() // Kružic za učitavanje
+                : Column(
+                    children: [_buildListaZapisa(context)],
+                  ),
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildListaZapisa(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: MediaQuery.of(context).size.height * 0.5,
+      color: const Color.fromARGB(0, 244, 67, 54),
+      child: loadingZapisi
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Column(
+                children: List.generate(
+                  (listaZapisa.length / 2).ceil().clamp(0, 3),
+                  (index) {
+                    int firstIndex = index * 2;
+                    int secondIndex = firstIndex + 1;
+
+                    Widget _buildItem(Map<String, dynamic> item) {
+                      bool isBicikl = item.containsKey('biciklId');
+                      String naziv = item['naziv'] ?? 'N/A';
+                      String cijena = item['cijena'] != null
+                          ? "${item['cijena']} KM"
+                          : 'N/A';
+                      List slike = item['slike'] ?? [];
+
+                      return GestureDetector(
+                        onTap: () {
+                          if (isBicikl) {
+                            int biciklId = item['biciklId'];
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    BicikliPrikaz(biciklId: biciklId),
+                              ),
+                            );
+                          } else {
+                            int dijeloviId = item['dijeloviId'];
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    DijeloviPrikaz(dijeloviId: dijeloviId),
+                              ),
+                            );
+                          }
+                        },
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.4,
+                          height: MediaQuery.of(context).size.height * 0.2,
+                          decoration: BoxDecoration(
+                            color: const Color.fromARGB(244, 255, 255, 255),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          child: Column(
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.4,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.16,
+                                decoration: BoxDecoration(
+                                  color: Color.fromARGB(229, 244, 67, 54),
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(10.0),
+                                    topRight: Radius.circular(10.0),
+                                  ),
+                                ),
+                                child: slike.isNotEmpty
+                                    ? ClipRRect(
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(10.0),
+                                          topRight: Radius.circular(10.0),
+                                        ),
+                                        child: Image.memory(
+                                          base64Decode(slike[0]['slika']),
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.4,
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.16,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      )
+                                    : const Center(
+                                        child: Icon(
+                                          Icons.image_not_supported,
+                                          color: Colors.grey,
+                                          size: 40.0,
+                                        ),
+                                      ),
+                              ),
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.4,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.04,
+                                color: const Color.fromARGB(0, 33, 149, 243),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Center(
+                                        child: Text(
+                                          naziv,
+                                          style: const TextStyle(
+                                            color: Color.fromARGB(255, 0, 0, 0),
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          softWrap: false,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Center(
+                                        child: Text(
+                                          cijena,
+                                          style: const TextStyle(
+                                            color: Color.fromARGB(255, 0, 0, 0),
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          softWrap: false,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }
+
+                    return Container(
+                      width: MediaQuery.of(context).size.width * 0.95,
+                      height: MediaQuery.of(context).size.height * 0.22,
+                      color: const Color.fromARGB(0, 255, 255, 255),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          if (firstIndex < listaZapisa.length)
+                            _buildItem(listaZapisa[firstIndex]),
+                          if (secondIndex < listaZapisa.length)
+                            _buildItem(listaZapisa[secondIndex]),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
     );
   }
 

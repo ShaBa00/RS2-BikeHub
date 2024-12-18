@@ -1,4 +1,4 @@
-// ignore_for_file: unused_field, prefer_const_declarations, use_rethrow_when_possible
+// ignore_for_file: unused_field, prefer_const_declarations, use_rethrow_when_possible, unnecessary_null_comparison
 
 import 'dart:async';
 import 'dart:convert';
@@ -175,6 +175,44 @@ class BiciklService {
     }
   }
 
+  Future<List<dynamic>> getPromotedItems() async {
+    final Map<String, dynamic> queryParams = {};
+
+    Uri uri = Uri.parse('${HelperService.baseUrl}/Bicikli/promoted-items');
+    uri = uri.replace(queryParameters: queryParams);
+
+    final String url = uri.toString();
+
+    final HttpClient httpClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+
+    final IOClient ioClient = IOClient(httpClient);
+
+    try {
+      final http.Response response = await ioClient
+          .get(Uri.parse(url))
+          .timeout(const Duration(seconds: 40));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+
+        logger.i("Uspješno preuzeti bicikli:");
+        return data;
+      } else {
+        logger.e("Neuspješan zahtjev: ${response.statusCode}");
+        return [];
+      }
+    } on TimeoutException catch (_) {
+      throw Exception('Failed to load users: Server is not available');
+    } catch (e) {
+      logger.e("Greška pri preuzimanju bicikala: $e");
+      return [];
+    } finally {
+      ioClient.close();
+    }
+  }
+
   Future<void> upravljanjeBiciklom(String status, int odabraniId) async {
     final String baseUrl = '${HelperService.baseUrl}/Bicikli';
     Uri uri;
@@ -298,6 +336,102 @@ class BiciklService {
     } catch (e) {
       logger.e("Greška pri dodavanju bicikla: $e");
       return {'poruka': "Greska prilikom dodavanja", 'biciklId': null};
+    } finally {
+      httpClient.close();
+    }
+  }
+
+  Future<String?> putBicikl(
+    int biciklId,
+    String? naziv,
+    int? cijena,
+    String? velicinaRama,
+    String? velicinaTocka,
+    int? brojBrzina,
+    int? kategorijaId,
+    int? kolicina,
+    int korisnikId,
+  ) async {
+    final String baseUrl = '${HelperService.baseUrl}/Bicikli';
+    Uri uri;
+
+    HttpClient httpClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+
+    try {
+      if (biciklId == 0) {
+        return "Bicikl ID je obavezan";
+      }
+      if (korisnikId == 0) {
+        return "Korisnik ID je obavezan";
+      }
+      if ((naziv == null || naziv.isEmpty) &&
+          cijena == null &&
+          (velicinaRama == null || velicinaRama.isEmpty) &&
+          (velicinaTocka == null || velicinaTocka.isEmpty) &&
+          brojBrzina == null &&
+          kategorijaId == null &&
+          kolicina == null) {
+        return "Potrebno je izmijeniti barem jedan zapis";
+      }
+      await _addAuthorizationHeader();
+      final body = <String, dynamic>{};
+      if (naziv != null && naziv.isNotEmpty) {
+        body['naziv'] = naziv;
+      }
+      if (cijena != null && cijena != 0) {
+        body['cijena'] = cijena.toString();
+      }
+      if (velicinaRama != null && velicinaRama.isNotEmpty) {
+        body['velicinaRama'] = velicinaRama;
+      }
+      if (velicinaTocka != null && velicinaTocka.isNotEmpty) {
+        body['velicinaTocka'] = velicinaTocka;
+      }
+      if (brojBrzina != null && brojBrzina != 0) {
+        body['brojBrzina'] = brojBrzina.toString();
+      }
+      if (kategorijaId != null && kategorijaId != 0) {
+        body['kategorijaId'] = kategorijaId.toString();
+      }
+      if (kolicina != null) {
+        body['kolicina'] = kolicina.toString();
+      }
+      body['korisnikId'] = korisnikId.toString();
+
+      uri = Uri.parse('$baseUrl/$biciklId');
+
+      final request = await httpClient.putUrl(uri);
+      request.headers.set('accept', 'application/json');
+      request.headers.set('Content-Type', 'application/json');
+      request.headers
+          .set('Authorization', _dio.options.headers['Authorization']);
+
+      request.write(jsonEncode(body));
+
+      final response = await request.close();
+
+      if (response.statusCode == 200) {
+        return "Bicikli uspješno izmijenjeni";
+      } else {
+        final responseBody = await response.transform(utf8.decoder).join();
+        final decodedResponse = jsonDecode(responseBody);
+        final errors = decodedResponse['errors'];
+        if (errors != null && errors['userError'] != null) {
+          return errors['userError'].join(', ');
+        } else {
+          return 'Greška prilikom izmjene bicikla';
+        }
+      }
+    } on HttpException catch (httpError) {
+      if (httpError.message != null) {
+        return 'Greška prilikom izmjene bicikla: ${httpError.message}';
+      }
+      return 'Greška prilikom izmjene bicikla: ${httpError.toString()}';
+    } catch (e) {
+      logger.e('Greška prilikom izmjene bicikla: $e');
+      return e.toString();
     } finally {
       httpClient.close();
     }

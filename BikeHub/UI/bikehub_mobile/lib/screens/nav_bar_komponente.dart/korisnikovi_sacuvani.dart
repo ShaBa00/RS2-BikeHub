@@ -67,7 +67,7 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
   List<Map<String, dynamic>> bicikliPodaci = [];
   bool isListaBiciklUcitana = false;
   int currentPage = 0;
-  int itemsPerPage = 2;
+  int itemsPerPage = 10;
 
   Future<void> getSacuvaniBicikli() async {
     List<int>? biciklIDovi = [];
@@ -103,7 +103,7 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
   List<Map<String, dynamic>> dijeloviPodaci = [];
   bool isListaDijeloviUcitana = false;
   int currentPageDijelovi = 0;
-  int itemsPerPageDijelovi = 2;
+  int itemsPerPageDijelovi = 10;
 
   Future<void> getSacuvaniDijelovi() async {
     List<int>? dijeloviIDovi = [];
@@ -398,7 +398,7 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
             child: SingleChildScrollView(
               child: Column(
                 children: List.generate(
-                  (bicikliPodaci.length / 2).ceil().clamp(0, 1),
+                  (bicikliPodaci.length / 2).ceil().clamp(0, 5),
                   (index) {
                     int firstIndex = index * 2 + currentPage * itemsPerPage;
                     int secondIndex = firstIndex + 1;
@@ -827,7 +827,7 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
             child: SingleChildScrollView(
               child: Column(
                 children: List.generate(
-                  (dijeloviPodaci.length / 2).ceil().clamp(0, 1),
+                  (dijeloviPodaci.length / 2).ceil().clamp(0, 5),
                   (index) {
                     int firstIndex =
                         index * 2 + currentPageDijelovi * itemsPerPageDijelovi;

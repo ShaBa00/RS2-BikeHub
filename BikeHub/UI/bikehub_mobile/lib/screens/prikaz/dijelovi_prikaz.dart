@@ -3,12 +3,16 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:bikehub_mobile/screens/dodavanje/promocija_zapisa.dart';
 import 'package:bikehub_mobile/screens/nav_bar.dart';
 import 'package:bikehub_mobile/screens/nav_bar_komponente.dart/korisnikovi_proizvodi.dart';
 import 'package:bikehub_mobile/screens/ostalo/prikaz_slika.dart';
+import 'package:bikehub_mobile/screens/prikaz/bicikli_prikaz.dart';
+import 'package:bikehub_mobile/servisi/dijelovi/dijelovi_promocija_service.dart';
 import 'package:bikehub_mobile/servisi/dijelovi/dijelovi_sacuvani_service.dart';
 import 'package:bikehub_mobile/servisi/dijelovi/dijelovi_service.dart';
 import 'package:bikehub_mobile/servisi/dijelovi/dijelovi_slike_service.dart';
+import 'package:bikehub_mobile/servisi/kategorije/kategorija_recomended_service.dart';
 import 'package:bikehub_mobile/servisi/kategorije/kategorija_service.dart';
 import 'package:bikehub_mobile/servisi/korisnik/adresa_service.dart';
 import 'package:bikehub_mobile/servisi/korisnik/korisnik_service.dart';
@@ -31,9 +35,14 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
 
   final DijeloviService _dijeloviService = DijeloviService();
   final KategorijaServis _kategorijaServis = KategorijaServis();
+  final KategorijaRecommendedService _kategorijaRecommendedService =
+      KategorijaRecommendedService();
+
   final AdresaServis _adresaServis = AdresaServis();
   final KorisnikServis _korisnikServis = KorisnikServis();
   final DijeloviSlikeService _dijeloviSlikeService = DijeloviSlikeService();
+  final DijeloviPromocijaService _dijeloviPromocijaService =
+      DijeloviPromocijaService();
   final DijeloviSacuvaniServis _dijeloviSacuvaniServis =
       DijeloviSacuvaniServis();
 
@@ -41,6 +50,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
   Map<String, dynamic>? zapis;
   Map<String, dynamic>? kategorija;
   Map<String, dynamic>? adresa;
+  bool isPromovisan = false;
 
   bool sacuvanZapisi = false;
   Map<String, dynamic>? zapisSacuvanog;
@@ -97,6 +107,20 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
     });
   }
 
+  List<dynamic> listaRecomendedBicikala = [];
+  _getRecomended() async {
+    try {
+      await _kategorijaRecommendedService.getRecommendedBiciklis(
+          dijeloviId: widget.dijeloviId);
+      setState(() {
+        listaRecomendedBicikala =
+            _kategorijaRecommendedService.listaRecomendedBicikala;
+      });
+    } catch (e) {
+      // Handle error if needed
+    }
+  }
+
   List<String> listaSlik = [];
   List<String> listaIdova = [];
 
@@ -108,7 +132,10 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
       });
 
       var result = await _dijeloviService.getDijeloviById(widget.dijeloviId);
+      isPromovisan = await _dijeloviPromocijaService.isPromovisan(
+          dijeloviId: widget.dijeloviId);
       setState(() {
+        isPromovisan;
         zapis = result;
         listaSlik = (result['slikeDijelovis'] as List<dynamic>?)
                 ?.where(
@@ -124,6 +151,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
 
         _getSpaseni();
         _getAdresa();
+        _getRecomended();
         _getKategorija();
       });
     } catch (e) {
@@ -317,6 +345,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                         pDio(context),
                         dDio(context),
                         tDio(context),
+                        cDio(context),
                       ],
                     ),
                   ),
@@ -340,7 +369,10 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height * 0.35,
         color: const Color.fromARGB(255, 255, 2, 2),
-        child: PrikazSlike(slikeBiciklis: slikeBiciklis),
+        child: PrikazSlike(
+          slikeBiciklis: slikeBiciklis,
+          isPromovisan: isPromovisan,
+        ),
       );
     } else {
       return Center(child: Text('Nema slika za prikaz.'));
@@ -647,37 +679,306 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                 ),
               ),
               child: Center(
-                child: GestureDetector(
-                  onTap: () {
-                    if (korisnikId != zapis?['korisnikId']) {
-                      naruci();
-                    } else {
-                      prikaziPopup(context);
-                    }
-                  },
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.45,
-                    height: MediaQuery.of(context).size.height * 0.05,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10.0),
-                      border: Border(
-                        bottom: BorderSide(color: Colors.white),
-                        right: BorderSide(color: Colors.white),
-                        left: BorderSide(color: Colors.white),
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        korisnikId != zapis?['korisnikId']
-                            ? "Naruci"
-                            : "Edituj",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 17,
+                child: korisnikId != zapis?['korisnikId']
+                    ? GestureDetector(
+                        onTap: () => naruci(),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.45,
+                            height: MediaQuery.of(context).size.height * 0.05,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.0),
+                              border: Border(
+                                bottom: BorderSide(color: Colors.white),
+                                right: BorderSide(color: Colors.white),
+                                left: BorderSide(color: Colors.white),
+                              ),
+                            ),
+                            child: Center(
+                              child: Text(
+                                "Naruci",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 17,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      )
+                    : SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            GestureDetector(
+                              onTap: () => prikaziPopup(context),
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.45,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.05,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  border: Border(
+                                    bottom: BorderSide(color: Colors.white),
+                                    right: BorderSide(color: Colors.white),
+                                    left: BorderSide(color: Colors.white),
+                                  ),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "Edituj",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 17,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 8.0),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => PromocijaZapisa(
+                                            zapisId: widget.dijeloviId,
+                                            isBicikl: false,
+                                          )),
+                                );
+                              },
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.45,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.05,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  border: Border(
+                                    bottom: BorderSide(color: Colors.white),
+                                    right: BorderSide(color: Colors.white),
+                                    left: BorderSide(color: Colors.white),
+                                  ),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "Promovisi",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 17,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
+              ),
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width * 0.95,
+              height: MediaQuery.of(context).size.height * 0.05,
+              color: const Color.fromARGB(0, 244, 67, 54),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget cDio(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height * 0.4,
+      color: Color.fromARGB(0, 2, 175, 255),
+      child: Center(
+        child: Column(
+          children: [
+            Container(
+              width: MediaQuery.of(context).size.width * 0.95,
+              height: MediaQuery.of(context).size.height * 0.33,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30.0),
+                gradient: const LinearGradient(
+                  colors: [
+                    Color.fromARGB(255, 82, 205, 210),
+                    Color.fromARGB(255, 7, 161, 235),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: Center(
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  height: MediaQuery.of(context).size.height * 0.31,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30.0),
+                    gradient: const LinearGradient(
+                      colors: [
+                        Color.fromARGB(255, 205, 238, 239),
+                        Color.fromARGB(255, 165, 196, 210),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        for (int i = 0;
+                            i <
+                                (listaRecomendedBicikala.length > 5
+                                    ? 5
+                                    : listaRecomendedBicikala.length);
+                            i++)
+                          GestureDetector(
+                            onTap: () {
+                              int biciklId =
+                                  listaRecomendedBicikala[i]['biciklId'];
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      BicikliPrikaz(biciklId: biciklId),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width: MediaQuery.of(context).size.width * 0.4,
+                              height: MediaQuery.of(context).size.height * 0.24,
+                              margin: EdgeInsets.symmetric(horizontal: 5.0),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color.fromARGB(255, 82, 205, 210),
+                                    Color.fromARGB(255, 7, 161, 235),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.4,
+                                    height: MediaQuery.of(context).size.height *
+                                        0.19,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(30.0),
+                                        topRight: Radius.circular(30.0),
+                                      ),
+                                      color: Colors.transparent,
+                                    ),
+                                    child: listaRecomendedBicikala[i]
+                                                    ['slikeBiciklis'] !=
+                                                null &&
+                                            listaRecomendedBicikala[i]
+                                                    ['slikeBiciklis']
+                                                .isNotEmpty
+                                        ? ClipRRect(
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(30.0),
+                                              topRight: Radius.circular(30.0),
+                                            ),
+                                            child: Image.memory(
+                                              base64Decode(
+                                                  listaRecomendedBicikala[i]
+                                                          ['slikeBiciklis'][0]
+                                                      ['slika']),
+                                              fit: BoxFit.cover,
+                                            ),
+                                          )
+                                        : Icon(
+                                            Icons.image_not_supported,
+                                            size: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.1,
+                                          ),
+                                  ),
+                                  Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.4,
+                                    height: MediaQuery.of(context).size.height *
+                                        0.05,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(30.0),
+                                      color: Colors.transparent,
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Flexible(
+                                          flex: 1,
+                                          child: Container(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.05,
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              listaRecomendedBicikala[i]
+                                                      ?['naziv'] ??
+                                                  'N/A',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: const Color.fromARGB(
+                                                    255, 255, 255, 255),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              maxLines: 1,
+                                              softWrap: true,
+                                            ),
+                                          ),
+                                        ),
+                                        Flexible(
+                                          flex: 1,
+                                          child: Container(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.05,
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              (listaRecomendedBicikala[i]
+                                                          ?['cijena']
+                                                      ?.toString() ??
+                                                  'N/A'),
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: const Color.fromARGB(
+                                                    255, 255, 255, 255),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              maxLines: 1,
+                                              softWrap: true,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 ),
@@ -685,8 +986,8 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
             ),
             Container(
               width: MediaQuery.of(context).size.width * 0.95,
-              height: MediaQuery.of(context).size.height * 0.05,
-              color: const Color.fromARGB(0, 244, 67, 54),
+              height: MediaQuery.of(context).size.height * 0.01,
+              color: Color.fromARGB(0, 244, 67, 54),
             ),
           ],
         ),

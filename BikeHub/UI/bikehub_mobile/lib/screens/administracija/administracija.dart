@@ -54,7 +54,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
 
   List _prikazaniBicikli = [];
   int _currentPageBicikli = 0;
-  int _pageSizeBicikli = 3;
+  int _pageSizeBicikli = 10;
   int _brojPrikazanihBicikli = 0;
   String _selectedStatusBicikli = 'Kreirani';
 

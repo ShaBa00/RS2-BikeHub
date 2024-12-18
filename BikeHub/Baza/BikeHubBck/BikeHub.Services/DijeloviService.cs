@@ -207,6 +207,7 @@ namespace BikeHub.Services
             }
             BeforeUpdate(request, entity);
             var state = _basePrvaGrupaState.CreateState(entity.Status);
+            Mapper.Map(entity, request);
             return state.Update(id, request);
         }
         

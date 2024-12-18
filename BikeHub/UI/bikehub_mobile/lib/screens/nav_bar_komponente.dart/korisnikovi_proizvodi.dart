@@ -24,11 +24,6 @@ class _KorisnikoviProizvodiState extends State<KorisnikoviProizvodi> {
 
   String _selectedSection = 'bicikl';
   Future<Map<String, dynamic>?>? futureKorisnik = Future.value(null);
-  @override
-  void initState() {
-    super.initState();
-    _initialize();
-  }
 
   int korisnikId = 0;
   bool isLogged = false;
@@ -52,7 +47,7 @@ class _KorisnikoviProizvodiState extends State<KorisnikoviProizvodi> {
   List<Map<String, dynamic>> bicikliPodaci = [];
   bool isListaBiciklUcitana = false;
   int currentPage = 0;
-  int itemsPerPage = 2;
+  int itemsPerPage = 10;
 
   Future<void> getBicikli() async {
     List<int>? biciklIDovi = [];
@@ -89,7 +84,7 @@ class _KorisnikoviProizvodiState extends State<KorisnikoviProizvodi> {
   List<Map<String, dynamic>> dijeloviPodaci = [];
   bool isListaDijeloviUcitana = false;
   int currentPageDijelovi = 0;
-  int itemsPerPageDijelovi = 2;
+  int itemsPerPageDijelovi = 10;
 
   Future<void> getDijelovi() async {
     List<int>? dijeloviIDovi = [];
@@ -131,6 +126,12 @@ class _KorisnikoviProizvodiState extends State<KorisnikoviProizvodi> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _initialize();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
@@ -161,19 +162,15 @@ class _KorisnikoviProizvodiState extends State<KorisnikoviProizvodi> {
   Widget dioPretrage(BuildContext context) {
     return Column(
       children: [
-        // Drugi dio
         Container(
           width: double.infinity,
-          height:
-              MediaQuery.of(context).size.height * 0.10, // 10% visine ekrana
-          color: Color.fromARGB(0, 255, 235, 59), // Zamijenite s bojom po želji
+          height: MediaQuery.of(context).size.height * 0.10,
+          color: Color.fromARGB(0, 255, 235, 59),
           child: Align(
             alignment: Alignment.bottomCenter,
             child: Container(
-              width:
-                  MediaQuery.of(context).size.width * 0.95, // 95% širine ekrana
-              height:
-                  MediaQuery.of(context).size.height * 0.05, // 5% visine ekrana
+              width: MediaQuery.of(context).size.width * 0.95,
+              height: MediaQuery.of(context).size.height * 0.05,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(25.0),
@@ -182,18 +179,15 @@ class _KorisnikoviProizvodiState extends State<KorisnikoviProizvodi> {
                 children: [
                   // dD
                   Container(
-                    width: MediaQuery.of(context).size.width *
-                        0.55, // 40% širine ekrana
-                    height: MediaQuery.of(context).size.height *
-                        0.09, // 9% visine ekrana
-                    color: const Color.fromARGB(
-                        0, 244, 67, 54), // Zamijenite s bojom po želji
+                    width: MediaQuery.of(context).size.width * 0.55,
+                    height: MediaQuery.of(context).size.height * 0.09,
+                    color: const Color.fromARGB(0, 244, 67, 54),
                     child: Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.arrow_back,
-                              color: Colors.black), // Ikone crne boje
-                          iconSize: 24.0, // Veličina ikone
+                          icon:
+                              const Icon(Icons.arrow_back, color: Colors.black),
+                          iconSize: 24.0,
                           onPressed: () {
                             Navigator.pushReplacement(
                               context,
@@ -286,8 +280,8 @@ class _KorisnikoviProizvodiState extends State<KorisnikoviProizvodi> {
 
   Widget dioBicikla(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width, // 100% širine ekrana
-      height: MediaQuery.of(context).size.height * 0.66, // 53% visine ekrana
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height * 0.66,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
@@ -386,7 +380,7 @@ class _KorisnikoviProizvodiState extends State<KorisnikoviProizvodi> {
             child: SingleChildScrollView(
               child: Column(
                 children: List.generate(
-                  (bicikliPodaci.length / 2).ceil().clamp(0, 1),
+                  (bicikliPodaci.length / 2).ceil().clamp(0, 5),
                   (index) {
                     int firstIndex = index * 2 + currentPage * itemsPerPage;
                     int secondIndex = firstIndex + 1;
@@ -803,7 +797,7 @@ class _KorisnikoviProizvodiState extends State<KorisnikoviProizvodi> {
   Widget _buildlistaZapisaDijelovi(BuildContext context) {
     if (!isListaDijeloviUcitana) {
       return Center(
-        child: Text("Podatci se ucitavaju, ili nemate sacuvanih podataka"),
+        child: Text("Podatci se ucitavaju, ili nemate  podataka"),
       );
     }
 
@@ -819,7 +813,7 @@ class _KorisnikoviProizvodiState extends State<KorisnikoviProizvodi> {
             child: SingleChildScrollView(
               child: Column(
                 children: List.generate(
-                  (dijeloviPodaci.length / 2).ceil().clamp(0, 1),
+                  (dijeloviPodaci.length / 2).ceil().clamp(0, 5),
                   (index) {
                     int firstIndex =
                         index * 2 + currentPageDijelovi * itemsPerPageDijelovi;

@@ -1,4 +1,4 @@
-// ignore_for_file: unused_field, prefer_const_declarations, use_rethrow_when_possible
+// ignore_for_file: unused_field, prefer_const_declarations, use_rethrow_when_possible, unnecessary_null_comparison
 
 import 'dart:async';
 import 'dart:convert';
@@ -96,6 +96,159 @@ class BiciklSlikeService {
     } catch (e) {
       logger.e("Greška pri dodavanju slika: $e");
       return "Greska prilikom dodavanja";
+    } finally {
+      httpClient.close();
+    }
+  }
+
+  Future<String?> putSlikeBicikl(
+      String slika, int biciklId, int slikaId) async {
+    final String baseUrl = '${HelperService.baseUrl}/SlikeBicikli';
+    HttpClient httpClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+
+    try {
+      if (slika.isEmpty) {
+        return "Slika je prazna";
+      }
+      await _addAuthorizationHeader();
+
+      final uri = Uri.parse('$baseUrl/$slikaId');
+
+      final body = {
+        'biciklId': biciklId.toString(),
+        'slika': slika,
+      };
+
+      final request = await httpClient.putUrl(uri); // Promjena POST u PUT
+      request.headers.set('accept', 'application/json');
+      request.headers.set('Content-Type', 'application/json');
+      request.headers
+          .set('Authorization', _dio.options.headers['Authorization']);
+
+      request.write(jsonEncode(body));
+
+      final response = await request.close();
+
+      if (response.statusCode == 200) {
+        return "Slika je uspješno dodana";
+      } else {
+        final responseBody = await response.transform(utf8.decoder).join();
+        final decodedResponse = jsonDecode(responseBody);
+        final errors = decodedResponse['errors'];
+        if (errors != null && errors['userError'] != null) {
+          return errors['userError'].join(', ');
+        } else {
+          return 'Greška prilikom dodavanja slike';
+        }
+      }
+    } on HttpException catch (httpError) {
+      if (httpError.message != null) {
+        return 'Greška prilikom dodavanja slike: ${httpError.message}';
+      }
+      return 'Greška prilikom dodavanja slike: ${httpError.toString()}';
+    } catch (e) {
+      logger.e('Greška prilikom dodavanja slike: $e');
+      return e.toString();
+    } finally {
+      httpClient.close();
+    }
+  }
+
+  Future<String?> postSlikeBicikli(List<String> slike, int biciklId) async {
+    final String baseUrl = '${HelperService.baseUrl}/SlikeBicikli';
+    HttpClient httpClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+
+    try {
+      if (slike.isEmpty) {
+        return "Lista slika je prazna";
+      }
+      await _addAuthorizationHeader();
+
+      for (String slika in slike) {
+        final uri = Uri.parse(baseUrl);
+
+        final body = {
+          'biciklId': biciklId.toString(),
+          'slika': slika,
+        };
+
+        final request = await httpClient.postUrl(uri);
+        request.headers.set('accept', 'application/json');
+        request.headers.set('Content-Type', 'application/json');
+        request.headers
+            .set('Authorization', _dio.options.headers['Authorization']);
+
+        request.write(jsonEncode(body));
+
+        final response = await request.close();
+
+        if (response.statusCode != 200) {
+          final responseBody = await response.transform(utf8.decoder).join();
+          final decodedResponse = jsonDecode(responseBody);
+          final errors = decodedResponse['errors'];
+          if (errors != null && errors['userError'] != null) {
+            return errors['userError'].join(', ');
+          } else {
+            return 'Greška prilikom dodavanja slike';
+          }
+        }
+      }
+      return "Sve slike su uspješno dodane";
+    } on HttpException catch (httpError) {
+      if (httpError.message != null) {
+        return 'Greška prilikom dodavanja slike: ${httpError.message}';
+      }
+      return 'Greška prilikom dodavanja slike: ${httpError.toString()}';
+    } catch (e) {
+      logger.e('Greška prilikom dodavanja slike: $e');
+      return e.toString();
+    } finally {
+      httpClient.close();
+    }
+  }
+
+  Future<String?> obrisiSlikuBicikl(int slikaId) async {
+    final String baseUrl = '${HelperService.baseUrl}/SlikeBicikli';
+    HttpClient httpClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+
+    try {
+      final uri = Uri.parse('$baseUrl/$slikaId');
+
+      await _addAuthorizationHeader();
+
+      final request = await httpClient.deleteUrl(uri);
+      request.headers.set('accept', 'application/json');
+      request.headers
+          .set('Authorization', _dio.options.headers['Authorization']);
+
+      final response = await request.close();
+
+      if (response.statusCode == 200) {
+        return "Slika je uspješno obrisana";
+      } else {
+        final responseBody = await response.transform(utf8.decoder).join();
+        final decodedResponse = jsonDecode(responseBody);
+        final errors = decodedResponse['errors'];
+        if (errors != null && errors['userError'] != null) {
+          return errors['userError'].join(', ');
+        } else {
+          return 'Greška prilikom brisanja slike';
+        }
+      }
+    } on HttpException catch (httpError) {
+      if (httpError.message != null) {
+        return 'Greška prilikom brisanja slike: ${httpError.message}';
+      }
+      return 'Greška prilikom brisanja slike: ${httpError.toString()}';
+    } catch (e) {
+      logger.e('Greška prilikom brisanja slike: $e');
+      return e.toString();
     } finally {
       httpClient.close();
     }
