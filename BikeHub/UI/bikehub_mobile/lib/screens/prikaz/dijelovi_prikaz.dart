@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:bikehub_mobile/screens/dodavanje/promocija_zapisa.dart';
+import 'package:bikehub_mobile/screens/glavni_prozor.dart';
 import 'package:bikehub_mobile/screens/nav_bar.dart';
 import 'package:bikehub_mobile/screens/nav_bar_komponente.dart/korisnikovi_proizvodi.dart';
 import 'package:bikehub_mobile/screens/ostalo/prikaz_slika.dart';
@@ -16,6 +17,8 @@ import 'package:bikehub_mobile/servisi/kategorije/kategorija_recomended_service.
 import 'package:bikehub_mobile/servisi/kategorije/kategorija_service.dart';
 import 'package:bikehub_mobile/servisi/korisnik/adresa_service.dart';
 import 'package:bikehub_mobile/servisi/korisnik/korisnik_service.dart';
+import 'package:bikehub_mobile/servisi/narudba/narudba_dijelovi_service.dart';
+import 'package:bikehub_mobile/servisi/narudba/narudba_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -37,7 +40,9 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
   final KategorijaServis _kategorijaServis = KategorijaServis();
   final KategorijaRecommendedService _kategorijaRecommendedService =
       KategorijaRecommendedService();
-
+  final NarudbaDijeloviService _narudbaDijeloviService =
+      NarudbaDijeloviService();
+  final NarudbaService _narudbaService = NarudbaService();
   final AdresaServis _adresaServis = AdresaServis();
   final KorisnikServis _korisnikServis = KorisnikServis();
   final DijeloviSlikeService _dijeloviSlikeService = DijeloviSlikeService();
@@ -181,7 +186,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
       return;
     }
 
-    // Ostali kod za funkciju naruci
+    showCustomPopup(context);
   }
 
   Future<void> spaseniUpravljanje() async {
@@ -1732,6 +1737,303 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
   String opis = "";
   List<Map<String, dynamic>>? _kategorijeDijelovi;
   Map<String, dynamic>? _odabranaKategorijaDijelovi;
+
+  int odabranaKolicina = 0;
+
+  narudbaDijelovi() async {
+    if (odabranaKolicina == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Potrebno je unjeti kolicinu',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: const Color.fromARGB(255, 255, 59, 59),
+        ),
+      );
+      return;
+    }
+    final narudbaOdgovor = await _narudbaService.postNarudba(
+        korisnikId: korisnikId, prodavaocId: zapis?['korisnikId']);
+
+    if (narudbaOdgovor['narudzbaId'] != null) {
+      final int narudzbaId = narudbaOdgovor['narudzbaId'];
+      final narudbaDijeloviOdgovor =
+          await _narudbaDijeloviService.postNarudbaDijelovi(
+        narudzbaId: narudzbaId,
+        dijeloviId: widget.dijeloviId,
+        kolicina: odabranaKolicina,
+      );
+      if (narudbaDijeloviOdgovor['poruka'] == "Uspjesno dodata narudba") {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              narudbaDijeloviOdgovor['poruka'],
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const GlavniProzor()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              narudbaDijeloviOdgovor['poruka'],
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: const Color.fromARGB(255, 255, 59, 59),
+          ),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            narudbaOdgovor['poruka'],
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: const Color.fromARGB(255, 255, 59, 59),
+        ),
+      );
+    }
+  }
+
+  void showCustomPopup(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Container(
+                width: MediaQuery.of(context).size.width * 0.95,
+                height: MediaQuery.of(context).size.height * 0.3,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color.fromARGB(255, 205, 238, 239),
+                      Color.fromARGB(255, 165, 196, 210),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.95,
+                      height: MediaQuery.of(context).size.height * 0.24,
+                      color: Color.fromARGB(0, 255, 0, 0),
+                      child: Column(
+                        children: [
+                          Stack(
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.95,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.05,
+                                color: Color.fromARGB(0, 13, 255, 0),
+                              ),
+                              Positioned(
+                                right: 0,
+                                child: IconButton(
+                                  icon: Icon(Icons.close, color: Colors.black),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.95,
+                            height: MediaQuery.of(context).size.height * 0.19,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color.fromARGB(255, 82, 205, 210),
+                                  Color.fromARGB(255, 7, 161, 235),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.95,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.1,
+                                  color: const Color.fromARGB(0, 33, 149, 243),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.35,
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.06,
+                                        decoration: BoxDecoration(
+                                          border: Border(
+                                            bottom: BorderSide(
+                                                color: Colors.white,
+                                                width: 2.0),
+                                            left: BorderSide(
+                                                color: Colors.white,
+                                                width: 2.0),
+                                            right: BorderSide(
+                                                color: Colors.white,
+                                                width: 2.0),
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
+                                        child: Center(
+                                          child: TextField(
+                                            keyboardType: TextInputType.number,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                            ),
+                                            decoration: InputDecoration(
+                                              hintText: "Upiši količinu",
+                                              hintStyle: TextStyle(
+                                                color: Colors.white
+                                                    .withOpacity(0.6),
+                                              ),
+                                              border: InputBorder.none,
+                                              contentPadding:
+                                                  EdgeInsets.symmetric(
+                                                      vertical: 10),
+                                            ),
+                                            textAlign: TextAlign.center,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                odabranaKolicina =
+                                                    int.tryParse(value) ?? 0;
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.35,
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.06,
+                                        decoration: BoxDecoration(
+                                          border: Border(
+                                            bottom: BorderSide(
+                                                color: Colors.white,
+                                                width: 2.0),
+                                            left: BorderSide(
+                                                color: Colors.white,
+                                                width: 2.0),
+                                            right: BorderSide(
+                                                color: Colors.white,
+                                                width: 2.0),
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            '${(zapis?['cijena'] ?? 0)} KM',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.35,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.06,
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(
+                                          color: Colors.white, width: 2.0),
+                                      left: BorderSide(
+                                          color: Colors.white, width: 2.0),
+                                      right: BorderSide(
+                                          color: Colors.white, width: 2.0),
+                                    ),
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      '${((zapis?['cijena'] ?? 0) * odabranaKolicina).toString()} KM',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.95,
+                      height: MediaQuery.of(context).size.height * 0.06,
+                      color: Color.fromARGB(0, 255, 0, 242),
+                      child: Center(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            narudbaDijelovi();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.lightBlue,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            fixedSize: Size(
+                              MediaQuery.of(context).size.width * 0.55,
+                              MediaQuery.of(context).size.height * 0.05,
+                            ),
+                          ),
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              'Potvrdi narudžbu',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
 
   sacuvajPodatke() async {
     if ((nazivDijelovi.isEmpty) &&

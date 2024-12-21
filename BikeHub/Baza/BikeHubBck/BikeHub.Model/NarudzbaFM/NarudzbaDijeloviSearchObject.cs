@@ -11,7 +11,7 @@ namespace BikeHub.Model.NarudzbaFM
 
         //public int? NarudzbaId { get; set; }
 
-        //public int? DijeloviId { get; set; }
+        public int? DijeloviId { get; set; }
 
         public int? Kolicina { get; set; }
 

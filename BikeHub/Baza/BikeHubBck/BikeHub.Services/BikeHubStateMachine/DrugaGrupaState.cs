@@ -65,6 +65,16 @@ namespace BikeHub.Services.BikeHubStateMachine
 
             return Mapper.Map<TModel>(entity);
         }
+        public override TModel MarkAsFinished(int id)
+        {
+            var set = Context.Set<TDbEntity>();
+            var entity = set.Find(id);
+            entity.GetType().GetProperty("Status").SetValue(entity, "zavrseno");
+            Context.Update(entity);
+            Context.SaveChanges();
+
+            return Mapper.Map<TModel>(entity);
+        }
     }
     public class IzmijenjenDrugaGrupaState<TModel, TDbEntity, TInsert, TUpdate> : BaseDrugaGrupaState<TModel, TDbEntity, TInsert, TUpdate> where TModel : class where TDbEntity : class
     {

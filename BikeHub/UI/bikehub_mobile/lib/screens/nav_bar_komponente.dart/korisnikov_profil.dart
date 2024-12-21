@@ -2,9 +2,9 @@
 
 import 'package:bikehub_mobile/screens/administracija/administracija.dart';
 import 'package:bikehub_mobile/screens/glavni_prozor.dart';
+import 'package:bikehub_mobile/screens/narudbe_zahtjev.dart';
 import 'package:bikehub_mobile/screens/nav_bar.dart';
 import 'package:bikehub_mobile/screens/nav_bar_komponente.dart/korisnikove_rezervacije.dart';
-import 'package:bikehub_mobile/screens/nav_bar_komponente.dart/korisnikovi_proizvodi.dart';
 import 'package:bikehub_mobile/screens/ostalo/poruka_helper.dart';
 import 'package:bikehub_mobile/screens/prijava/log_in.dart';
 import 'package:bikehub_mobile/screens/servis/korisnikov_servis.dart';
@@ -470,14 +470,13 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
         });
         break;
       case "Adresu":
-        _adresaService
-            .promjeniAdresu(
-          grad.text,
-          postanskiBroj.text,
-          ulica.text,
-          adresa?['adresaId'],
-        )
-            .then((result) {
+        final Future<String?> adresaResult = adresa == null || adresa!.isEmpty
+            ? _adresaService.postAdresa(
+                korisnikId, grad.text, postanskiBroj.text, ulica.text)
+            : _adresaService.promjeniAdresu(
+                grad.text, postanskiBroj.text, ulica.text, adresa?['adresaId']);
+
+        adresaResult.then((result) {
           if (result == "Adresa uspješno izmjenjena") {
             grad.clear();
             postanskiBroj.clear();
@@ -494,6 +493,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
           PorukaHelper.prikaziPorukuGreske(context, "Greška: $error");
         });
         break;
+
       case "Osnovne":
         if (username.text.isEmpty &&
             email.text.isEmpty &&
@@ -503,6 +503,32 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
               context, "Potrebno je izmjenuti barem jedan zapis");
         } else {
           if (imePrezime.text.isNotEmpty || telefon.text.isNotEmpty) {
+            if (korisnik?['korisnikInfos'] == null ||
+                korisnik?['korisnikInfos']!.isEmpty) {
+              if (imePrezime.text.isEmpty || telefon.text.isEmpty) {
+                PorukaHelper.prikaziPorukuUpozorenja(
+                    context, "Potrebno je dodati obe vrijednosti");
+              }
+              _korisnikInfoServis
+                  .postKorisnikInfo(korisnikId, imePrezime.text, telefon.text)
+                  .then((result) {
+                if (result == "Korisnik Info uspješno izmjenjena") {
+                  imePrezime.clear();
+                  telefon.clear();
+                  setState(() {
+                    activeTitleP = "home";
+                    _initialize();
+                  });
+
+                  PorukaHelper.prikaziPorukuUspjeha(context, result!);
+                } else {
+                  PorukaHelper.prikaziPorukuGreske(context, result!);
+                }
+              }).catchError((error) {
+                PorukaHelper.prikaziPorukuGreske(context, "Greška: $error");
+              });
+              break;
+            }
             _korisnikInfoServis
                 .promjeniKorisnikInfo(imePrezime.text, telefon.text,
                     korisnik?['korisnikInfos'][0]['korisnikInfoId'])
@@ -990,7 +1016,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                           color: const Color.fromARGB(
                               0, 244, 67, 54), // Boja pozadine za prvi dio
                           child: Center(
-                            child: _buildButton("Proizvodi"),
+                            child: _buildButton("Narudžbe"),
                           ),
                         ),
                         Container(
@@ -1196,10 +1222,10 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                   )),
         );
         break;
-      case 'Proizvodi':
+      case 'Narudžbe':
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => KorisnikoviProizvodi()),
+          MaterialPageRoute(builder: (context) => NarudbeZahtjev()),
         );
         break;
       case 'Servis':

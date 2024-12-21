@@ -57,6 +57,14 @@ namespace BikeHub.Services
             {
                 NoviQuery = NoviQuery.Include(x => x.NarudzbaDijelovis);
             }
+            if (search?.KorisnikId != null && search?.KorisnikId != 0)
+            {
+                NoviQuery = NoviQuery.Where(x => x.KorisnikId == search.KorisnikId);
+            }
+            if (search?.ProdavaocId != null && search?.ProdavaocId != 0)
+            {
+                NoviQuery = NoviQuery.Where(x => x.ProdavaocId == search.ProdavaocId);
+            }
             return NoviQuery;
         }
 
@@ -66,12 +74,22 @@ namespace BikeHub.Services
             {
                 throw new UserException("KorisnikId ne smije biti prazan ili nula.");
             }
+            if (request.ProdavaocId == 0)
+            {
+                throw new UserException("ProdavaocId ne smije biti prazan ili nula.");
+            }
             var korisnik = _context.Korisniks.FirstOrDefault(x => x.KorisnikId == request.KorisnikId);
             if (korisnik == null)
             {
                 throw new UserException("Korisnik sa datim ID-om ne postoji.");
             }
+            var prodavaoc = _context.Korisniks.FirstOrDefault(x => x.KorisnikId == request.ProdavaocId);
+            if (prodavaoc == null)
+            {
+                throw new UserException("Prodavaoc sa datim ID-om ne postoji.");
+            }
             entity.KorisnikId = request.KorisnikId;
+            entity.ProdavaocId = request.ProdavaocId;
             entity.DatumNarudzbe = DateTime.Now;
             base.BeforeInsert(request, entity);
         }
@@ -137,37 +155,72 @@ namespace BikeHub.Services
 
             var narudzbaBiciklis = _context.NarudzbaBiciklis.Where(nb => nb.NarudzbaId == id).ToList();
             var narudzbaDijelovis = _context.NarudzbaDijelovis.Where(nd => nd.NarudzbaId == id).ToList();
+            var korisnikId = entity.KorisnikId;
 
-            if (narudzbaBiciklis.Any() && narudzbaDijelovis.Any())
+            List<int> listaBiciklId = new List<int>();
+            List<int> listaDijeloviId = new List<int>();
+
+            foreach (var narudzbaBicikli in narudzbaBiciklis)
             {
-                foreach (var narudzbaBicikli in narudzbaBiciklis)
-                {
-                    foreach (var narudzbaDijelovi in narudzbaDijelovis)
-                    {
-                        var recommendedKategorija = _context.RecommendedKategorijas
-                            .FirstOrDefault(rk => rk.BicikliId == narudzbaBicikli.BiciklId && rk.DijeloviId == narudzbaDijelovi.DijeloviId);
+                listaBiciklId.Add(narudzbaBicikli.BiciklId);
+            }
 
-                        if (recommendedKategorija != null)
-                        {
-                            recommendedKategorija.BrojPreporuka = (recommendedKategorija.BrojPreporuka ?? 0) + 1;
-                            _context.RecommendedKategorijas.Update(recommendedKategorija);
-                        }
-                        else
-                        {
-                            var noviRecommendedKategorija = new RecommendedKategorija
-                            {
-                                BicikliId = narudzbaBicikli.BiciklId,
-                                DijeloviId = narudzbaDijelovi.DijeloviId,
-                                BrojPreporuka = 1,  
-                                DatumKreiranja = DateTime.Now,
-                                Status = "kreiran"
-                            };
-                            _context.RecommendedKategorijas.Add(noviRecommendedKategorija);
-                        }
-                        _context.SaveChanges();
-                    }
+            foreach (var narudzbaDijelovi in narudzbaDijelovis)
+            {
+                listaDijeloviId.Add(narudzbaDijelovi.DijeloviId);
+            }
+
+            // Uzimanje zadnje narudžbe korisnika
+            var zadnjaNarudzba = _context.Narudzbas
+                .Where(n => n.KorisnikId == korisnikId && n.NarudzbaId != id)
+                .OrderByDescending(n => n.DatumNarudzbe)
+                .FirstOrDefault();
+
+
+            if (zadnjaNarudzba != null)
+            {
+                var zadnjeNarudzbaBiciklis = _context.NarudzbaBiciklis.Where(nb => nb.NarudzbaId == zadnjaNarudzba.NarudzbaId).ToList();
+                var zadnjeNarudzbaDijelovis = _context.NarudzbaDijelovis.Where(nd => nd.NarudzbaId == zadnjaNarudzba.NarudzbaId).ToList();
+
+                foreach (var zadnjaBicikli in zadnjeNarudzbaBiciklis)
+                {
+                    listaBiciklId.Add(zadnjaBicikli.BiciklId);
+                }
+
+                foreach (var zadnjaDijelovi in zadnjeNarudzbaDijelovis)
+                {
+                    listaDijeloviId.Add(zadnjaDijelovi.DijeloviId);
                 }
             }
+
+            foreach (var biciklId in listaBiciklId)
+            {
+                foreach (var dijeloviId in listaDijeloviId)
+                {
+                    var recommendedKategorija = _context.RecommendedKategorijas
+                        .FirstOrDefault(rk => rk.BicikliId == biciklId && rk.DijeloviId == dijeloviId);
+
+                    if (recommendedKategorija != null)
+                    {
+                        recommendedKategorija.BrojPreporuka = (recommendedKategorija.BrojPreporuka ?? 0) + 1;
+                        _context.RecommendedKategorijas.Update(recommendedKategorija);
+                    }
+                    else
+                    {
+                        var noviRecommendedKategorija = new RecommendedKategorija
+                        {
+                            BicikliId = biciklId,
+                            DijeloviId = dijeloviId,
+                            BrojPreporuka = 1,
+                            DatumKreiranja = DateTime.Now,
+                            Status = "kreiran"
+                        };
+                        _context.RecommendedKategorijas.Add(noviRecommendedKategorija);
+                    }
+                    _context.SaveChanges();
+                }
+            }
+
             foreach (var narudzbaBicikli in narudzbaBiciklis)
             {
                 _narudzbaBicikliService.Zavrsavanje(narudzbaBicikli.NarudzbaBicikliId);
@@ -179,6 +232,9 @@ namespace BikeHub.Services
             var state = _baseDrugaGrupaState.CreateState(entity.Status);
             state.MarkAsFinished(id);
         }
+
+
+
 
         public override void Aktivacija(int id, bool aktivacija)
         {

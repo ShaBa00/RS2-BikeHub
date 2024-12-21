@@ -37,6 +37,10 @@ namespace BikeHub.Services
             {
                 NoviQuery = NoviQuery.Where(x => x.Cijena == search.Cijena);
             }
+            if (search?.BiciklId != null)
+            {
+                NoviQuery = NoviQuery.Where(x => x.BiciklId == search.BiciklId);
+            }
             if (!string.IsNullOrWhiteSpace(search?.Status))
             {
                 NoviQuery = NoviQuery.Where(x => x.Status.StartsWith(search.Status));

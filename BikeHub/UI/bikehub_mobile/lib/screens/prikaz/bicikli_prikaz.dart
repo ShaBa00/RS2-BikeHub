@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:bikehub_mobile/screens/dodavanje/promocija_zapisa.dart';
+import 'package:bikehub_mobile/screens/glavni_prozor.dart';
 import 'package:bikehub_mobile/screens/nav_bar.dart';
 import 'package:bikehub_mobile/screens/nav_bar_komponente.dart/korisnikovi_proizvodi.dart';
 import 'package:bikehub_mobile/screens/ostalo/prikaz_slika.dart';
@@ -16,6 +17,8 @@ import 'package:bikehub_mobile/servisi/kategorije/kategorija_recomended_service.
 import 'package:bikehub_mobile/servisi/kategorije/kategorija_service.dart';
 import 'package:bikehub_mobile/servisi/korisnik/adresa_service.dart';
 import 'package:bikehub_mobile/servisi/korisnik/korisnik_service.dart';
+import 'package:bikehub_mobile/servisi/narudba/narudba_bicikl_service.dart';
+import 'package:bikehub_mobile/servisi/narudba/narudba_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -43,6 +46,8 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
   final BiciklSacuvaniServis _biciklSacuvaniServis = BiciklSacuvaniServis();
   final BiciklPromocijaService _biciklPromocijaService =
       BiciklPromocijaService();
+  final NarudbaBiciklService _narudbaBiciklService = NarudbaBiciklService();
+  final NarudbaService _narudbaService = NarudbaService();
 
   bool loadingZapisi = true;
   Map<String, dynamic>? zapis;
@@ -2079,6 +2084,75 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
 
   int odabranaKolicina = 0;
 
+  narudbaBicikla() async {
+    if (odabranaKolicina == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Potrebno je unjeti kolicinu',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: const Color.fromARGB(255, 255, 59, 59),
+        ),
+      );
+      return;
+    }
+
+    // Prvo pozovi postNarudba
+    final narudbaOdgovor = await _narudbaService.postNarudba(
+        korisnikId: korisnikId, prodavaocId: zapis?['korisnikId']);
+
+    if (narudbaOdgovor['narudzbaId'] != null) {
+      // Uzmi narudzbaId iz odgovora
+      final int narudzbaId = narudbaOdgovor['narudzbaId'];
+
+      // Zatim pozovi postNarudbaBicikl s potrebnim podacima
+      final narudbaBiciklOdgovor =
+          await _narudbaBiciklService.postNarudbaBicikl(
+        narudzbaId: narudzbaId,
+        biciklId: widget.biciklId,
+        kolicina: odabranaKolicina,
+      );
+      if (narudbaBiciklOdgovor['poruka'] == "Uspjesno dodata narudba") {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              narudbaBiciklOdgovor['poruka'],
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Preusmjeravanje na GlavniProzor
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const GlavniProzor()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              narudbaBiciklOdgovor['poruka'],
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: const Color.fromARGB(255, 255, 59, 59),
+          ),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            narudbaOdgovor['poruka'],
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: const Color.fromARGB(255, 255, 59, 59),
+        ),
+      );
+    }
+  }
+
   void showCustomPopup(BuildContext context) {
     showDialog(
       context: context,
@@ -2278,7 +2352,9 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                       color: Color.fromARGB(0, 255, 0, 242),
                       child: Center(
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            narudbaBicikla();
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.lightBlue,
                             shape: RoundedRectangleBorder(

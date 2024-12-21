@@ -10,26 +10,23 @@ import 'package:bikehub_mobile/screens/prikaz/dijelovi_prikaz.dart';
 import 'package:bikehub_mobile/servisi/bicikli/bicikl_service.dart';
 import 'package:bikehub_mobile/servisi/dijelovi/dijelovi_service.dart';
 import 'package:bikehub_mobile/servisi/korisnik/korisnik_service.dart';
-import 'package:bikehub_mobile/servisi/korisnik/rezervacije_service.dart';
 import 'package:bikehub_mobile/servisi/narudba/narudba_bicikl_service.dart';
 import 'package:bikehub_mobile/servisi/narudba/narudba_dijelovi_service.dart';
 import 'package:bikehub_mobile/servisi/narudba/narudba_service.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
-class KorisnikovaHistorija extends StatefulWidget {
+class NarudbeZahtjev extends StatefulWidget {
   @override
-  _KorisnikovaHistorijaState createState() => _KorisnikovaHistorijaState();
+  _NarudbeZahtjevaState createState() => _NarudbeZahtjevaState();
 }
 
-class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
+class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
   //servisi
   final KorisnikServis _korisnikService = KorisnikServis();
   final NarudbaService _narudbaService = NarudbaService();
   final NarudbaBiciklService _narudbaBiciklService = NarudbaBiciklService();
   final NarudbaDijeloviService _narudbaDijeloviService =
       NarudbaDijeloviService();
-  final RezervacijaServis _rezervacijaServis = RezervacijaServis();
   final BiciklService _biciklService = BiciklService();
   final DijeloviService _dijeloviService = DijeloviService();
 
@@ -53,7 +50,6 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
   // liste
   List<Map<String, dynamic>> listaNarudbaBicikli = [];
   List<Map<String, dynamic>> listaNarudbaDijelovi = [];
-  List<Map<String, dynamic>> listaRezervacija = [];
   @override
   void initState() {
     super.initState();
@@ -61,7 +57,7 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
   }
 
   _getNarudbe() async {
-    await _narudbaService.getNarudbe(korisnikId: korisnikId);
+    await _narudbaService.getNarudbe(prodavaocId: korisnikId);
     listaNarudbaBicikli = _narudbaService.listaNarudbaBicikli;
     listaNarudbaDijelovi = _narudbaService.listaNarudbaDijelovi;
   }
@@ -72,7 +68,6 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
       final userInfo = await _korisnikService.getUserInfo();
       korisnikId = int.parse(userInfo['korisnikId']!);
       await _getNarudbe();
-      await getRezervacije();
       isLogged = true;
     }
 
@@ -139,10 +134,8 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                 children: [
                   // dD
                   Container(
-                    width: MediaQuery.of(context).size.width *
-                        0.55, // 40% širine ekrana
-                    height: MediaQuery.of(context).size.height *
-                        0.09, // 9% visine ekrana
+                    width: MediaQuery.of(context).size.width * 0.80,
+                    height: MediaQuery.of(context).size.height * 0.09,
                     color: const Color.fromARGB(
                         0, 244, 67, 54), // Zamijenite s bojom po želji
                     child: Row(
@@ -160,8 +153,8 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                           },
                         ),
                         const Text(
-                          'Historija narudžbi',
-                          style: TextStyle(fontSize: 20), // Povećan font
+                          'Zahtjev za narudžbu',
+                          style: TextStyle(fontSize: 20),
                         ),
                       ],
                     ),
@@ -169,7 +162,7 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                   // lD
                   Container(
                     width: MediaQuery.of(context).size.width *
-                        0.40, // 55% širine ekrana
+                        0.10, // 55% širine ekrana
                     height: MediaQuery.of(context).size.height *
                         0.09, // 9% visine ekrana
                     color: const Color.fromARGB(
@@ -193,8 +186,6 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
             children: [
               customButton(context, 'bicikl', Icons.directions_bike,
                   _selectedSection, _updateSection),
-              customButton(context, 'serviseri', Icons.build, _selectedSection,
-                  _updateSection),
               customButton(context, 'dijelovi', Icons.handyman,
                   _selectedSection, _updateSection),
             ],
@@ -668,473 +659,6 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
         zapisUcitan = false;
       });
     }
-  }
-
-  //servisi
-  Widget dioHistorijServisa(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width, // 100% širine ekrana
-      height: MediaQuery.of(context).size.height * 0.66, // 53% visine ekrana
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            Color.fromARGB(255, 33, 217, 238),
-            Color.fromARGB(255, 3, 72, 79),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: Center(
-        child: Container(
-          width: MediaQuery.of(context).size.width * 0.9,
-          height: MediaQuery.of(context).size.height * 0.6,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [
-                Color.fromARGB(255, 255, 255, 255),
-                Color.fromARGB(255, 188, 188, 188),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(20.0),
-          ),
-          child: Center(
-            child: isLoading
-                ? CircularProgressIndicator()
-                : isLogged
-                    ? Container(
-                        width: MediaQuery.of(context).size.width * 0.9,
-                        height: MediaQuery.of(context).size.height * 0.6,
-                        color: const Color.fromARGB(0, 68, 137, 255),
-                        child: listaRezervacija.isEmpty
-                            ? Center(
-                                child: Text(
-                                  'Nema odradenih rezervacija',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              )
-                            : SingleChildScrollView(
-                                child: Column(
-                                  children: listaRezervacija.map((narudzba) {
-                                    return GestureDetector(
-                                      onTap: () async {
-                                        setState(() {
-                                          zapisUcitan = false;
-                                          _selectedSection = "serviseriPrikaz";
-                                          _odabraniId =
-                                              narudzba['rezervacijaId'];
-                                        });
-                                        await getRezervacija();
-                                      },
-                                      child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.85,
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
-                                        margin:
-                                            EdgeInsets.symmetric(vertical: 5),
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          gradient: const LinearGradient(
-                                            colors: [
-                                              Color.fromARGB(255, 82, 205, 210),
-                                              Color.fromARGB(255, 7, 161, 235),
-                                            ],
-                                            begin: Alignment.topLeft,
-                                            end: Alignment.bottomRight,
-                                          ),
-                                        ),
-                                        child: Center(
-                                          child: Center(
-                                            child: Text(
-                                              'Datum rezervacije: ${narudzba['datumRezervacije'] != null ? formatDate(narudzba['datumRezervacije']) : 'N/A'}, Ocjena: ${narudzba['ocjena'] ?? 'N/A'}',
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
-                      )
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Potrebno je prijaviti se',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 18,
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.4,
-                            height: MediaQuery.of(context).size.height * 0.05,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Color.fromARGB(255, 87, 202, 255),
-                              ),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const LogIn()),
-                                );
-                              },
-                              child: Text(
-                                "Prijava",
-                                style: TextStyle(
-                                  color:
-                                      const Color.fromARGB(255, 255, 255, 255),
-                                  fontSize: 18,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildRezervacija(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height * 0.66,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            Color.fromARGB(255, 33, 217, 238),
-            Color.fromARGB(255, 3, 72, 79),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: Center(
-        child: Container(
-          width: MediaQuery.of(context).size.width * 0.9,
-          height: MediaQuery.of(context).size.height * 0.6,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [
-                Color.fromARGB(255, 255, 255, 255),
-                Color.fromARGB(255, 188, 188, 188),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(20.0),
-          ),
-          child: !zapisUcitan
-              ? Center(
-                  child: SizedBox(
-                    width: 50,
-                    height: 50,
-                    child: CircularProgressIndicator(),
-                  ),
-                )
-              : Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                          width: MediaQuery.of(context).size.width * 0.77,
-                          height: MediaQuery.of(context).size.height * 0.065,
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(0, 255, 255, 255),
-                            borderRadius: BorderRadius.circular(20.0),
-                          ),
-                          child: Center(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  _selectedSection = "serviseri";
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.lightBlue,
-                                minimumSize: Size(
-                                  MediaQuery.of(context).size.width * 0.4,
-                                  MediaQuery.of(context).size.height * 0.055,
-                                ),
-                              ),
-                              child: Text(
-                                'Nazad',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          )),
-                      SizedBox(height: 10),
-                      Container(
-                        width: MediaQuery.of(context).size.width * 0.77,
-                        height: MediaQuery.of(context).size.height * 0.33,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Color.fromARGB(255, 82, 205, 210),
-                              Color.fromARGB(255, 7, 161, 235),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        child: Column(
-                          children: [
-                            SizedBox(height: 10),
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.77,
-                              height:
-                                  MediaQuery.of(context).size.height * 0.075,
-                              color: const Color.fromARGB(0, 244, 67, 54),
-                              child: Center(
-                                child: Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.5,
-                                  height: MediaQuery.of(context).size.height *
-                                      0.065,
-                                  decoration: BoxDecoration(
-                                    color: Color.fromARGB(0, 255, 255, 255),
-                                    borderRadius: BorderRadius.circular(20.0),
-                                    border: Border(
-                                      bottom: BorderSide(color: Colors.white),
-                                      right: BorderSide(color: Colors.white),
-                                      left: BorderSide(color: Colors.white),
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      rezervacija['ocjena'] != null
-                                          ? 'Ocjena: ${rezervacija['ocjena'].toString()}'
-                                          : 'N/A',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: const Color.fromARGB(
-                                              255, 253, 253, 253)),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.77,
-                              height:
-                                  MediaQuery.of(context).size.height * 0.075,
-                              color: const Color.fromARGB(0, 76, 175, 79),
-                              child: Center(
-                                child: Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.5,
-                                  height: MediaQuery.of(context).size.height *
-                                      0.065,
-                                  decoration: BoxDecoration(
-                                    color:
-                                        const Color.fromARGB(0, 255, 255, 255),
-                                    borderRadius: BorderRadius.circular(20.0),
-                                    border: Border(
-                                      bottom: BorderSide(color: Colors.white),
-                                      right: BorderSide(color: Colors.white),
-                                      left: BorderSide(color: Colors.white),
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      rezervacija['datumRezervacije'] != null
-                                          ? 'Datum: ${DateFormat('dd MM yyyy').format(DateTime.parse(rezervacija['datumRezervacije']))}'
-                                          : 'N/A',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: const Color.fromARGB(
-                                              255, 252, 252, 252)),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.77,
-                              height:
-                                  MediaQuery.of(context).size.height * 0.075,
-                              color: const Color.fromARGB(0, 33, 149, 243),
-                              child: Center(
-                                child: Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.5,
-                                  height: MediaQuery.of(context).size.height *
-                                      0.065,
-                                  decoration: BoxDecoration(
-                                    color: Color.fromARGB(0, 255, 255, 255),
-                                    borderRadius: BorderRadius.circular(20.0),
-                                    border: Border(
-                                      bottom: BorderSide(color: Colors.white),
-                                      right: BorderSide(color: Colors.white),
-                                      left: BorderSide(color: Colors.white),
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: DropdownButton<String>(
-                                      value: odabranaOcjena,
-                                      icon: Icon(Icons.arrow_downward),
-                                      iconSize: 24,
-                                      elevation: 16,
-                                      style: TextStyle(
-                                          color: Color.fromARGB(255, 0, 0, 0)),
-                                      underline: Container(),
-                                      onChanged: (String? newValue) {
-                                        setState(() {
-                                          odabranaOcjena = newValue!;
-                                        });
-                                      },
-                                      items: <String>['1', '2', '3', '4', '5']
-                                          .map<DropdownMenuItem<String>>(
-                                              (String value) {
-                                        return DropdownMenuItem<String>(
-                                          value: value,
-                                          child: Text(value),
-                                        );
-                                      }).toList(),
-                                      hint: Text(
-                                        'Ocjena',
-                                        style: TextStyle(color: Colors.black),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.77,
-                              height:
-                                  MediaQuery.of(context).size.height * 0.075,
-                              color: const Color.fromARGB(0, 255, 235, 59),
-                              child: Center(
-                                child: GestureDetector(
-                                  onTap: () {
-                                    ocjeniRezervaciju();
-                                  },
-                                  child: Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.5,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.065,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20.0),
-                                      border: Border(
-                                        bottom: BorderSide(color: Colors.white),
-                                        right: BorderSide(color: Colors.white),
-                                        left: BorderSide(color: Colors.white),
-                                      ),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        'Ocjeni',
-                                        style: TextStyle(
-                                            color: const Color.fromARGB(
-                                                255, 255, 255, 255)),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> getRezervacija() async {
-    try {
-      rezervacija = await _rezervacijaServis.getRezervacijakById(_odabraniId);
-      setState(() {
-        zapisUcitan = true;
-      });
-    } catch (e) {
-      setState(() {
-        zapisUcitan = false;
-      });
-    }
-  }
-
-  ocjeniRezervaciju() async {
-    if (odabranaOcjena == null || int.tryParse(odabranaOcjena!) == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Odaberite ocjenu'),
-        ),
-      );
-      return;
-    }
-
-    int ocjena = int.parse(odabranaOcjena!);
-    if (ocjena < 1 || ocjena > 5) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Odaberite ocjenu između 1 i 5'),
-        ),
-      );
-      return;
-    }
-
-    try {
-      bool uspjesno = await _rezervacijaServis.setRezervacija(
-        rezervacijaId: _odabraniId,
-        ocjena: ocjena,
-      );
-      if (uspjesno) {
-        await getRezervacije();
-        setState(() {
-          _selectedSection = "serviseri";
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Rezervacija uspješno ocijenjena.',
-              style: TextStyle(color: Colors.white),
-            ),
-            backgroundColor: Colors.green,
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Neuspješno ocjenjivanje rezervacije.',
-              style: TextStyle(color: Colors.white), // Boja teksta
-            ),
-            backgroundColor: Colors.red, // Boja pozadine
-          ),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Greška pri ocjenjivanju rezervacije: $e'),
-        ),
-      );
-    }
-  }
-
-  getRezervacije() async {
-    listaRezervacija = (await _rezervacijaServis.getRezervacije(
-        status: "zavrseno", korisnikId: korisnikId))!;
   }
 
   //Dijelovi
@@ -1634,14 +1158,10 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
     switch (_selectedSection) {
       case 'bicikl':
         return dioHistorijaBicikla(context);
-      case 'serviseri':
-        return dioHistorijServisa(context);
       case 'dijelovi':
         return dioHistorijDijelova(context);
       case 'biciklPrikaz':
         return buildNarudbaBicikl(context);
-      case 'serviseriPrikaz':
-        return buildRezervacija(context);
       case 'dijeloviPrikaz':
         return buildNarudbaDijelovi(context);
       default:

@@ -113,4 +113,75 @@ class KorisnikInfoServis {
       httpClient.close();
     }
   }
+
+  Future<String?> postKorisnikInfo(
+      int korisnikId, String? imePrezime, String? telefon) async {
+    final String baseUrl = '${HelperService.baseUrl}/KorisnikInfo';
+    Uri uri;
+
+    HttpClient httpClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+
+    try {
+      // Provjeri da li je poslan korisnikId
+      if (korisnikId == 0) {
+        return "Korisnik ID je obavezan";
+      }
+
+      // Provjeri da li je poslan barem jedan zapis za izmjenu
+      if ((imePrezime == null || imePrezime.isEmpty) &&
+          (telefon == null || telefon.isEmpty)) {
+        return "Potrebno je izmjenuti barem jedan zapis";
+      }
+
+      // Dodavanje Authorization header-a
+      await _addAuthorizationHeader();
+
+      // Priprema body za slanje
+      final body = <String, dynamic>{};
+      body['korisnikId'] = korisnikId.toString();
+      if (imePrezime != null && imePrezime.isNotEmpty) {
+        body['imePrezime'] = imePrezime;
+      }
+      if (telefon != null && telefon.isNotEmpty) {
+        body['telefon'] = telefon;
+      }
+
+      uri = Uri.parse(baseUrl);
+
+      final request = await httpClient.postUrl(uri);
+      request.headers.set('accept', 'application/json');
+      request.headers.set('Content-Type', 'application/json');
+      request.headers
+          .set('Authorization', _dio.options.headers['Authorization']);
+
+      request.write(jsonEncode(body));
+
+      final response = await request.close();
+
+      if (response.statusCode == 200) {
+        return "Korisnik Info uspješno izmjenjena";
+      } else {
+        final responseBody = await response.transform(utf8.decoder).join();
+        final decodedResponse = jsonDecode(responseBody);
+        final errors = decodedResponse['errors'];
+        if (errors != null && errors['userError'] != null) {
+          return errors['userError'].join(', ');
+        } else {
+          return 'Greška prilikom izmjene informacija';
+        }
+      }
+    } on HttpException catch (httpError) {
+      if (httpError is HttpException && httpError.message != null) {
+        return 'Greška prilikom izmjene informacija: ${httpError.message}';
+      }
+      return 'Greška prilikom izmjene informacija: ${httpError.toString()}';
+    } catch (e) {
+      logger.e('Greška prilikom izmjene informacija: $e');
+      return e.toString();
+    } finally {
+      httpClient.close();
+    }
+  }
 }

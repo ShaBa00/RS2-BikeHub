@@ -178,4 +178,79 @@ class AdresaServis {
       httpClient.close();
     }
   }
+
+  Future<String?> postAdresa(int korisnikId, String? grad,
+      String? postanskiBroj, String? ulica) async {
+    final String baseUrl = '${HelperService.baseUrl}/Adresa';
+    Uri uri;
+
+    HttpClient httpClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+
+    try {
+      // Provjeri da li je poslan korisnikId
+      if (korisnikId == 0) {
+        return "Korisnik ID je obavezan";
+      }
+
+      // Provjeri da li je poslan barem jedan zapis za izmjenu
+      if ((grad == null || grad.isEmpty) &&
+          (postanskiBroj == null || postanskiBroj.isEmpty) &&
+          (ulica == null || ulica.isEmpty)) {
+        return "Potrebno je izmjenuti barem jedan zapis";
+      }
+
+      // Dodavanje Authorization header-a
+      await _addAuthorizationHeader();
+
+      // Priprema body za slanje
+      final body = <String, dynamic>{};
+      body['korisnikId'] = korisnikId.toString();
+      if (grad != null && grad.isNotEmpty) {
+        body['grad'] = grad;
+      }
+      if (ulica != null && ulica.isNotEmpty) {
+        body['ulica'] = ulica;
+      }
+      if (postanskiBroj != null && postanskiBroj.isNotEmpty) {
+        body['postanskiBroj'] = postanskiBroj;
+      }
+
+      uri = Uri.parse(baseUrl);
+
+      final request = await httpClient.postUrl(uri);
+      request.headers.set('accept', 'application/json');
+      request.headers.set('Content-Type', 'application/json');
+      request.headers
+          .set('Authorization', _dio.options.headers['Authorization']);
+
+      request.write(jsonEncode(body));
+
+      final response = await request.close();
+
+      if (response.statusCode == 200) {
+        return "Adresa uspješno izmjenjena";
+      } else {
+        final responseBody = await response.transform(utf8.decoder).join();
+        final decodedResponse = jsonDecode(responseBody);
+        final errors = decodedResponse['errors'];
+        if (errors != null && errors['userError'] != null) {
+          return errors['userError'].join(', ');
+        } else {
+          return 'Greška prilikom izmjene adrese';
+        }
+      }
+    } on HttpException catch (httpError) {
+      if (httpError is HttpException && httpError.message != null) {
+        return 'Greška prilikom izmjene adrese: ${httpError.message}';
+      }
+      return 'Greška prilikom izmjene adrese: ${httpError.toString()}';
+    } catch (e) {
+      logger.e('Greška prilikom izmjene adrese: $e');
+      return e.toString();
+    } finally {
+      httpClient.close();
+    }
+  }
 }

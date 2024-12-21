@@ -103,7 +103,7 @@ class RezervacijaServis {
         if (data['resultsList'] != null && data['resultsList'].isNotEmpty) {
           return List<Map<String, dynamic>>.from(data['resultsList']);
         } else {
-          return null;
+          return [];
         }
       } else {
         throw Exception('Failed to load data: ${response.statusCode}');
