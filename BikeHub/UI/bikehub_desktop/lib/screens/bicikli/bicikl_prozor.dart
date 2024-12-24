@@ -1,7 +1,7 @@
 import 'package:bikehub_desktop/services/adresa/adresa_service.dart';
 import 'bicikl_prikaz.dart';
 import 'package:flutter/material.dart';
-import '../../services/bicikli/bicikl_service.dart'; 
+import '../../services/bicikli/bicikl_service.dart';
 import '../../services/kategorije/kategorija_service.dart';
 import 'dart:convert';
 import 'dart:typed_data';
@@ -29,51 +29,56 @@ class _BiciklProzorState extends State<BiciklProzor> {
   int? kategorijaId;
   int? selectedGradId;
 
-  
   int _currentPage = 0;
   final int _pageSize = 12;
 
   @override
-  void initState() {
+  initState() {
     super.initState();
-    _loadBicikli(); 
-    kategorijaServis.getBikeKategorije();
+    getKategorije();
+    _loadBicikli();
     adresaService.getGradKorisniciDto();
+  }
+
+  final ValueNotifier<List<Map<String, dynamic>>> _listaBikeKategorijeNotifier = ValueNotifier([]);
+
+  getKategorije() async {
+    var bikeKategorije = await kategorijaServis.getBikeKategorije();
+    _listaBikeKategorijeNotifier.value = List<Map<String, dynamic>>.from(bikeKategorije.where((kategorija) => kategorija['status'] == 'aktivan'));
   }
 
   Future<void> _loadBicikli() async {
     List<int>? korisniciId;
-    if(selectedGradId!=null){
-      final selectedGrad = adresaService.listaGradKorisniciDto.value
-      .firstWhere((adresa) => adresa['GradId'] == selectedGradId, orElse: () => <String, dynamic>{});
+    if (selectedGradId != null) {
+      final selectedGrad =
+          adresaService.listaGradKorisniciDto.value.firstWhere((adresa) => adresa['GradId'] == selectedGradId, orElse: () => <String, dynamic>{});
 
       List<int>? korisniciIds;
       // ignore: unnecessary_null_comparison
       if (selectedGrad != null) {
         korisniciIds = List<int>.from(selectedGrad['KorisnikIds']);
-        korisniciId=korisniciIds;
+        korisniciId = korisniciIds;
       }
     }
     final bicikli = await biciklService.getBicikli(
-      naziv: naziv,
-      velicinaRama: velicinaRama,
-      velicinaTocka: velicinaTocka,
-      brojBrzina: brojBrzina,
-      pocetnaCijena: pocetnaCijena,
-      krajnjaCijena: krajnjaCijena,
-      page: _currentPage,
-      pageSize: _pageSize,
-      kategorijaId: selectedKategorijaId,
-      korisniciId: korisniciId, 
-      status: "aktivan"
-    );
+        naziv: naziv,
+        velicinaRama: velicinaRama,
+        velicinaTocka: velicinaTocka,
+        brojBrzina: brojBrzina,
+        pocetnaCijena: pocetnaCijena,
+        krajnjaCijena: krajnjaCijena,
+        page: _currentPage,
+        pageSize: _pageSize,
+        kategorijaId: selectedKategorijaId,
+        korisniciId: korisniciId,
+        status: "aktivan");
     biciklService.lista_ucitanih_bicikala.value = bicikli;
   }
 
   void _nextPage() {
-    if(biciklService.count>(_pageSize*(_currentPage+1))){
+    if (biciklService.count > (_pageSize * (_currentPage + 1))) {
       if (biciklService.lista_ucitanih_bicikala.value.length == _pageSize) {
-        _currentPage++;      
+        _currentPage++;
         _loadBicikli();
       }
     }
@@ -92,7 +97,7 @@ class _BiciklProzorState extends State<BiciklProzor> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(56.0), 
+        preferredSize: const Size.fromHeight(56.0),
         child: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -107,7 +112,7 @@ class _BiciklProzorState extends State<BiciklProzor> {
           child: AppBar(
             title: const Text('Bicikl'),
             backgroundColor: Colors.transparent,
-            elevation: 0, 
+            elevation: 0,
           ),
         ),
       ),
@@ -133,14 +138,14 @@ class _BiciklProzorState extends State<BiciklProzor> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ValueListenableBuilder<List<Map<String, dynamic>>>(
-                      valueListenable: kategorijaServis.lista_ucitanih_kategorija,
+                      valueListenable: _listaBikeKategorijeNotifier,
                       builder: (context, kategorije, _) {
                         return InputDecorator(
                           decoration: const InputDecoration(
                             labelText: '',
                             labelStyle: TextStyle(color: Colors.white),
                             filled: true,
-                            fillColor: Colors.blueAccent, 
+                            fillColor: Colors.blueAccent,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.all(Radius.circular(4.0)),
                             ),
@@ -150,8 +155,8 @@ class _BiciklProzorState extends State<BiciklProzor> {
                               value: selectedKategorijaId,
                               hint: const Text("Sve Kategorije", style: TextStyle(color: Colors.white)),
                               isExpanded: true,
-                              dropdownColor: Colors.blueAccent, 
-                              style: const TextStyle(color: Colors.white), 
+                              dropdownColor: Colors.blueAccent,
+                              style: const TextStyle(color: Colors.white),
                               items: [
                                 const DropdownMenuItem<int?>(
                                   value: null,
@@ -162,14 +167,13 @@ class _BiciklProzorState extends State<BiciklProzor> {
                                     value: kategorija['kategorijaId'],
                                     child: Text(kategorija['naziv']),
                                   );
-                                // ignore: unnecessary_to_list_in_spreads
-                                }).toList(),
+                                }),
                               ],
                               onChanged: (newValue) {
                                 setState(() {
                                   selectedKategorijaId = newValue;
                                 });
-                                _currentPage=0;
+                                _currentPage = 0;
                                 _loadBicikli();
                               },
                             ),
@@ -208,7 +212,7 @@ class _BiciklProzorState extends State<BiciklProzor> {
                                     value: adresa['GradId'],
                                     child: Text(adresa['Grad']),
                                   );
-                                // ignore: unnecessary_to_list_in_spreads
+                                  // ignore: unnecessary_to_list_in_spreads
                                 }).toList(),
                               ],
                               onChanged: (newValue) async {
@@ -287,7 +291,7 @@ class _BiciklProzorState extends State<BiciklProzor> {
                           pocetnaCijena = values.start;
                           krajnjaCijena = values.end;
                         });
-                        _currentPage = 0; 
+                        _currentPage = 0;
                         _loadBicikli();
                       },
                     ),
@@ -299,7 +303,7 @@ class _BiciklProzorState extends State<BiciklProzor> {
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () async {
-                        _currentPage = 0; 
+                        _currentPage = 0;
                         await _loadBicikli();
                       },
                       child: const Text('Pretraži'),
@@ -364,7 +368,7 @@ class _BiciklProzorState extends State<BiciklProzor> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => BiciklPrikaz(biciklId: biciklId, korisnikId: korisnikId, userProfile:false),
+                                          builder: (context) => BiciklPrikaz(biciklId: biciklId, korisnikId: korisnikId, userProfile: false),
                                         ),
                                       );
                                     },

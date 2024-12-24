@@ -9,8 +9,7 @@ class AdresaService {
   final logger = Logger();
   final KorisnikService _korisnikService = KorisnikService();
 
-  final ValueNotifier<List<Map<String, dynamic>>> listaUcitanihAdresa =
-      ValueNotifier([]);
+  final ValueNotifier<List<Map<String, dynamic>>> listaUcitanihAdresa = ValueNotifier([]);
   int count = 0;
 
   Future<List<Map<String, dynamic>>> getAdrese({
@@ -45,8 +44,7 @@ class AdresaService {
 
       if (response.statusCode == 200) {
         count = response.data['count'];
-        final List<Map<String, dynamic>> adrese =
-            List<Map<String, dynamic>>.from(response.data['resultsList']);
+        final List<Map<String, dynamic>> adrese = List<Map<String, dynamic>>.from(response.data['resultsList']);
         listaUcitanihAdresa.value = adrese;
         // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
         listaUcitanihAdresa.notifyListeners();
@@ -60,8 +58,7 @@ class AdresaService {
     }
   }
 
-  final ValueNotifier<List<Map<String, dynamic>>> listaGradKorisniciDto =
-      ValueNotifier([]);
+  final ValueNotifier<List<Map<String, dynamic>>> listaGradKorisniciDto = ValueNotifier([]);
 
   Future<List<Map<String, dynamic>>> getGradKorisniciDto({
     int? gradId,
@@ -78,12 +75,11 @@ class AdresaService {
       );
 
       if (response.statusCode == 200) {
-        final List<Map<String, dynamic>> gradKorisniciDto =
-            List<Map<String, dynamic>>.from(response.data.map((grad) => {
-                  "GradId": grad['gradId'],
-                  "Grad": grad['grad'],
-                  "KorisnikIds": List<int>.from(grad['korisnikIds']),
-                }));
+        final List<Map<String, dynamic>> gradKorisniciDto = List<Map<String, dynamic>>.from(response.data.map((grad) => {
+              "GradId": grad['gradId'],
+              "Grad": grad['grad'],
+              "KorisnikIds": List<int>.from(grad['korisnikIds']),
+            }));
         listaGradKorisniciDto.value = gradKorisniciDto;
         // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
         listaGradKorisniciDto.notifyListeners();
@@ -140,17 +136,12 @@ class AdresaService {
     _dio.options.headers['Authorization'] = authHeader;
   }
 
-  Future<void> addAdresa(
-      int korisnikId, String grad, String ulica, String postanskiBroj) async {
+  Future<void> addAdresa(int korisnikId, String grad, String ulica, String postanskiBroj) async {
     try {
       // Dodavanje Authorization headera
       await _addAuthorizationHeader();
-      if (korisnikId == 0 ||
-          grad.isEmpty ||
-          ulica.isEmpty ||
-          postanskiBroj.isEmpty) {
-        throw Exception(
-            'Potrebno je unjeti sve podatke: grad, ulica, postanskiBroj.');
+      if (korisnikId == 0 || grad.isEmpty || ulica.isEmpty || postanskiBroj.isEmpty) {
+        throw Exception('Potrebno je unjeti sve podatke: grad, ulica, postanskiBroj.');
       }
 
       final body = <String, dynamic>{
@@ -182,8 +173,42 @@ class AdresaService {
     }
   }
 
-  Future<void> updateAdresa(
-      int adresaId, String grad, String ulica, String postanskiBroj) async {
+  Future<String> postAdresa({
+    required int korisnikId,
+    required String grad,
+    required String postanskiBroj,
+    required String ulica,
+  }) async {
+    try {
+      await _addAuthorizationHeader();
+      final response = await _dio.post(
+        '${HelperService.baseUrl}/Adresa',
+        data: {
+          'korisnikId': korisnikId,
+          'grad': grad,
+          'postanskiBroj': postanskiBroj,
+          'ulica': ulica,
+        },
+        options: Options(
+          headers: {
+            'Authorization': _dio.options.headers['Authorization'],
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return 'Uspjesno';
+      } else {
+        final errorMessage = response.data['errors'] != null ? response.data['errors']['userError'].join(', ') : 'Nepoznata greska';
+        return errorMessage;
+      }
+    } catch (e) {
+      logger.e("Greska pri dodavanju adrese: $e");
+      return 'Greska pri dodavanju adrese: $e';
+    }
+  }
+
+  Future<void> updateAdresa(int adresaId, String grad, String ulica, String postanskiBroj) async {
     try {
       // Dodavanje Authorization headera
       await _addAuthorizationHeader();

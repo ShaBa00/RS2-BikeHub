@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 class LogInProzor extends StatelessWidget {
   const LogInProzor({super.key, required this.onLogin});
 
-   final VoidCallback onLogin;
+  final VoidCallback onLogin;
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +37,8 @@ class LogInProzor extends StatelessWidget {
         body: Center(
           child: Container(
             padding: const EdgeInsets.all(20.0),
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
                 colors: [
                   Color.fromARGB(255, 6, 247, 255),
                   Color.fromARGB(255, 50, 131, 165),
@@ -46,6 +46,7 @@ class LogInProzor extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
+              borderRadius: BorderRadius.circular(15.0),
             ),
             width: MediaQuery.of(context).size.width * 0.3,
             child: Column(
@@ -91,7 +92,6 @@ class LogInProzor extends StatelessWidget {
 
                       final korisnik = await korisnikService.login(username, password);
 
-
                       if (korisnik != null) {
                         PorukaHelper.prikaziPorukuUspjeha(context, 'Uspješno prijavljivanje!');
                         onLogin();
@@ -102,7 +102,7 @@ class LogInProzor extends StatelessWidget {
                     },
                     child: const Text(
                       'Prijavi',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
                     ),
                   ),
                 ),

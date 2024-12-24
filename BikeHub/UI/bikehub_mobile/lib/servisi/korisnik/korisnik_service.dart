@@ -72,12 +72,14 @@ class KorisnikServis {
     final username = await _storage.read(key: 'username');
     final password = await _storage.read(key: 'password');
     final isAdmin = await _storage.read(key: 'isAdmin');
+    final status = await _storage.read(key: 'status');
 
     return {
       'korisnikId': korisnikId,
       'username': username,
       'password': password,
       'isAdmin': isAdmin,
+      'status': status,
     };
   }
 
@@ -93,17 +95,14 @@ class KorisnikServis {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> korisnik = response.data;
-        // Pohrani korisničke podatke u secure storage
         await _storage.write(key: 'username', value: korisnik['username']);
-        await _storage.write(
-            key: 'password', value: password); // Pohranjujemo lozinku
+        await _storage.write(key: 'status', value: korisnik['status']);
+        await _storage.write(key: 'password', value: password);
         await _storage.write(
             key: 'korisnikId', value: korisnik['korisnikId'].toString());
         await _storage.write(
             key: 'isAdmin', value: korisnik['isAdmin'].toString());
-        await _storage.write(
-            key: 'token',
-            value: korisnik['token']); // Možeš pohraniti token ako je potrebno
+        await _storage.write(key: 'token', value: korisnik['token']);
         return korisnik;
       } else {
         throw Exception('Failed to login');
@@ -445,6 +444,63 @@ class KorisnikServis {
     } catch (e) {
       logger.e('Greška prilikom izmjene korisnika: $e');
       return e.toString();
+    } finally {
+      httpClient.close();
+    }
+  }
+
+  Future<Map<String, dynamic>> postNoviKorisnik(String username, String lozinka,
+      String lozinkaPotvrda, String email) async {
+    final String baseUrl = '${HelperService.baseUrl}/Korisnik';
+    Uri uri;
+    HttpClient httpClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+    try {
+      final body = <String, dynamic>{};
+      body['username'] = username.toString();
+      body['lozinka'] = lozinka.toString();
+      body['lozinkaPotvrda'] = lozinkaPotvrda.toString();
+      body['email'] = email.toString();
+
+      uri = Uri.parse(baseUrl);
+      final request = await httpClient.postUrl(uri);
+      request.headers.set('accept', 'application/json');
+      request.headers.set('Content-Type', 'application/json');
+      request.write(jsonEncode(body));
+
+      final response = await request.close();
+      if (response.statusCode == 200) {
+        final responseBody = await response.transform(utf8.decoder).join();
+        if (responseBody.isEmpty) {}
+        final decodedResponse = jsonDecode(responseBody);
+        return {
+          'message': 'Uspjesno',
+          'korisnikId': decodedResponse['korisnikId'],
+        };
+      } else {
+        final responseBody = await response.transform(utf8.decoder).join();
+        if (responseBody.isEmpty) {}
+        final decodedResponse = jsonDecode(responseBody);
+        final errors = decodedResponse['errors'];
+        if (errors != null && errors['userError'] != null) {
+          return {
+            'message': errors['userError'].join(', '),
+            'korisnikId': 0,
+          };
+        } else {
+          return {
+            'message': 'Došlo je do greške prilikom dodavanja',
+            'korisnikId': 0,
+          };
+        }
+      }
+    } catch (e) {
+      logger.e('Greška: $e');
+      return {
+        'message': 'Došlo je do greške: $e',
+        'korisnikId': 0,
+      };
     } finally {
       httpClient.close();
     }

@@ -272,7 +272,23 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
       );
       return;
     }
-
+    String status = "kreiran";
+    var userInfo = await _korisnikServis.getUserInfo();
+    setState(() {
+      status = userInfo['status'] ?? 'kreiran';
+    });
+    if (status != "aktivan") {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Samo verifikovani korisnici mogu naruciti',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Color.fromARGB(255, 219, 244, 31),
+        ),
+      );
+      return;
+    }
     if (odabraniDatum != null && slobodniDani.contains(odabraniDatum!.day)) {
       try {
         Map<String, String?> korisnikInfo = await _korisnikServis.getUserInfo();

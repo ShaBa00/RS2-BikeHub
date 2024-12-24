@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
 import 'package:bikehub_desktop/screens/ostalo/poruka_helper.dart';
 import 'package:bikehub_desktop/screens/prijava/log_in_prozor.dart';
@@ -13,7 +13,7 @@ class ServiserPrikaz extends StatefulWidget {
   final int serviserId;
   final int korisnikId;
   //final RezervacijaServisaService rezervacijaServisaService;
-  
+
   // ignore: use_super_parameters
   const ServiserPrikaz({
     Key? key,
@@ -27,13 +27,13 @@ class ServiserPrikaz extends StatefulWidget {
 }
 
 class _ServiserPrikazState extends State<ServiserPrikaz> {
-  final ServiserService _serviserService = ServiserService(); 
+  final ServiserService _serviserService = ServiserService();
   final KorisnikService _korisnikService = KorisnikService();
 
   int selectedMonth = DateTime.now().month;
   int selectedYear = DateTime.now().year;
   List<int> slobodniDani = [];
-  String? odabraniDatum="YYYY-MM-DD";
+  String? odabraniDatum = "YYYY-MM-DD";
   DateTime newfocusedDay = DateTime.now();
 
   final Logger logger = Logger();
@@ -41,9 +41,14 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
   Map<String, dynamic>? serviserDetalji;
 
   bool isLoggedIn = false;
-  int korisnikId=0;
+  int korisnikId = 0;
 
   void rezervacija() async {
+    Map<String, String?> userInfo = await _korisnikService.getUserInfo();
+    if (userInfo['status'] != "aktivan") {
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Samo verifikovani korisnici mogu dodavati");
+      return;
+    }
     final rezervacijaServisaService = RezervacijaServisaService();
 
     bool isLoggedIn = await _korisnikService.isLoggedIn();
@@ -54,31 +59,29 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
       );
       return;
     }
-    
+
     if (odabraniDatum == null || odabraniDatum!.isEmpty || odabraniDatum == "YYYY-MM-DD") {
       PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je odabrati datum");
       return;
     }
-    
+
     if (newfocusedDay.isBefore(DateTime.now())) {
       PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je odabrati datum koji je u budućnosti");
       return;
     }
-    
+
     int odabraniDan = newfocusedDay.day;
     if (!slobodniDani.contains(odabraniDan)) {
       PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je odabrati slobodni datum");
       return;
     }
-
-    Map<String, String?> userInfo = await _korisnikService.getUserInfo();
     int? korisnikId = int.tryParse(userInfo['korisnikId'] ?? '');
 
     if (korisnikId == null) {
       PorukaHelper.prikaziPorukuUpozorenja(context, "Neuspješno dohvaćanje korisničkih podataka.");
       return;
     }
-    
+
     bool success = await rezervacijaServisaService.rezervisi(
       korisnikId: korisnikId,
       serviserId: widget.serviserId,
@@ -100,9 +103,10 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
     fetchSlobodniDani(selectedMonth, selectedYear);
     _checkLoginStatus();
   }
+
   Future<void> fetchSlobodniDani(int month, int year) async {
-    selectedMonth=month;
-    selectedYear=year;
+    selectedMonth = month;
+    selectedYear = year;
     try {
       final days = await RezervacijaServisaService().getSlobodniDani(
         serviserId: widget.serviserId,
@@ -122,7 +126,7 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
     isLoggedIn = await _korisnikService.isLoggedIn();
     if (isLoggedIn) {
       var korisnik = await _korisnikService.getUserInfo();
-      korisnikId = int.parse(korisnik['korisnikId'] as String); 
+      korisnikId = int.parse(korisnik['korisnikId'] as String);
     }
     setState(() {});
   }
@@ -158,7 +162,7 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
     // ignore: unused_local_variable
     //final daysInMonth = DateTime(selectedYear, selectedMonth + 1, 0).day;
     // ignore: unused_local_variable
-    //final startDay = DateTime(selectedYear, selectedMonth, 1).weekday;    
+    //final startDay = DateTime(selectedYear, selectedMonth, 1).weekday;
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -207,7 +211,7 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
             Expanded(
               flex: 25,
               child: Container(
-                color: Colors.transparent, 
+                color: Colors.transparent,
                 padding: const EdgeInsets.all(16.0),
                 child: serviserDetalji != null
                     ? Column(
@@ -233,10 +237,10 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
                     // Gornji dio - kalendar
                     Expanded(
                       flex: 50,
-                      child: SizedBox(                        
-                      height: MediaQuery.of(context).size.height * 0.3,
-                      width: MediaQuery.of(context).size.width * 0.7, 
-                      child: TableCalendar(
+                      child: SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.3,
+                        width: MediaQuery.of(context).size.width * 0.7,
+                        child: TableCalendar(
                           shouldFillViewport: true,
                           firstDay: DateTime.utc(2020, 1, 1),
                           lastDay: DateTime.utc(2030, 12, 31),
@@ -249,7 +253,8 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
                           onDaySelected: (selectedDate, focusedDate) {
                             setState(() {
                               newfocusedDay = selectedDate;
-                              odabraniDatum = "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}";
+                              odabraniDatum =
+                                  "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}";
                             });
                           },
                           onPageChanged: (focusedDate) {
@@ -303,39 +308,42 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                              Container(
-                                padding: const EdgeInsets.all(8.0),
-                                width: MediaQuery.of(context).size.width * 0.2 ,
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.1), 
-                                  border: Border(
-                                    left: BorderSide(color: Colors.blue.shade900, width: 2.0),
-                                    bottom: BorderSide(color: Colors.blue.shade900, width: 2.0),
-                                    right: BorderSide(color: Colors.blue.shade900, width: 2.0),
-                                  ),
-                                  borderRadius: BorderRadius.circular(8.0),
+                            Container(
+                              padding: const EdgeInsets.all(8.0),
+                              width: MediaQuery.of(context).size.width * 0.2,
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.1),
+                                border: Border(
+                                  left: BorderSide(color: Colors.blue.shade900, width: 2.0),
+                                  bottom: BorderSide(color: Colors.blue.shade900, width: 2.0),
+                                  right: BorderSide(color: Colors.blue.shade900, width: 2.0),
                                 ),
-                                child: Row(
-                                  children: [
-                                    const Expanded(
-                                      child: Text(
-                                        'Odabrani datum: ',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ),
-                                    Text(
-                                      '$odabraniDatum',
-                                      style: const TextStyle(color: Colors.white),
-                                    ),
-                                  ],
-                                ),
+                                borderRadius: BorderRadius.circular(8.0),
                               ),
+                              child: Row(
+                                children: [
+                                  const Expanded(
+                                    child: Text(
+                                      'Odabrani datum: ',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                  Text(
+                                    '$odabraniDatum',
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ),
                             const SizedBox(height: 20.0),
                             ElevatedButton(
                               onPressed: () {
                                 rezervacija();
                               },
-                              child: const Text("Rezervisi"),
+                              child: Text(
+                                "Rezervisi",
+                                style: TextStyle(color: Color.fromARGB(255, 87, 202, 255)),
+                              ),
                             ),
                           ],
                         ),
@@ -356,7 +364,7 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
     return Container(
       padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.1), 
+        color: Colors.black.withOpacity(0.1),
         border: Border(
           left: BorderSide(color: Colors.blue.shade900, width: 2.0),
           bottom: BorderSide(color: Colors.blue.shade900, width: 2.0),
@@ -381,6 +389,7 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
       ),
     );
   }
+
   Widget _buildResponsiveButton(BuildContext context, String label, VoidCallback onPressed) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.066,

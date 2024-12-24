@@ -595,7 +595,7 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                                             child: FittedBox(
                                               fit: BoxFit.scaleDown,
                                               child: Text(
-                                                'Status: ${biciklNarudba['status'] == 'vracen' ? 'Otkazana' : biciklNarudba['status'] == 'zavrseno' || biciklNarudba['status'] == 'obrisan' ? 'Isporucena' : biciklNarudba['status'] != null ? 'U isporuci' : 'N/A'}',
+                                                'Status: ${biciklNarudba['status'] == 'vracen' ? 'Otkazana' : biciklNarudba['status'] == 'kreiran' ? 'Obrada' : biciklNarudba['status'] == 'zavrseno' || biciklNarudba['status'] == 'obrisan' ? 'Isporucena' : biciklNarudba['status'] != null ? 'U isporuci' : 'N/A'}',
                                                 style: TextStyle(
                                                     color: Colors.white),
                                               ),
@@ -612,6 +612,7 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                         ),
                       ),
                       if (biciklNarudba['status'] != 'zavrseno' &&
+                          biciklNarudba['status'] != 'kreiran' &&
                           biciklNarudba['status'] != 'obrisan' &&
                           biciklNarudba['status'] != 'vracen')
                         Container(
@@ -1537,7 +1538,7 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                                             child: FittedBox(
                                               fit: BoxFit.scaleDown,
                                               child: Text(
-                                                'Status: ${dijeloviNarudba['status'] == 'vracen' ? 'Otkazana' : dijeloviNarudba['status'] == 'zavrseno' || dijeloviNarudba['status'] == 'obrisan' ? 'Isporucena' : dijeloviNarudba['status'] != null ? 'U isporuci' : 'N/A'}',
+                                                'Status: ${biciklNarudba['status'] == 'vracen' ? 'Otkazana' : biciklNarudba['status'] == 'kreiran' ? 'Obrada' : biciklNarudba['status'] == 'zavrseno' || biciklNarudba['status'] == 'obrisan' ? 'Isporucena' : biciklNarudba['status'] != null ? 'U isporuci' : 'N/A'}',
                                                 style: TextStyle(
                                                     color: Colors.white),
                                               ),
@@ -1555,6 +1556,7 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                       ),
                       if (dijeloviNarudba['status'] != 'zavrseno' &&
                           dijeloviNarudba['status'] != 'obrisan' &&
+                          biciklNarudba['status'] != 'kreiran' &&
                           dijeloviNarudba['status'] != 'vracen')
                         Container(
                           width: MediaQuery.of(context).size.width * 0.77,

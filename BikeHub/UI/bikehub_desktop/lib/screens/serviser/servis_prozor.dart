@@ -2,6 +2,7 @@ import 'package:bikehub_desktop/screens/serviser/servis_prikaz.dart';
 import 'package:flutter/material.dart';
 import 'package:bikehub_desktop/services/adresa/adresa_service.dart';
 import '../../services/serviser/serviser_service.dart';
+
 class ServiserProzor extends StatefulWidget {
   const ServiserProzor({super.key});
 
@@ -31,48 +32,46 @@ class _ServiserProzorState extends State<ServiserProzor> {
   // ignore: must_call_super
   void initState() {
     adresaService.getGradKorisniciDto();
-    serviserService.getServiseriDTO();
+    serviserService.getServiseriDTO(status: "aktivan");
   }
 
   Future<void> _loadServisere() async {
     List<int>? korisniciId;
-    if(selectedGradId!=null){
-      final selectedGrad = adresaService.listaGradKorisniciDto.value
-      .firstWhere((adresa) => adresa['GradId'] == selectedGradId, orElse: () => <String, dynamic>{});
+    if (selectedGradId != null) {
+      final selectedGrad =
+          adresaService.listaGradKorisniciDto.value.firstWhere((adresa) => adresa['GradId'] == selectedGradId, orElse: () => <String, dynamic>{});
 
       List<int>? korisniciIds;
       // ignore: unnecessary_null_comparison
       if (selectedGrad != null) {
         korisniciIds = List<int>.from(selectedGrad['KorisnikIds']);
-        korisniciId=korisniciIds;
+        korisniciId = korisniciIds;
       }
     }
     final serviseri = await serviserService.getServiseriDTO(
       username: username,
-
       pocetnaCijena: cijenaOd,
       krajnjaCijena: cijenaDo,
-
       pocetniBrojServisa: brojServisaOd,
       krajnjiBrojServisa: brojServisaDo,
-
       pocetnaOcjena: ukupnaOcjenaOd,
       krajnjaOcjena: ukupnaOcjenaDo,
-
       page: _currentPage,
       pageSize: _pageSize,
-      korisniciId: korisniciId, 
+      korisniciId: korisniciId,
     );
     serviserService.listaUcitanihServisera.value = serviseri;
   }
+
   void _nextPage() {
-    if(serviserService.count>(_pageSize*(_currentPage))){
+    if (serviserService.count > (_pageSize * (_currentPage))) {
       if (serviserService.listaUcitanihServisera.value.length == _pageSize) {
-        _currentPage++;      
+        _currentPage++;
         _loadServisere();
       }
     }
   }
+
   void _previousPage() {
     if (_currentPage > 1) {
       setState(() {
@@ -86,7 +85,7 @@ class _ServiserProzorState extends State<ServiserProzor> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(56.0), 
+        preferredSize: const Size.fromHeight(56.0),
         child: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -101,7 +100,7 @@ class _ServiserProzorState extends State<ServiserProzor> {
           child: AppBar(
             title: const Text('Serviseri'),
             backgroundColor: Colors.transparent,
-            elevation: 0, 
+            elevation: 0,
           ),
         ),
       ),
@@ -156,7 +155,7 @@ class _ServiserProzorState extends State<ServiserProzor> {
                       _currentPage = 1;
                       _loadServisere();
                     },
-                  ),                  
+                  ),
                   const SizedBox(height: 16),
                   const Text("Broj Servisa", style: TextStyle(color: Colors.white)),
                   RangeSlider(
@@ -201,58 +200,59 @@ class _ServiserProzorState extends State<ServiserProzor> {
                   ),
                   const SizedBox(height: 16),
                   const SizedBox(height: 16),
-                    ValueListenableBuilder<List<Map<String, dynamic>>>(
-                      valueListenable: adresaService.listaGradKorisniciDto,
-                      builder: (context, adrese, _) {
-                        return InputDecorator(
-                          decoration: const InputDecoration(
-                            labelText: '',
-                            labelStyle: TextStyle(color: Colors.white),
-                            filled: true,
-                            fillColor: Colors.blueAccent,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(4.0)),
-                            ),
+                  ValueListenableBuilder<List<Map<String, dynamic>>>(
+                    valueListenable: adresaService.listaGradKorisniciDto,
+                    builder: (context, adrese, _) {
+                      return InputDecorator(
+                        decoration: const InputDecoration(
+                          labelText: '',
+                          labelStyle: TextStyle(color: Colors.white),
+                          filled: true,
+                          fillColor: Colors.blueAccent,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(4.0)),
                           ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<int?>(
-                              value: selectedGradId,
-                              hint: const Text("Svi gradovi", style: TextStyle(color: Colors.white)),
-                              isExpanded: true,
-                              dropdownColor: Colors.blueAccent,
-                              style: const TextStyle(color: Colors.white),
-                              items: [
-                                const DropdownMenuItem<int?>(
-                                  value: null,
-                                  child: Text("Svi gradovi"),
-                                ),
-                                ...adrese.map((adresa) {
-                                  return DropdownMenuItem<int>(
-                                    value: adresa['GradId'],
-                                    child: Text(adresa['Grad']),
-                                  );
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<int?>(
+                            value: selectedGradId,
+                            hint: const Text("Svi gradovi", style: TextStyle(color: Colors.white)),
+                            isExpanded: true,
+                            dropdownColor: Colors.blueAccent,
+                            style: const TextStyle(color: Colors.white),
+                            items: [
+                              const DropdownMenuItem<int?>(
+                                value: null,
+                                child: Text("Svi gradovi"),
+                              ),
+                              ...adrese.map((adresa) {
+                                return DropdownMenuItem<int>(
+                                  value: adresa['GradId'],
+                                  child: Text(adresa['Grad']),
+                                );
                                 // ignore: unnecessary_to_list_in_spreads
-                                }).toList(),
-                              ],
-                              onChanged: (newValue) async {
-                                setState(() {
-                                  selectedGradId = newValue;
-                                });
-                                _currentPage = 1;
-                                await _loadServisere();
-                              },
-                            ),
+                              }).toList(),
+                            ],
+                            onChanged: (newValue) async {
+                              setState(() {
+                                selectedGradId = newValue;
+                              });
+                              _currentPage = 1;
+                              await _loadServisere();
+                            },
                           ),
-                        );
-                      },
-                    ),const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () async {
-                        _currentPage = 1; 
-                        await _loadServisere();
-                      },
-                      child: const Text('Pretraži'),
-                    ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () async {
+                      _currentPage = 1;
+                      await _loadServisere();
+                    },
+                    child: const Text('Pretraži'),
+                  ),
                 ],
               ),
             ),
@@ -289,7 +289,8 @@ class _ServiserProzorState extends State<ServiserProzor> {
                             final serviser = serviseri[index];
                             bool isHovering = false; // Varijabla za praćenje hover stanja
 
-                            return StatefulBuilder( // Koristimo StatefulBuilder da pratimo stanje hovera
+                            return StatefulBuilder(
+                              // Koristimo StatefulBuilder da pratimo stanje hovera
                               builder: (context, setState) {
                                 return InkWell(
                                   onTap: () {

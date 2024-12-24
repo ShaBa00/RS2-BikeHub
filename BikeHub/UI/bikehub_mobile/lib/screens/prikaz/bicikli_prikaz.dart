@@ -62,8 +62,6 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
   _getSpaseni() async {
     isLoggedInCache ??= await _korisnikServis.isLoggedIn();
     if (isLoggedInCache == true) {
-      Map<String, String?> userInfo = await _korisnikServis.getUserInfo();
-      int korisnikId = int.tryParse(userInfo['korisnikId'] ?? '0') ?? 0;
       zapisSacuvanog = await _biciklSacuvaniServis.isBiciklSacuvan(
           korisnikId: korisnikId, biciklId: widget.biciklId);
       if (zapisSacuvanog != null && zapisSacuvanog?['status'] != "obrisan") {
@@ -125,12 +123,14 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
 
   List<String> listaSlik = [];
   List<String> listaIdova = [];
+  String statusPrijavljenog = "kreiran";
 
   _initialize() async {
     try {
       var userInfo = await _korisnikServis.getUserInfo();
       setState(() {
         korisnikId = int.tryParse(userInfo['korisnikId'] ?? '0') ?? 0;
+        statusPrijavljenog = userInfo['status'] ?? 'kreiran';
       });
       var result = await _biciklService.getBiciklById(widget.biciklId);
       isPromovisan =
@@ -218,8 +218,6 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
             false);
       }
     } else {
-      Map<String, String?> userInfo = await _korisnikServis.getUserInfo();
-      int korisnikId = int.tryParse(userInfo['korisnikId'] ?? '0') ?? 0;
       poruka = await _biciklSacuvaniServis.dodajNoviSacuvani(
         widget.biciklId,
         korisnikId,
@@ -244,6 +242,7 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
     return GestureDetector(
       onTap: _dismissKeyboard,
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: PreferredSize(
           preferredSize:
               Size.fromHeight(MediaQuery.of(context).size.height * 0.06),
@@ -311,9 +310,12 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
         body: Stack(
           children: [
             centralniDio(context),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: const NavBar(),
+            Visibility(
+              visible: MediaQuery.of(context).viewInsets.bottom == 0,
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: const NavBar(),
+              ),
             ),
           ],
         ),
@@ -2085,6 +2087,19 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
   int odabranaKolicina = 0;
 
   narudbaBicikla() async {
+    if (statusPrijavljenog != "aktivan") {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Samo verifikovani korisnici mogu naruciti',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Color.fromARGB(255, 219, 244, 31),
+        ),
+      );
+      return;
+    }
+
     if (odabranaKolicina == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

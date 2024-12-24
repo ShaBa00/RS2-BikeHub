@@ -6,6 +6,7 @@ import 'package:bikehub_desktop/screens/korisnik/profil_prozor.dart';
 import 'package:bikehub_desktop/screens/korisnik/sacuvani_proizvodi.dart';
 import 'package:bikehub_desktop/screens/ostalo/poruka_helper.dart';
 import 'package:bikehub_desktop/screens/prijava/log_in_prozor.dart';
+import 'package:bikehub_desktop/screens/prijava/sign_up_prozor.dart';
 import 'package:flutter/material.dart';
 import '../bicikli/bicikl_prozor.dart';
 import '../dijelovi/dijelovi_prozor.dart';
@@ -13,8 +14,7 @@ import '../serviser/servis_prozor.dart';
 import '../../services/korisnik/korisnik_service.dart';
 
 class PocetniProzorP1 extends StatefulWidget {
-  const PocetniProzorP1(
-      {super.key, required this.onToggleDisplay, required this.showBicikli});
+  const PocetniProzorP1({super.key, required this.onToggleDisplay, required this.showBicikli});
 
   final VoidCallback onToggleDisplay;
   final bool showBicikli;
@@ -44,8 +44,7 @@ class _PocetniProzorP1State extends State<PocetniProzorP1> {
     isLoggedIn = await korisnikService.isLoggedIn();
     if (isLoggedIn) {
       var korisnik = await korisnikService.getUserInfo();
-      korisnikId =
-          int.parse(korisnik['korisnikId'] as String); // Pretvara String u int
+      korisnikId = int.parse(korisnik['korisnikId'] as String); // Pretvara String u int
     } else {
       isLoggedIn = false;
     }
@@ -100,27 +99,25 @@ class _PocetniProzorP1State extends State<PocetniProzorP1> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: isLoggedIn
                                 ? [
-                                    _buildResponsiveButton3(
-                                        context, 'Sign out', _logout),
+                                    _buildResponsiveButton3(context, 'Sign out', _logout),
                                   ]
                                 : [
-                                    _buildResponsiveButton3(context, 'Log in',
-                                        () async {
-                                      // Navigiraj ka ekranu za prijavu
+                                    _buildResponsiveButton3(context, 'Log in', () async {
                                       await Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => LogInProzor(
-                                            onLogin:
-                                                _checkLoginStatus, // Osvježava status kad je login uspješan
-                                          ),
+                                          builder: (context) => LogInProzor(onLogin: _checkLoginStatus),
                                         ),
                                       );
                                       _checkLoginStatus();
                                     }),
-                                    _buildResponsiveButton3(context, 'Sign up',
-                                        () {
-                                      // Logika za "Sign up"
+                                    _buildResponsiveButton3(context, 'Sign up', () async {
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => SignUpProzor(onLogin: _checkLoginStatus),
+                                        ),
+                                      );
                                     }),
                                   ],
                           ),
@@ -177,8 +174,7 @@ class _PocetniProzorP1State extends State<PocetniProzorP1> {
               if (isLoggedIn) {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const BiciklDodajProzor()),
+                  MaterialPageRoute(builder: (context) => const BiciklDodajProzor()),
                 );
               } else {
                 Navigator.push(
@@ -194,8 +190,7 @@ class _PocetniProzorP1State extends State<PocetniProzorP1> {
               if (isLoggedIn) {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const DijeloviDodajProzor()),
+                  MaterialPageRoute(builder: (context) => const DijeloviDodajProzor()),
                 );
               } else {
                 Navigator.push(
@@ -232,8 +227,7 @@ class _PocetniProzorP1State extends State<PocetniProzorP1> {
             if (isLoggedIn) {
               await Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (context) => ProfilProzor(korisnikId: korisnikId)),
+                MaterialPageRoute(builder: (context) => ProfilProzor(korisnikId: korisnikId)),
               );
             } else {
               await Navigator.push(
@@ -249,8 +243,7 @@ class _PocetniProzorP1State extends State<PocetniProzorP1> {
             if (isLoggedIn) {
               await Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (context) => const SacuvaniProizvodiProzor()),
+                MaterialPageRoute(builder: (context) => const SacuvaniProizvodiProzor()),
               );
             } else {
               await Navigator.push(
@@ -273,9 +266,7 @@ class _PocetniProzorP1State extends State<PocetniProzorP1> {
           minHeight: MediaQuery.of(context).size.width * 0.0265,
         ),
         style: IconButton.styleFrom(
-          backgroundColor: icon == Icons.home
-              ? const Color.fromARGB(255, 7, 181, 255)
-              : const Color.fromARGB(255, 9, 72, 138),
+          backgroundColor: icon == Icons.home ? const Color.fromARGB(255, 7, 181, 255) : const Color.fromARGB(255, 9, 72, 138),
         ),
       );
     }
@@ -313,8 +304,7 @@ class _PocetniProzorP1State extends State<PocetniProzorP1> {
     );
   }
 
-  Widget _buildResponsiveButton3(
-      BuildContext context, String label, VoidCallback onPressed) {
+  Widget _buildResponsiveButton3(BuildContext context, String label, VoidCallback onPressed) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.086,
       height: MediaQuery.of(context).size.height * 0.065,

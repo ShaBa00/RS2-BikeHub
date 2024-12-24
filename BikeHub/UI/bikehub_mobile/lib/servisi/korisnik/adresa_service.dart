@@ -189,22 +189,18 @@ class AdresaServis {
           (X509Certificate cert, String host, int port) => true;
 
     try {
-      // Provjeri da li je poslan korisnikId
       if (korisnikId == 0) {
         return "Korisnik ID je obavezan";
       }
 
-      // Provjeri da li je poslan barem jedan zapis za izmjenu
       if ((grad == null || grad.isEmpty) &&
           (postanskiBroj == null || postanskiBroj.isEmpty) &&
           (ulica == null || ulica.isEmpty)) {
         return "Potrebno je izmjenuti barem jedan zapis";
       }
 
-      // Dodavanje Authorization header-a
       await _addAuthorizationHeader();
 
-      // Priprema body za slanje
       final body = <String, dynamic>{};
       body['korisnikId'] = korisnikId.toString();
       if (grad != null && grad.isNotEmpty) {

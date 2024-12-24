@@ -374,7 +374,7 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
   String selectedValue = "";
   int _brojZapisa = 0;
   int _trenutnaStranica = 0;
-  final int _velicinaStranice = 2;
+  final int _velicinaStranice = 10;
 
   _initialize() async {
     try {

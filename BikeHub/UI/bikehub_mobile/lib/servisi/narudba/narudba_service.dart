@@ -226,4 +226,47 @@ class NarudbaService {
       httpClient.close();
     }
   }
+
+  Future<String> aktivacijaNarudbe(int odabraniId, bool aktivacija) async {
+    final String baseUrl = '${HelperService.baseUrl}/Narudzba/aktivacija';
+    Uri uri = Uri.parse('$baseUrl/$odabraniId')
+        .replace(queryParameters: {'aktivacija': aktivacija.toString()});
+
+    HttpClient httpClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+
+    try {
+      await _addAuthorizationHeader();
+
+      final request = await httpClient.openUrl(
+        'PUT',
+        uri,
+      );
+
+      final String? authHeader = _dio.options.headers['Authorization'];
+      if (authHeader != null) {
+        request.headers.set('Authorization', authHeader);
+      }
+      request.headers.set('accept', 'application/json');
+
+      final response = await request.close();
+
+      if (response.statusCode == 200) {
+        return "Uspjesno izvrsena radnja";
+      } else {
+        final responseBody = await response.transform(utf8.decoder).join();
+        final Map<String, dynamic> errorData = jsonDecode(responseBody);
+        return errorData['message'] ??
+            "Neuspješan zahtjev: ${response.statusCode}";
+      }
+    } on TimeoutException catch (_) {
+      return 'Failed to update status: Server is not available';
+    } catch (e) {
+      logger.e("Greška pri ažuriranju statusa: $e");
+      return e.toString();
+    } finally {
+      httpClient.close();
+    }
+  }
 }

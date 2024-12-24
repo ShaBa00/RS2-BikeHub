@@ -1,6 +1,6 @@
 import 'package:bikehub_desktop/screens/dijelovi/dijelovi_prikaz.dart';
 import 'package:flutter/material.dart';
-import '../../services/dijelovi/dijelovi_service.dart'; 
+import '../../services/dijelovi/dijelovi_service.dart';
 import '../../services/kategorije/kategorija_service.dart';
 import 'package:bikehub_desktop/services/adresa/adresa_service.dart';
 import 'dart:convert';
@@ -15,7 +15,6 @@ class DijeloviProzor extends StatefulWidget {
 }
 
 class _DijeloviProzorState extends State<DijeloviProzor> {
-
   final DijeloviService dijeloviService = DijeloviService();
   final KategorijaServis kategorijaServis = KategorijaServis();
   final AdresaService adresaService = AdresaService();
@@ -33,41 +32,47 @@ class _DijeloviProzorState extends State<DijeloviProzor> {
   @override
   void initState() {
     super.initState();
+    getKategorije();
     _loadDijelovi();
-    kategorijaServis.getDijeloviKategorije();
     adresaService.getGradKorisniciDto();
+  }
+
+  final ValueNotifier<List<Map<String, dynamic>>> _listaDijeloviKategorijeNotifier = ValueNotifier([]);
+  getKategorije() async {
+    var dijeloviKategorije = await kategorijaServis.getDijeloviKategorije();
+    _listaDijeloviKategorijeNotifier.value =
+        List<Map<String, dynamic>>.from(dijeloviKategorije.where((kategorija) => kategorija['status'] == 'aktivan'));
   }
 
   Future<void> _loadDijelovi() async {
     List<int>? korisniciId;
-    if(selectedGradId!=null){
-      final selectedGrad = adresaService.listaGradKorisniciDto.value
-      .firstWhere((adresa) => adresa['GradId'] == selectedGradId, orElse: () => <String, dynamic>{});
+    if (selectedGradId != null) {
+      final selectedGrad =
+          adresaService.listaGradKorisniciDto.value.firstWhere((adresa) => adresa['GradId'] == selectedGradId, orElse: () => <String, dynamic>{});
 
       List<int>? korisniciIds;
       // ignore: unnecessary_null_comparison
       if (selectedGrad != null) {
         korisniciIds = List<int>.from(selectedGrad['KorisnikIds']);
-        korisniciId=korisniciIds;
+        korisniciId = korisniciIds;
       }
     }
     final dijelovi = await dijeloviService.getDijelovi(
-      naziv: naziv,
-      pocetnaCijena: pocetnaCijena,
-      krajnjaCijena: krajnjaCijena,
-      page: _currentPage,
-      pageSize: _pageSize,
-      kategorijaId: selectedKategorijaId,
-      korisniciId: korisniciId, 
-      status: "aktivan"
-    );
+        naziv: naziv,
+        pocetnaCijena: pocetnaCijena,
+        krajnjaCijena: krajnjaCijena,
+        page: _currentPage,
+        pageSize: _pageSize,
+        kategorijaId: selectedKategorijaId,
+        korisniciId: korisniciId,
+        status: "aktivan");
     dijeloviService.lista_ucitanih_dijelova.value = dijelovi;
   }
 
-  void _nextPage() async{
-    if(dijeloviService.count>(_pageSize*(_currentPage+1))){
+  void _nextPage() async {
+    if (dijeloviService.count > (_pageSize * (_currentPage + 1))) {
       if (dijeloviService.lista_ucitanih_dijelova.value.length == _pageSize) {
-        _currentPage++;      
+        _currentPage++;
         _loadDijelovi();
       }
     }
@@ -86,7 +91,7 @@ class _DijeloviProzorState extends State<DijeloviProzor> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(56.0), 
+        preferredSize: const Size.fromHeight(56.0),
         child: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -100,8 +105,8 @@ class _DijeloviProzorState extends State<DijeloviProzor> {
           ),
           child: AppBar(
             title: const Text('Dijelovi'),
-            backgroundColor: Colors.transparent, 
-            elevation: 0, 
+            backgroundColor: Colors.transparent,
+            elevation: 0,
           ),
         ),
       ),
@@ -127,7 +132,7 @@ class _DijeloviProzorState extends State<DijeloviProzor> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ValueListenableBuilder<List<Map<String, dynamic>>>(
-                      valueListenable: kategorijaServis.lista_ucitanih_d_kategorija,
+                      valueListenable: _listaDijeloviKategorijeNotifier,
                       builder: (context, kategorije, _) {
                         return InputDecorator(
                           decoration: const InputDecoration(
@@ -144,7 +149,7 @@ class _DijeloviProzorState extends State<DijeloviProzor> {
                               value: selectedKategorijaId,
                               hint: const Text("Sve Kategorije", style: TextStyle(color: Colors.white)),
                               isExpanded: true,
-                              dropdownColor: Colors.blueAccent, 
+                              dropdownColor: Colors.blueAccent,
                               style: const TextStyle(color: Colors.white),
                               items: [
                                 const DropdownMenuItem<int?>(
@@ -156,14 +161,14 @@ class _DijeloviProzorState extends State<DijeloviProzor> {
                                     value: kategorija['kategorijaId'],
                                     child: Text(kategorija['naziv']),
                                   );
-                                // ignore: unnecessary_to_list_in_spreads
+                                  // ignore: unnecessary_to_list_in_spreads
                                 }).toList(),
                               ],
                               onChanged: (newValue) {
                                 setState(() {
                                   selectedKategorijaId = newValue;
                                 });
-                                _currentPage=0;
+                                _currentPage = 0;
                                 _loadDijelovi();
                               },
                             ),
@@ -202,7 +207,7 @@ class _DijeloviProzorState extends State<DijeloviProzor> {
                                     value: adresa['GradId'],
                                     child: Text(adresa['Grad']),
                                   );
-                                // ignore: unnecessary_to_list_in_spreads
+                                  // ignore: unnecessary_to_list_in_spreads
                                 }).toList(),
                               ],
                               onChanged: (newValue) async {
@@ -257,7 +262,7 @@ class _DijeloviProzorState extends State<DijeloviProzor> {
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () async {
-                        _currentPage = 0; 
+                        _currentPage = 0;
                         await _loadDijelovi();
                       },
                       child: const Text('Pretraži'),
@@ -315,7 +320,7 @@ class _DijeloviProzorState extends State<DijeloviProzor> {
                                   final base64Image = item['slikeDijelovis'][0]['slika'];
                                   imageBytes = base64Decode(base64Image);
                                 }
-                                return  MouseRegion(
+                                return MouseRegion(
                                   cursor: SystemMouseCursors.click,
                                   child: GestureDetector(
                                     onTap: () {

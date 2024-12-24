@@ -586,7 +586,7 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                                             child: FittedBox(
                                               fit: BoxFit.scaleDown,
                                               child: Text(
-                                                'Status: ${biciklNarudba['status'] == 'vracen' ? 'Otkazana' : biciklNarudba['status'] == 'zavrseno' || biciklNarudba['status'] == 'obrisan' ? 'Isporucena' : biciklNarudba['status'] != null ? 'U isporuci' : 'N/A'}',
+                                                'Status: ${biciklNarudba['status'] == 'vracen' ? 'Otkazana' : biciklNarudba['status'] == 'kreiran' ? 'Obrada' : biciklNarudba['status'] == 'zavrseno' || biciklNarudba['status'] == 'obrisan' ? 'Isporucena' : biciklNarudba['status'] != null ? 'U isporuci' : 'N/A'}',
                                                 style: TextStyle(
                                                     color: Colors.white),
                                               ),
@@ -602,37 +602,77 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                           ],
                         ),
                       ),
-                      if (biciklNarudba['status'] != 'zavrseno' &&
-                          biciklNarudba['status'] != 'obrisan' &&
-                          biciklNarudba['status'] != 'vracen')
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.77,
-                          height: MediaQuery.of(context).size.height * 0.065,
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(0, 255, 255, 255),
-                            borderRadius: BorderRadius.circular(20.0),
-                          ),
-                          child: Center(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                zavrsiNarudbu(biciklNarudba['narudzbaId']);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.lightBlue,
-                                minimumSize: Size(
-                                  MediaQuery.of(context).size.width * 0.4,
-                                  MediaQuery.of(context).size.height * 0.055,
-                                ),
+                      if (biciklNarudba['status'] == 'kreiran')
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.35,
+                              height:
+                                  MediaQuery.of(context).size.height * 0.065,
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(0, 255, 255, 255),
+                                borderRadius: BorderRadius.circular(20.0),
                               ),
-                              child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Text(
-                                  'Potvrdi isporuku',
-                                  style: TextStyle(color: Colors.white),
+                              child: Center(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    posaljiNarudbom(
+                                        biciklNarudba['narudzbaId'], true);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.lightBlue,
+                                    minimumSize: Size(
+                                      MediaQuery.of(context).size.width * 0.3,
+                                      MediaQuery.of(context).size.height *
+                                          0.055,
+                                    ),
+                                  ),
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      'Posalji artikal',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
+                            SizedBox(width: 10),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.35,
+                              height:
+                                  MediaQuery.of(context).size.height * 0.065,
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(0, 255, 255, 255),
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              child: Center(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    posaljiNarudbom(
+                                        biciklNarudba['narudzbaId'], false);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        const Color.fromARGB(255, 244, 3, 99),
+                                    minimumSize: Size(
+                                      MediaQuery.of(context).size.width * 0.3,
+                                      MediaQuery.of(context).size.height *
+                                          0.055,
+                                    ),
+                                  ),
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      'Otkaži ',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                     ],
                   ),
@@ -1061,7 +1101,7 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                                             child: FittedBox(
                                               fit: BoxFit.scaleDown,
                                               child: Text(
-                                                'Status: ${dijeloviNarudba['status'] == 'vracen' ? 'Otkazana' : dijeloviNarudba['status'] == 'zavrseno' || dijeloviNarudba['status'] == 'obrisan' ? 'Isporucena' : dijeloviNarudba['status'] != null ? 'U isporuci' : 'N/A'}',
+                                                'Status: ${dijeloviNarudba['status'] == 'vracen' ? 'Otkazana' : dijeloviNarudba['status'] == 'kreiran' ? 'Obrada' : dijeloviNarudba['status'] == 'zavrseno' || dijeloviNarudba['status'] == 'obrisan' ? 'Isporucena' : dijeloviNarudba['status'] != null ? 'U isporuci' : 'N/A'}',
                                                 style: TextStyle(
                                                     color: Colors.white),
                                               ),
@@ -1077,37 +1117,77 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                           ],
                         ),
                       ),
-                      if (dijeloviNarudba['status'] != 'zavrseno' &&
-                          dijeloviNarudba['status'] != 'obrisan' &&
-                          dijeloviNarudba['status'] != 'vracen')
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.77,
-                          height: MediaQuery.of(context).size.height * 0.065,
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(0, 255, 255, 255),
-                            borderRadius: BorderRadius.circular(20.0),
-                          ),
-                          child: Center(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                zavrsiNarudbu(dijeloviNarudba['narudzbaId']);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.lightBlue,
-                                minimumSize: Size(
-                                  MediaQuery.of(context).size.width * 0.4,
-                                  MediaQuery.of(context).size.height * 0.055,
-                                ),
+                      if (dijeloviNarudba['status'] == 'kreiran')
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.35,
+                              height:
+                                  MediaQuery.of(context).size.height * 0.065,
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(0, 255, 255, 255),
+                                borderRadius: BorderRadius.circular(20.0),
                               ),
-                              child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Text(
-                                  'Potvrdi isporuku',
-                                  style: TextStyle(color: Colors.white),
+                              child: Center(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    posaljiNarudbom(
+                                        dijeloviNarudba['narudzbaId'], true);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.lightBlue,
+                                    minimumSize: Size(
+                                      MediaQuery.of(context).size.width * 0.3,
+                                      MediaQuery.of(context).size.height *
+                                          0.055,
+                                    ),
+                                  ),
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      'Posalji artikal',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
+                            SizedBox(width: 10),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.35,
+                              height:
+                                  MediaQuery.of(context).size.height * 0.065,
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(0, 255, 255, 255),
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              child: Center(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    posaljiNarudbom(
+                                        dijeloviNarudba['narudzbaId'], false);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        const Color.fromARGB(255, 244, 3, 99),
+                                    minimumSize: Size(
+                                      MediaQuery.of(context).size.width * 0.3,
+                                      MediaQuery.of(context).size.height *
+                                          0.055,
+                                    ),
+                                  ),
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      'Otkaži ',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                     ],
                   ),
@@ -1135,9 +1215,9 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
   }
   //zajednicke funkcije
 
-  Future<void> zavrsiNarudbu(int odabranaNarudbaId) async {
+  Future<void> posaljiNarudbom(int odabranaNarudbaId, bool aktivacija) async {
     String poruka =
-        await _narudbaService.upravljanjeNarudbom(odabranaNarudbaId);
+        await _narudbaService.aktivacijaNarudbe(odabranaNarudbaId, aktivacija);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -1146,7 +1226,7 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor:
-            poruka == "Uspjesno potvrdeno" ? Colors.green : Colors.red,
+            poruka == "Uspjesno izvrsena radnja" ? Colors.green : Colors.red,
       ),
     );
     setState(() {

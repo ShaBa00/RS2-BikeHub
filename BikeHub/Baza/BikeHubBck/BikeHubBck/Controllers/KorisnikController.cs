@@ -44,6 +44,12 @@ namespace BikeHubBck.Controllers
             return base.Update(id, request);
         }
 
+        [AllowAnonymous]
+        public override BikeHub.Model.KorisnikFM.Korisnik Insert(KorisniciInsertR request)
+        {
+            return base.Insert(request);
+        }
+
         public override IActionResult SoftDelete(int id)
         {
             var currentUsername = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

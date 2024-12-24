@@ -28,14 +28,12 @@ class KorisnikInfoService {
     _dio.options.headers['Authorization'] = authHeader;
   }
 
-  Future<void> addInfo(
-      int korisnikId, String imePrezime, String telefon) async {
+  Future<void> addInfo(int korisnikId, String imePrezime, String telefon) async {
     try {
       // Dodavanje Authorization headera
       await _addAuthorizationHeader();
       if (korisnikId == 0 || imePrezime.isEmpty || telefon.isEmpty) {
-        throw Exception(
-            'Potrebno je unjeti sve podatke: korisnikId, Ime i Prezime, Telefon.');
+        throw Exception('Potrebno je unjeti sve podatke: korisnikId, Ime i Prezime, Telefon.');
       }
 
       final body = <String, dynamic>{
@@ -66,8 +64,7 @@ class KorisnikInfoService {
     }
   }
 
-  Future<void> updateInfo(
-      int korisnikInfoId, String imePrezime, String telefon) async {
+  Future<void> updateInfo(int korisnikInfoId, String imePrezime, String telefon) async {
     try {
       // Dodavanje Authorization headera
       await _addAuthorizationHeader();
@@ -109,6 +106,39 @@ class KorisnikInfoService {
     }
   }
 
+  Future<String> postKorisnikinfo({
+    required int korisnikId,
+    required String imePrezime,
+    required String telefon,
+  }) async {
+    try {
+      await _addAuthorizationHeader();
+      final response = await _dio.post(
+        '${HelperService.baseUrl}/KorisnikInfo',
+        data: {
+          'korisnikId': korisnikId,
+          'imePrezime': imePrezime,
+          'telefon': telefon,
+        },
+        options: Options(
+          headers: {
+            'Authorization': _dio.options.headers['Authorization'],
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return 'Uspjesno';
+      } else {
+        final errorMessage = response.data['errors'] != null ? response.data['errors']['userError'].join(', ') : 'Nepoznata greska';
+        return errorMessage;
+      }
+    } catch (e) {
+      logger.e("Greska pri dodavanju korisnickih informacija: $e");
+      return 'Greska pri dodavanju korisnickih informacija: $e';
+    }
+  }
+
   Future<List<Map<String, dynamic>>> getKorisnikInfos({
     String? imePrezime,
     String? status, //="aktivan",
@@ -138,8 +168,7 @@ class KorisnikInfoService {
       );
 
       if (response.statusCode == 200) {
-        List<Map<String, dynamic>> korisnikInfos =
-            List<Map<String, dynamic>>.from(response.data['resultsList']);
+        List<Map<String, dynamic>> korisnikInfos = List<Map<String, dynamic>>.from(response.data['resultsList']);
 
         return korisnikInfos;
       } else {

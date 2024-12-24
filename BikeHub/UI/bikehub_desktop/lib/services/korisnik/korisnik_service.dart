@@ -13,6 +13,7 @@ class KorisnikService {
   List<dynamic> listaKorisnika = [];
   int countKorisnika = 0;
   List<dynamic> listaAdministratora = [];
+
   Future<void> getKorisniks({String? status, int? page, int? pageSize}) async {
     try {
       final queryParams = <String, dynamic>{};
@@ -40,9 +41,7 @@ class KorisnikService {
         listaKorisnika = data['resultsList'] ?? [];
         countKorisnika = data['count'] ?? 0;
 
-        listaAdministratora = data['resultsList']
-            .where((korisnik) => korisnik['isAdmin'] == true)
-            .toList();
+        listaAdministratora = data['resultsList'].where((korisnik) => korisnik['isAdmin'] == true).toList();
 
         logger.i("Uspješno preuzeti korisnici: $listaKorisnika");
       } else {
@@ -63,8 +62,7 @@ class KorisnikService {
     }
 
     final authHeader = encodeBasicAuth(username, password);
-    _dio.options.headers['Authorization'] =
-        authHeader; // Dodavanje Basic Auth headera
+    _dio.options.headers['Authorization'] = authHeader; // Dodavanje Basic Auth headera
 
     return await _dio.get(url);
   }
@@ -139,9 +137,7 @@ class KorisnikService {
       } else {
         if (korisnik.username.isNotEmpty ||
             korisnik.email.isNotEmpty ||
-            (korisnik.staraLozinka.isNotEmpty &&
-                korisnik.lozinka.isNotEmpty &&
-                korisnik.lozinkaPotvrda.isNotEmpty)) {
+            (korisnik.staraLozinka.isNotEmpty && korisnik.lozinka.isNotEmpty && korisnik.lozinkaPotvrda.isNotEmpty)) {
           final korisniciUpdateR = {
             'Username': korisnik.username,
             'StaraLozinka': korisnik.staraLozinka,
@@ -226,12 +222,14 @@ class KorisnikService {
     final username = await _storage.read(key: 'username');
     final password = await _storage.read(key: 'password');
     final isAdmin = await _storage.read(key: 'isAdmin');
+    final status = await _storage.read(key: 'status');
 
     return {
       'korisnikId': korisnikId,
       'username': username,
       'password': password,
       'isAdmin': isAdmin,
+      'status': status,
     };
   }
 
@@ -241,8 +239,7 @@ class KorisnikService {
 
   Future<Map<String, dynamic>?> getKorisnikInfo() async {
     try {
-      final response =
-          await _getWithBasicAuth('${HelperService.baseUrl}/Korisnik/info');
+      final response = await _getWithBasicAuth('${HelperService.baseUrl}/Korisnik/info');
       if (response.statusCode == 200) {
         return response.data;
       } else {
@@ -287,15 +284,11 @@ class KorisnikService {
         final Map<String, dynamic> korisnik = response.data;
         // Pohrani korisničke podatke u secure storage
         await _storage.write(key: 'username', value: korisnik['username']);
-        await _storage.write(
-            key: 'password', value: password); // Pohranjujemo lozinku
-        await _storage.write(
-            key: 'korisnikId', value: korisnik['korisnikId'].toString());
-        await _storage.write(
-            key: 'isAdmin', value: korisnik['isAdmin'].toString());
-        await _storage.write(
-            key: 'token',
-            value: korisnik['token']); // Možeš pohraniti token ako je potrebno
+        await _storage.write(key: 'status', value: korisnik['status']);
+        await _storage.write(key: 'password', value: password); // Pohranjujemo lozinku
+        await _storage.write(key: 'korisnikId', value: korisnik['korisnikId'].toString());
+        await _storage.write(key: 'isAdmin', value: korisnik['isAdmin'].toString());
+        await _storage.write(key: 'token', value: korisnik['token']); // Možeš pohraniti token ako je potrebno
         return korisnik;
       } else {
         throw Exception('Failed to login');
@@ -303,6 +296,103 @@ class KorisnikService {
     } catch (e) {
       logger.e('Greška: $e');
       return null;
+    }
+  }
+
+  Future<Map<String, dynamic>> postKorisnik({
+    required String username,
+    required String lozinka,
+    required String lozinkaPotvrda,
+    required String email,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '${HelperService.baseUrl}/Korisnik',
+        data: {
+          'username': username,
+          'lozinka': lozinka,
+          'lozinkaPotvrda': lozinkaPotvrda,
+          'email': email,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        final korisnikId = data['korisnikId'] ?? 0;
+        return {'korisnikId': korisnikId, 'poruka': 'Uspjesno'};
+      } else {
+        final errorMessage = response.data['errors'] != null ? response.data['errors']['userError'].join(', ') : 'Nepoznata greska';
+        return {'korisnikId': 0, 'poruka': errorMessage};
+      }
+    } catch (e) {
+      logger.e("Greska pri dodavanju korisnika: $e");
+      return {'korisnikId': 0, 'poruka': 'Greska pri dodavanju korisnika: $e'};
+    }
+  }
+
+  Future<bool> ceckKorisnikUsername({String? username}) async {
+    try {
+      final queryParams = <String, dynamic>{};
+
+      if (username != null && username.isNotEmpty) {
+        queryParams['username'] = username;
+      }
+
+      final response = await _dio.get(
+        '${HelperService.baseUrl}/Korisnik',
+        queryParameters: queryParams,
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        final resultsList = data['resultsList'] ?? [];
+
+        if (resultsList.isNotEmpty) {
+          logger.i("Uspješno preuzeti korisnici: $resultsList");
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        logger.e("Neuspješan zahtjev: ${response.statusCode}");
+        return false;
+      }
+    } catch (e) {
+      logger.e("Greška pri preuzimanju korisnika: $e");
+      return false;
+    }
+  }
+
+  Future<bool> ceckKorisnikEmail({String? email}) async {
+    try {
+      final queryParams = <String, dynamic>{};
+
+      if (email != null && email.isNotEmpty) {
+        queryParams['email'] = email;
+      }
+
+      final response = await _dio.get(
+        '${HelperService.baseUrl}/Korisnik',
+        queryParameters: queryParams,
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        final resultsList = data['resultsList'] ?? [];
+
+        if (resultsList.isNotEmpty) {
+          logger.i("Uspješno preuzeti korisnici: $resultsList");
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        logger.e("Neuspješan zahtjev: ${response.statusCode}");
+        return false;
+      }
+    } catch (e) {
+      logger.e("Greška pri preuzimanju korisnika: $e");
+      return false;
     }
   }
 }

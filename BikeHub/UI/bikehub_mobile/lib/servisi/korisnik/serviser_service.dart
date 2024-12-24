@@ -389,4 +389,55 @@ class ServiserService {
       httpClient.close();
     }
   }
+
+  Future<String?> postServiser(int korisnikId, int cijena) async {
+    final String baseUrl = '${HelperService.baseUrl}/Serviser';
+    Uri uri;
+
+    HttpClient httpClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+
+    try {
+      await _addAuthorizationHeader();
+
+      uri = Uri.parse(baseUrl);
+
+      final request = await httpClient.postUrl(uri);
+      request.headers.set('accept', 'application/json');
+      request.headers.set('Content-Type', 'application/json');
+      request.headers
+          .set('Authorization', _dio.options.headers['Authorization']);
+
+      request.write(jsonEncode({
+        'korisnikId': korisnikId.toString(),
+        'cijena': cijena.toString(),
+      }));
+
+      final response = await request.close();
+
+      if (response.statusCode == 200) {
+        return "Zahtjev uspješno poslan";
+      } else {
+        final responseBody = await response.transform(utf8.decoder).join();
+        final decodedResponse = jsonDecode(responseBody);
+        final errors = decodedResponse['errors'];
+        if (errors != null && errors['userError'] != null) {
+          return errors['userError'].join(', ');
+        } else {
+          return 'Došlo je do greške prilikom dodavanja administratora';
+        }
+      }
+    } on HttpException catch (httpError) {
+      if (httpError is HttpException && httpError.message != null) {
+        return 'Došlo je do greške: ${httpError.message}';
+      }
+      return 'Došlo je do greške: ${httpError.toString()}';
+    } catch (e) {
+      logger.e('Greška: $e');
+      return e.toString();
+    } finally {
+      httpClient.close();
+    }
+  }
 }

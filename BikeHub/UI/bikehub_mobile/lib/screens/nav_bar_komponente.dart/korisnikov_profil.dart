@@ -1,4 +1,4 @@
-// ignore_for_file: use_key_in_widget_constructors, library_private_types_in_public_api, prefer_const_constructors, prefer_const_literals_to_create_immutables, unnecessary_const, unnecessary_null_comparison, prefer_final_fields, unused_field, sort_child_properties_last, avoid_print, sized_box_for_whitespace
+// ignore_for_file: use_key_in_widget_constructors, library_private_types_in_public_api, prefer_const_constructors, prefer_const_literals_to_create_immutables, unnecessary_const, unnecessary_null_comparison, prefer_final_fields, unused_field, sort_child_properties_last, avoid_print, sized_box_for_whitespace, use_build_context_synchronously
 
 import 'package:bikehub_mobile/screens/administracija/administracija.dart';
 import 'package:bikehub_mobile/screens/glavni_prozor.dart';
@@ -11,6 +11,7 @@ import 'package:bikehub_mobile/screens/servis/korisnikov_servis.dart';
 import 'package:bikehub_mobile/servisi/korisnik/adresa_service.dart';
 import 'package:bikehub_mobile/servisi/korisnik/korisnik_info_service.dart';
 import 'package:bikehub_mobile/servisi/korisnik/rezervacije_service.dart';
+import 'package:bikehub_mobile/servisi/korisnik/serviser_service.dart';
 import 'package:flutter/material.dart';
 import 'package:bikehub_mobile/servisi/korisnik/korisnik_service.dart';
 
@@ -26,6 +27,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
   Map<String, dynamic>? korisnik;
   String activeTitleP = 'home';
   final KorisnikServis _korisnikService = KorisnikServis();
+  final ServiserService _serviserService = ServiserService();
   final AdresaServis _adresaService = AdresaServis();
   final KorisnikInfoServis _korisnikInfoServis = KorisnikInfoServis();
   final RezervacijaServis _rezervacijaServis = RezervacijaServis();
@@ -1238,10 +1240,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
         );
         break;
       case 'Zahtjev':
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const LogIn()),
-        );
+        prikaziSlanjeZahtjeva(context);
         break;
       case 'Admin':
         Navigator.push(
@@ -1259,8 +1258,167 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
           activeTitleP = "home";
         });
         break;
+      case 'Posalji':
+        if (cijenaNovog <= 0) {
+          PorukaHelper.prikaziPorukuUpozorenja(
+              context, 'Cijena mora biti veca od 0.');
+
+          Navigator.of(context).pop();
+          break;
+        }
+        slanjeZahtjeva(context);
+        Navigator.of(context).pop();
+        break;
       default:
         PorukaHelper.prikaziPorukuUpozorenja(context, 'Nepoznata radnja.');
     }
+  }
+
+  Future<void> slanjeZahtjeva(BuildContext context) async {
+    String? result =
+        await _serviserService.postServiser(korisnikId, cijenaNovog);
+
+    bool uspjesnoDodano = result == "Zahtjev uspješno poslan";
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          result ?? 'Došlo je do greške. Pokušajte ponovo.',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: uspjesnoDodano ? Colors.green : Colors.red,
+      ),
+    );
+    if (uspjesnoDodano) {
+      setState(() {
+        activeTitleP = "home";
+        _initialize();
+      });
+    }
+  }
+
+  int cijenaNovog = 0;
+  void prikaziSlanjeZahtjeva(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.43,
+            height: MediaQuery.of(context).size.height * 0.43,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [
+                  Color.fromARGB(255, 82, 205, 210),
+                  Color.fromARGB(255, 7, 161, 235),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height * 0.07,
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(0, 244, 67, 54),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20.0),
+                      topRight: Radius.circular(20.0),
+                    ),
+                  ),
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: IconButton(
+                      icon: Icon(Icons.close, color: Colors.white),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height * 0.26,
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(0, 76, 175, 79),
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height * 0.12,
+                        child: Center(
+                          child: Text(
+                            "Da bi poslali zahtjev potrebno je upisati cijenu vaseg servisa, cijeli broj",
+                            style: TextStyle(color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height * 0.14,
+                        child: Center(
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.45,
+                            height: MediaQuery.of(context).size.height * 0.07,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20.0),
+                              border: Border(
+                                left: BorderSide(color: Colors.white),
+                                right: BorderSide(color: Colors.white),
+                                bottom: BorderSide(color: Colors.white),
+                              ),
+                            ),
+                            child: Center(
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.4,
+                                child: TextField(
+                                  keyboardType: TextInputType.number,
+                                  style: TextStyle(color: Colors.white),
+                                  decoration: InputDecoration(
+                                    hintText: "Unesi cijenu",
+                                    hintStyle: TextStyle(color: Colors.white54),
+                                    border: InputBorder.none,
+                                  ),
+                                  onChanged: (value) {
+                                    if (value.isNotEmpty &&
+                                        int.tryParse(value) != null) {
+                                      cijenaNovog = int.parse(value);
+                                    }
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height * 0.10,
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(
+                        0, 255, 235, 59), // Promijeni pozadinu po želji
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(20.0),
+                      bottomRight: Radius.circular(20.0),
+                    ),
+                  ),
+                  child: Center(
+                    child: _buildButton('Posalji'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }

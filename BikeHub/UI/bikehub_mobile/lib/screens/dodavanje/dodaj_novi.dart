@@ -33,6 +33,7 @@ class _DodajNoviState extends State<DodajNovi> {
   String _selectedSection = 'Bicikl';
 
   bool isLogiran = false;
+  String statusPrijavljenog = "kreiran";
 
   Future<void> _getKategorije() async {
     try {
@@ -64,7 +65,10 @@ class _DodajNoviState extends State<DodajNovi> {
       if (isLoggedIn) {
         Map<String, String?> userInfo = await _korisnikService.getUserInfo();
         korisnikId = int.parse(userInfo['korisnikId']!);
+        statusPrijavljenog = userInfo['status'] ?? 'kreiran';
         setState(() {
+          statusPrijavljenog;
+          korisnikId;
           isLogiran = true;
         });
       }
@@ -158,6 +162,18 @@ class _DodajNoviState extends State<DodajNovi> {
   }
 
   dodajBicikl() async {
+    if (statusPrijavljenog != "aktivan") {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Samo verifikovani korisnici mogu dodavati',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Color.fromARGB(255, 219, 244, 31),
+        ),
+      );
+      return;
+    }
     if (slike.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

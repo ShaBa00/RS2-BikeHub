@@ -60,6 +60,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
   bool sacuvanZapisi = false;
   Map<String, dynamic>? zapisSacuvanog;
   bool? isLoggedInCache;
+  String statusPrijavljenog = "kreiran";
 
   _getKategorija() async {
     try {
@@ -98,8 +99,6 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
   _getSpaseni() async {
     isLoggedInCache ??= await _korisnikServis.isLoggedIn();
     if (isLoggedInCache == true) {
-      Map<String, String?> userInfo = await _korisnikServis.getUserInfo();
-      int korisnikId = int.tryParse(userInfo['korisnikId'] ?? '0') ?? 0;
       zapisSacuvanog = await _dijeloviSacuvaniServis.isDioSacuvan(
           korisnikId: korisnikId, dijeloviId: widget.dijeloviId);
       if (zapisSacuvanog != null && zapisSacuvanog?['status'] != "obrisan") {
@@ -134,6 +133,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
       var userInfo = await _korisnikServis.getUserInfo();
       setState(() {
         korisnikId = int.tryParse(userInfo['korisnikId'] ?? '0') ?? 0;
+        statusPrijavljenog = userInfo['status'] ?? 'kreiran';
       });
 
       var result = await _dijeloviService.getDijeloviById(widget.dijeloviId);
@@ -221,8 +221,6 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
             false);
       }
     } else {
-      Map<String, String?> userInfo = await _korisnikServis.getUserInfo();
-      int korisnikId = int.tryParse(userInfo['korisnikId'] ?? '0') ?? 0;
       poruka = await _dijeloviSacuvaniServis.dodajNoviSacuvani(
         widget.dijeloviId,
         korisnikId,
@@ -1741,6 +1739,18 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
   int odabranaKolicina = 0;
 
   narudbaDijelovi() async {
+    if (statusPrijavljenog != "aktivan") {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Samo verifikovani korisnici mogu naruciti',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Color.fromARGB(255, 219, 244, 31),
+        ),
+      );
+      return;
+    }
     if (odabranaKolicina == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

@@ -29,16 +29,8 @@ class _ProfilProzorState extends State<ProfilProzor> {
   Map<String, dynamic>? korisnik;
   Map<String, dynamic>? adresaK;
 
-  KorisnikModel korisnikNoviPodatci = KorisnikModel(
-      korisnikId: 0,
-      username: "",
-      staraLozinka: "",
-      lozinka: "",
-      lozinkaPotvrda: "",
-      email: "",
-      stanje: "",
-      ak: 0,
-      isAdmin: false);
+  KorisnikModel korisnikNoviPodatci =
+      KorisnikModel(korisnikId: 0, username: "", staraLozinka: "", lozinka: "", lozinkaPotvrda: "", email: "", stanje: "", ak: 0, isAdmin: false);
 
   TextEditingController usernameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -74,51 +66,37 @@ class _ProfilProzorState extends State<ProfilProzor> {
         korisnikNoviPodatci.lozinka.isEmpty &&
         korisnikNoviPodatci.lozinkaPotvrda.isEmpty &&
         korisnikNoviPodatci.staraLozinka.isEmpty) {
-      PorukaHelper.prikaziPorukuUpozorenja(
-          context, "Potrebno je uneti neki od podataka");
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je uneti neki od podataka");
       return;
     }
-    if ((korisnikNoviPodatci.staraLozinka.isNotEmpty ||
-            korisnikNoviPodatci.lozinka.isNotEmpty ||
-            korisnikNoviPodatci.lozinkaPotvrda.isNotEmpty) &&
-        (!korisnikNoviPodatci.staraLozinka.isNotEmpty ||
-            !korisnikNoviPodatci.lozinka.isNotEmpty ||
-            !korisnikNoviPodatci.lozinkaPotvrda.isNotEmpty)) {
-      PorukaHelper.prikaziPorukuUpozorenja(context,
-          "Za promenu lozinke potrebno je uneti staru lozinku, novu lozinku i potvrdu.");
+    if ((korisnikNoviPodatci.staraLozinka.isNotEmpty || korisnikNoviPodatci.lozinka.isNotEmpty || korisnikNoviPodatci.lozinkaPotvrda.isNotEmpty) &&
+        (!korisnikNoviPodatci.staraLozinka.isNotEmpty || !korisnikNoviPodatci.lozinka.isNotEmpty || !korisnikNoviPodatci.lozinkaPotvrda.isNotEmpty)) {
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Za promenu lozinke potrebno je uneti staru lozinku, novu lozinku i potvrdu.");
       return;
     }
     if (korisnikNoviPodatci.lozinka != korisnikNoviPodatci.lozinkaPotvrda) {
-      PorukaHelper.prikaziPorukuUpozorenja(
-          context, "Nova lozinka i potvrda lozinke moraju biti iste");
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Nova lozinka i potvrda lozinke moraju biti iste");
       return;
     }
-    if (korisnikNoviPodatci.lozinka.isNotEmpty &&
-        korisnikNoviPodatci.lozinkaPotvrda.isNotEmpty &&
-        korisnikNoviPodatci.staraLozinka.isNotEmpty) {
+    if (korisnikNoviPodatci.lozinka.isNotEmpty && korisnikNoviPodatci.lozinkaPotvrda.isNotEmpty && korisnikNoviPodatci.staraLozinka.isNotEmpty) {
       changePassword = true;
     }
     if (korisnikNoviPodatci.username == korisnik?['username']) {
-      PorukaHelper.prikaziPorukuUpozorenja(
-          context, "Novi username mora biti drugačiji od starog");
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Novi username mora biti drugačiji od starog");
       return;
     }
     if (korisnikNoviPodatci.email == korisnik?['email']) {
-      PorukaHelper.prikaziPorukuUpozorenja(
-          context, "Novi email mora biti drugačiji od starog");
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Novi email mora biti drugačiji od starog");
       return;
     }
 
-    if (korisnikNoviPodatci.username.isNotEmpty ||
-        korisnikNoviPodatci.email.isNotEmpty ||
-        changePassword == true) {
+    if (korisnikNoviPodatci.username.isNotEmpty || korisnikNoviPodatci.email.isNotEmpty || changePassword == true) {
       try {
         await korisnikService.upravljanjeKorisnikom(korisnikNoviPodatci);
         PorukaHelper.prikaziPorukuUspjeha(context, "Korisnik uspešno ažuriran");
         if (korisnikNoviPodatci.username.isNotEmpty || changePassword == true) {
           await korisnikService.logout();
-          PorukaHelper.prikaziPorukuUspjeha(context,
-              "Uspešno promenjen username ili password, potrebno je da se ponovo prijavite.");
+          PorukaHelper.prikaziPorukuUspjeha(context, "Uspešno promenjen username ili password, potrebno je da se ponovo prijavite.");
           await Navigator.push(
             context,
             MaterialPageRoute(
@@ -141,18 +119,15 @@ class _ProfilProzorState extends State<ProfilProzor> {
     var imePrezime = imePrezimeController.text;
     var telefon = telefonController.text;
 
-    var korisnikInfos = await korisnikInfoService.getKorisnikInfos(
-        korisnikId: widget.korisnikId);
+    var korisnikInfos = await korisnikInfoService.getKorisnikInfos(korisnikId: widget.korisnikId);
 
     if (korisnikInfos.isEmpty) {
       if (imePrezime.isEmpty || telefon.isEmpty) {
-        PorukaHelper.prikaziPorukuUpozorenja(
-            context, "Potrebno je unjeti obe stavke");
+        PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je unjeti obe stavke");
         return;
       }
       try {
-        await korisnikInfoService.addInfo(
-            widget.korisnikId, imePrezime, telefon);
+        await korisnikInfoService.addInfo(widget.korisnikId, imePrezime, telefon);
         PorukaHelper.prikaziPorukuUspjeha(context, "Korisnik uspešno dodana");
         await _fetchKorisnik();
         disposeInfo();
@@ -167,14 +142,12 @@ class _ProfilProzorState extends State<ProfilProzor> {
       korisnikInfoId = korisnikInfos[0]['korisnikInfoId'];
     }
     if (imePrezime.isEmpty && telefon.isEmpty) {
-      PorukaHelper.prikaziPorukuUpozorenja(
-          context, "Potrebno je unjeti barem jednu promjenu");
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je unjeti barem jednu promjenu");
       return;
     }
     if ((imePrezime.isNotEmpty || telefon.isNotEmpty) && korisnikInfoId != 0) {
       try {
-        await korisnikInfoService.updateInfo(
-            korisnikInfoId, imePrezime, telefon);
+        await korisnikInfoService.updateInfo(korisnikInfoId, imePrezime, telefon);
         PorukaHelper.prikaziPorukuUspjeha(context, "Korisnik uspešno ažuriran");
         await _fetchKorisnik();
         disposeInfo();
@@ -194,13 +167,11 @@ class _ProfilProzorState extends State<ProfilProzor> {
 
     if (adresa == null) {
       if (grad.isEmpty || ulica.isEmpty || postanskiBroj.isEmpty) {
-        PorukaHelper.prikaziPorukuUpozorenja(
-            context, "Potrebno je dodati sve stavke");
+        PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati sve stavke");
         return;
       }
       try {
-        await adresaService.addAdresa(
-            widget.korisnikId, grad, ulica, postanskiBroj);
+        await adresaService.addAdresa(widget.korisnikId, grad, ulica, postanskiBroj);
         PorukaHelper.prikaziPorukuUspjeha(context, "Adresa uspešno dodana");
         await _fetchKorisnik();
         disposeInfo();
@@ -215,12 +186,10 @@ class _ProfilProzorState extends State<ProfilProzor> {
       adresaId = adresa['adresaId'];
     }
     if (grad.isEmpty && ulica.isEmpty && postanskiBroj.isEmpty) {
-      PorukaHelper.prikaziPorukuUpozorenja(
-          context, "Potrebno je unjeti barem jednu promjenu");
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je unjeti barem jednu promjenu");
       return;
     }
-    if ((grad.isNotEmpty || ulica.isNotEmpty || postanskiBroj.isNotEmpty) &&
-        adresaId != 0) {
+    if ((grad.isNotEmpty || ulica.isNotEmpty || postanskiBroj.isNotEmpty) && adresaId != 0) {
       try {
         await adresaService.updateAdresa(adresaId, grad, ulica, postanskiBroj);
         PorukaHelper.prikaziPorukuUspjeha(context, "Adresa uspešno ažuriran");
@@ -269,8 +238,7 @@ class _ProfilProzorState extends State<ProfilProzor> {
 
   void obrisi() async {
     if (widget.korisnikId == 0) {
-      PorukaHelper.prikaziPorukuUpozorenja(
-          context, "Problem prilikom dohvacanja vašeg ID-a");
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Problem prilikom dohvacanja vašeg ID-a");
       return;
     }
     KorisnikModel korisnikZaBrisanje = KorisnikModel(
@@ -290,27 +258,22 @@ class _ProfilProzorState extends State<ProfilProzor> {
       PorukaHelper.prikaziPorukuUspjeha(context, "Korisnik uspješno obrisan.");
       _fetchKorisnik();
     } catch (e) {
-      PorukaHelper.prikaziPorukuGreske(
-          context, "Greška pri brisanju korisnika: $e");
+      PorukaHelper.prikaziPorukuGreske(context, "Greška pri brisanju korisnika: $e");
     }
   }
 
   final TextEditingController _cijenaController = TextEditingController();
   void zahtjevZaServiserLincencu() async {
     String cijenaText = _cijenaController.text;
-    if (cijenaText.isEmpty ||
-        double.tryParse(cijenaText) == null ||
-        double.parse(cijenaText) <= 0) {
-      PorukaHelper.prikaziPorukuUpozorenja(
-          context, "Unesite validnu cijenu veću od 0.");
+    if (cijenaText.isEmpty || double.tryParse(cijenaText) == null || double.parse(cijenaText) <= 0) {
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Unesite validnu cijenu veću od 0.");
       return;
     }
 
     double cijena = double.parse(cijenaText);
     int korisnikId = widget.korisnikId;
 
-    String? rezultat =
-        await ServiserService().dodajServisera(korisnikId, cijena);
+    String? rezultat = await ServiserService().dodajServisera(korisnikId, cijena);
 
     if (rezultat != null) {
       PorukaHelper.prikaziPorukuUspjeha(context, rezultat);
@@ -341,8 +304,7 @@ class _ProfilProzorState extends State<ProfilProzor> {
           backgroundColor: const Color.fromARGB(255, 92, 225, 230),
         ),
         body: const Center(
-          child:
-              CircularProgressIndicator(), // Prikazuje se dok se podaci učitavaju
+          child: CircularProgressIndicator(), // Prikazuje se dok se podaci učitavaju
         ),
       );
     }
@@ -384,9 +346,7 @@ class _ProfilProzorState extends State<ProfilProzor> {
                   height: screenHeight * 0.65 * 0.2,
                   width: double.infinity,
                   alignment: Alignment.center,
-                  child: korisnik != null
-                      ? _buildDetailContainer("Username", korisnik!['username'])
-                      : const CircularProgressIndicator(),
+                  child: korisnik != null ? _buildDetailContainer("Username", korisnik!['username']) : const CircularProgressIndicator(),
                 ),
                 // 2. red
                 Expanded(
@@ -407,51 +367,25 @@ class _ProfilProzorState extends State<ProfilProzor> {
                               alignment: Alignment.center,
                               child: korisnik != null
                                   ? Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        _buildDetailContainer(
-                                            "Email", korisnik!['email']),
+                                        _buildDetailContainer("Email", korisnik!['email']),
+                                        SizedBox(height: screenHeight * 0.015),
+                                        _buildDetailContainer("Ime i Prezime",
+                                            korisnik!['korisnikInfos'].isNotEmpty ? korisnik!['korisnikInfos'][0]['imePrezime'] : 'N/A'),
                                         SizedBox(height: screenHeight * 0.015),
                                         _buildDetailContainer(
-                                            "Ime i Prezime",
-                                            korisnik!['korisnikInfos']
-                                                    .isNotEmpty
-                                                ? korisnik!['korisnikInfos'][0]
-                                                    ['imePrezime']
-                                                : 'N/A'),
+                                            "Telefon", korisnik!['korisnikInfos'].isNotEmpty ? korisnik!['korisnikInfos'][0]['telefon'] : 'N/A'),
                                         SizedBox(height: screenHeight * 0.015),
-                                        _buildDetailContainer(
-                                            "Telefon",
-                                            korisnik!['korisnikInfos']
-                                                    .isNotEmpty
-                                                ? korisnik!['korisnikInfos'][0]
-                                                    ['telefon']
-                                                : 'N/A'),
+                                        _buildDetailContainer("Grad",
+                                            adresaK == null || adresaK?['grad'] == null || adresaK?['grad'].isEmpty ? "N/A" : adresaK?['grad']),
                                         SizedBox(height: screenHeight * 0.015),
-                                        _buildDetailContainer(
-                                            "Grad",
-                                            adresaK == null ||
-                                                    adresaK?['grad'] == null ||
-                                                    adresaK?['grad'].isEmpty
-                                                ? "N/A"
-                                                : adresaK?['grad']),
-                                        SizedBox(height: screenHeight * 0.015),
-                                        _buildDetailContainer(
-                                            "Ulica",
-                                            adresaK == null ||
-                                                    adresaK?['ulica'] == null ||
-                                                    adresaK?['ulica'].isEmpty
-                                                ? "N/A"
-                                                : adresaK?['ulica']),
+                                        _buildDetailContainer("Ulica",
+                                            adresaK == null || adresaK?['ulica'] == null || adresaK?['ulica'].isEmpty ? "N/A" : adresaK?['ulica']),
                                         SizedBox(height: screenHeight * 0.015),
                                         _buildDetailContainer(
                                             "Postanski broj",
-                                            adresaK == null ||
-                                                    adresaK?['postanskiBroj'] ==
-                                                        null ||
-                                                    adresaK?['postanskiBroj']
-                                                        .isEmpty
+                                            adresaK == null || adresaK?['postanskiBroj'] == null || adresaK?['postanskiBroj'].isEmpty
                                                 ? "N/A"
                                                 : adresaK?['postanskiBroj']),
                                       ],
@@ -466,11 +400,9 @@ class _ProfilProzorState extends State<ProfilProzor> {
                               alignment: Alignment.center,
                               child: korisnik != null
                                   ? Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        _buildDetailContainer("Broj Proizvoda",
-                                            korisnik!['brojProizvoda']),
+                                        _buildDetailContainer("Broj Proizvoda", korisnik!['brojProizvoda']),
                                         const SizedBox(height: 20),
                                         customButton(
                                           width: screenWidth * 0.65 * 0.19,
@@ -478,19 +410,14 @@ class _ProfilProzorState extends State<ProfilProzor> {
                                           onPressed: () {
                                             Navigator.push(
                                               context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      KorisnikProizvodiPrikaz()),
+                                              MaterialPageRoute(builder: (context) => KorisnikProizvodiPrikaz()),
                                             );
                                           },
                                         ),
                                         const SizedBox(height: 20),
-                                        _buildDetailContainer("Ukupna Kolicina",
-                                            korisnik!['ukupnaKolicina']),
+                                        _buildDetailContainer("Ukupna Kolicina", korisnik!['ukupnaKolicina']),
                                         const SizedBox(height: 20),
-                                        _buildDetailContainer(
-                                            "Broj rezervacija",
-                                            korisnik!['brojRezervacija']),
+                                        _buildDetailContainer("Broj rezervacija", korisnik!['brojRezervacija']),
                                         const SizedBox(height: 20),
                                         if (korisnik!['brojRezervacija'] > 0)
                                           ElevatedButton(
@@ -498,11 +425,14 @@ class _ProfilProzorState extends State<ProfilProzor> {
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        RezervacijeKorisnika()),
+                                                  builder: (context) => RezervacijeKorisnika(),
+                                                ),
                                               );
                                             },
-                                            child: const Text("Rezervacije"),
+                                            child: const Text(
+                                              "Rezervacije",
+                                              style: TextStyle(color: Color.fromARGB(255, 87, 202, 255)),
+                                            ),
                                           ),
                                       ],
                                     )
@@ -517,11 +447,7 @@ class _ProfilProzorState extends State<ProfilProzor> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  _buildDetailContainer(
-                                      "Admin Status",
-                                      korisnik!['isAdmin']
-                                          ? "Jeste admin"
-                                          : "Nije admin"),
+                                  _buildDetailContainer("Admin Status", korisnik!['isAdmin'] ? "Jeste admin" : "Nije admin"),
                                   if (korisnik!['isAdmin']) ...[
                                     SizedBox(height: 20),
                                     customButton(
@@ -530,23 +456,27 @@ class _ProfilProzorState extends State<ProfilProzor> {
                                       onPressed: () {
                                         Navigator.push(
                                           context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const AdministracijaP1Prozor()),
+                                          MaterialPageRoute(builder: (context) => const AdministracijaP1Prozor()),
                                         );
                                       },
                                     ),
                                   ],
                                   SizedBox(height: screenHeight * 0.015),
                                   _buildDetailContainer(
-                                      "Status Korisnika", korisnik!['status']),
+                                    "Status Korisnika",
+                                    korisnik!['status'] == 'aktivan'
+                                        ? "Verifikovan"
+                                        : korisnik?['status'] == 'vracen'
+                                            ? "Potrebne izmjene"
+                                            : "Nije verifikovan",
+                                  ),
+
                                   SizedBox(height: 20),
                                   // Prikaz za jeServiser
                                   _buildDetailContainer(
                                     "Serviser Status",
                                     (() {
-                                      if (korisnik!.containsKey('jeServiser') &&
-                                          korisnik!['jeServiser'] != null) {
+                                      if (korisnik!.containsKey('jeServiser') && korisnik!['jeServiser'] != null) {
                                         switch (korisnik!['jeServiser']) {
                                           case "aktivan":
                                             return "Jeste serviser";
@@ -575,14 +505,11 @@ class _ProfilProzorState extends State<ProfilProzor> {
                                       onPressed: () {
                                         Navigator.push(
                                           context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ServiserProfil()),
+                                          MaterialPageRoute(builder: (context) => ServiserProfil()),
                                         );
                                       },
                                     ),
-                                  ] else if (korisnik!['jeServiser'] == null ||
-                                      korisnik!['jeServiser'] == "vracen") ...[
+                                  ] else if (korisnik!['jeServiser'] == null || korisnik!['jeServiser'] == "vracen") ...[
                                     SizedBox(height: 20),
                                     customButton(
                                       width: screenWidth * 0.65 * 0.19,
@@ -592,64 +519,47 @@ class _ProfilProzorState extends State<ProfilProzor> {
                                           context: context,
                                           builder: (BuildContext context) {
                                             return AlertDialog(
-                                              contentPadding:
-                                                  EdgeInsets.all(20),
+                                              contentPadding: EdgeInsets.all(20),
                                               shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(10.0)),
+                                                borderRadius: BorderRadius.all(Radius.circular(10.0)),
                                               ),
                                               content: Container(
                                                 decoration: BoxDecoration(
                                                   gradient: LinearGradient(
                                                     colors: [
-                                                      Color.fromARGB(
-                                                          255, 82, 205, 210),
-                                                      Color.fromARGB(
-                                                          255, 7, 161, 235),
+                                                      Color.fromARGB(255, 82, 205, 210),
+                                                      Color.fromARGB(255, 7, 161, 235),
                                                     ],
                                                     begin: Alignment.topLeft,
                                                     end: Alignment.bottomRight,
                                                   ),
                                                 ),
                                                 child: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
+                                                  mainAxisSize: MainAxisSize.min,
                                                   children: [
                                                     Text(
                                                       "Unesite cijenu vasih usluga servisa",
-                                                      style: TextStyle(
-                                                          fontSize: 18,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          color: Colors.white),
+                                                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
                                                     ),
                                                     SizedBox(height: 20),
                                                     TextField(
-                                                      controller:
-                                                          _cijenaController,
-                                                      decoration:
-                                                          InputDecoration(
+                                                      controller: _cijenaController,
+                                                      decoration: InputDecoration(
                                                         labelText: "Cijena",
-                                                        labelStyle: TextStyle(
-                                                            color:
-                                                                Colors.white),
-                                                        border:
-                                                            OutlineInputBorder(),
+                                                        labelStyle: TextStyle(color: Colors.white),
+                                                        border: OutlineInputBorder(),
                                                       ),
-                                                      style: TextStyle(
-                                                          color: Colors.white),
+                                                      style: TextStyle(color: Colors.white),
                                                     ),
                                                     SizedBox(height: 20),
                                                     ElevatedButton(
                                                       onPressed: () {
                                                         zahtjevZaServiserLincencu();
-                                                        Navigator.of(context)
-                                                            .pop();
+                                                        Navigator.of(context).pop();
                                                       },
                                                       child: Text(
                                                         "Posalji zahtjev",
-                                                        style: TextStyle(
-                                                            color: Colors.blue),
+                                                        style: TextStyle(color: Colors.blue),
                                                       ),
                                                     ),
                                                   ],
@@ -704,17 +614,13 @@ class _ProfilProzorState extends State<ProfilProzor> {
     );
   }
 
-  Widget customButton(
-      {required double width,
-      required String title,
-      required VoidCallback onPressed}) {
+  Widget customButton({required double width, required String title, required VoidCallback onPressed}) {
     return SizedBox(
       width: width,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor:
-              const Color.fromARGB(255, 242, 242, 242), // Pozadina dugmeta
+          backgroundColor: const Color.fromARGB(255, 242, 242, 242), // Pozadina dugmeta
         ),
         child: Text(
           title,
@@ -745,8 +651,7 @@ class _ProfilProzorState extends State<ProfilProzor> {
           ),
           // Zamjena Flexible-a s odgovarajućim widgetom
           Container(
-            constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.15),
+            constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.15),
             child: Text(
               '$value',
               style: const TextStyle(color: Colors.white),
@@ -775,9 +680,7 @@ class _ProfilProzorState extends State<ProfilProzor> {
   }) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        backgroundColor: isSelected
-            ? Color.fromARGB(255, 87, 202, 255)
-            : const Color.fromARGB(255, 242, 242, 242),
+        backgroundColor: isSelected ? Color.fromARGB(255, 87, 202, 255) : const Color.fromARGB(255, 242, 242, 242),
       ),
       onPressed: onPressed,
       child: Container(
@@ -826,8 +729,7 @@ class _ProfilProzorState extends State<ProfilProzor> {
                     borderRadius: BorderRadius.all(Radius.circular(20)),
                   ),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment
-                        .center, // Centriranje dugmadi u koloni
+                    mainAxisAlignment: MainAxisAlignment.center, // Centriranje dugmadi u koloni
                     children: [
                       customButtonInfo(
                         width: screenWidth * 0.1, // Širina dugmeta
@@ -915,10 +817,8 @@ class _ProfilProzorState extends State<ProfilProzor> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildPasswordInput(
-                          'Stara lozinka', staraLozinkaController),
-                      _buildPasswordInput(
-                          'Nova lozinka', novaLozinkaController),
+                      _buildPasswordInput('Stara lozinka', staraLozinkaController),
+                      _buildPasswordInput('Nova lozinka', novaLozinkaController),
                       _buildPasswordInput('Potvrda', lozinkaPotvrdaController),
                     ],
                   ),
