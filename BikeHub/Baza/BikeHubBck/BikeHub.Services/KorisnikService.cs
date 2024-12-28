@@ -157,7 +157,7 @@ namespace BikeHub.Services
                 throw new UserException("Email je zauzet");
             }
             entity.Username = request.Username;
-            entity.Email = request.Username;
+            entity.Email = request.Email;
             entity.LozinkaSalt = GenerateSalt();
             entity.LozinkaHash = GenerateHash(entity.LozinkaSalt, request.Lozinka);
             base.BeforeInsert(request, entity);

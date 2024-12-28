@@ -25,7 +25,7 @@ class SlikeDijeloviService {
     }
     // Generiraj Authorization header
     final authHeader = _korisnikService.encodeBasicAuth(username, password);
-    _dio.options.headers['Authorization'] = authHeader; 
+    _dio.options.headers['Authorization'] = authHeader;
   }
 
   Future<Map<String, dynamic>?> postDijeloviSlika(int dijeloviId, String slika) async {
@@ -53,6 +53,70 @@ class SlikeDijeloviService {
         return result;
       } else {
         throw Exception('Failed to upload image');
+      }
+    } catch (e) {
+      logger.e('Greška: $e');
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> putDijeloviSlika(int dijeloviId, int slikeDijeloviId, String slika) async {
+    if (dijeloviId == 0 || slikeDijeloviId == 0 || slika.isEmpty) {
+      return null;
+    }
+    try {
+      await _addAuthorizationHeader();
+
+      final data = {
+        'dijeloviId': dijeloviId,
+        'slika': slika,
+      };
+
+      final response = await _dio.put(
+        '${HelperService.baseUrl}/SlikeDijelovi/$slikeDijeloviId',
+        options: Options(
+          headers: {
+            'accept': 'text/plain',
+            'Content-Type': 'application/json',
+          },
+        ),
+        data: data,
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> result = response.data;
+        return result;
+      } else {
+        throw Exception('Failed to upload image');
+      }
+    } catch (e) {
+      logger.e('Greška: $e');
+      return null;
+    }
+  }
+
+  Future<String?> deleteDijeloviSlika(int slikeDijeloviId) async {
+    if (slikeDijeloviId == 0) {
+      return null;
+    }
+    try {
+      await _addAuthorizationHeader();
+
+      final response = await _dio.delete(
+        '${HelperService.baseUrl}/SlikeDijelovi/$slikeDijeloviId',
+        options: Options(
+          headers: {
+            'accept': 'text/plain',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final String result = response.data;
+        return result;
+      } else {
+        throw Exception('Failed to delete image');
       }
     } catch (e) {
       logger.e('Greška: $e');

@@ -1,13 +1,17 @@
 // ignore_for_file: library_private_types_in_public_api, prefer_const_constructors, unused_element, sized_box_for_whitespace, prefer_const_literals_to_create_immutables, prefer_final_fields, unused_field, no_leading_underscores_for_local_identifiers, unnecessary_null_comparison, unused_local_variable, use_build_context_synchronously, prefer_typing_uninitialized_variables
 
 import 'package:bikehub_desktop/modeli/bicikli/bicikl_model.dart';
+import 'package:bikehub_desktop/modeli/bicikli/bicikli_promocija_model.dart';
 import 'package:bikehub_desktop/modeli/dijelovi/dijelovi_model.dart';
+import 'package:bikehub_desktop/modeli/dijelovi/dijelovi_promocija_model.dart';
 import 'package:bikehub_desktop/modeli/korisnik/korisnik_model.dart';
 import 'package:bikehub_desktop/modeli/serviseri/serviser_model.dart';
 import 'package:bikehub_desktop/screens/administracija/dodatno/image_carousel.dart';
 import 'package:bikehub_desktop/screens/ostalo/pomocne_klase.dart';
 import 'package:bikehub_desktop/services/bicikli/bicikl_service.dart';
+import 'package:bikehub_desktop/services/bicikli/promocija_bicikli_service.dart';
 import 'package:bikehub_desktop/services/dijelovi/dijelovi_service.dart';
+import 'package:bikehub_desktop/services/dijelovi/promocija_dijelovi_service.dart';
 import 'package:bikehub_desktop/services/kategorije/kategorija_service.dart';
 import 'package:bikehub_desktop/services/korisnik/korisnik_service.dart';
 import 'package:bikehub_desktop/screens/ostalo/poruka_helper.dart';
@@ -65,12 +69,26 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
   List _listaServisera = [];
   int _countServisera = 0;
 
+  List _prikazaniPromocijeB = [];
+  int _currentPagePromocijeB = 0;
+  int _pageSizePromocijeB = 5;
+  int _brojPrikazanihPromocijeB = 0;
+  String _selectedStatusPromocijeB = 'Kreirani';
+
+  List _prikazaniPromocijeD = [];
+  int _currentPagePromocijeD = 0;
+  int _pageSizePromocijeD = 5;
+  int _brojPrikazanihPromocijeD = 0;
+  String _selectedStatusPromocijeD = 'Kreirani';
+
   String _username = "";
   final KorisnikService _korisnikService = KorisnikService();
   final BiciklService _bicikliService = BiciklService();
   final DijeloviService _dijeloviService = DijeloviService();
   final ServiserService _serviserService = ServiserService();
   final KategorijaServis _kategorijaServis = KategorijaServis();
+  final PromocijaBicikliService _promocijaBicikliService = PromocijaBicikliService();
+  final PromocijaDijeloviService _promocijaDijeloviService = PromocijaDijeloviService();
 
   @override
   void initState() {
@@ -85,6 +103,7 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
     await _bicikliService.getBicikli(status: '', isSlikaIncluded: false, page: null, pageSize: null);
     await _dijeloviService.getDijelovi(status: '', isSlikaIncluded: false, page: null, pageSize: null);
     await _serviserService.getServiseriDTO(status: '', page: null, pageSize: null);
+    getPromovisani();
     await getKategorije();
     setState(() {
       _listaKorisnika = _korisnikService.listaKorisnika;
@@ -98,11 +117,14 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
       _listaServisera = _serviserService.listaServisra;
       _countServisera = _listaServisera.length;
       _isLoading = false;
+      promovisaniBicikl;
+      promovisaniDijelovi;
     });
     await _filterKorisnici("Kreirani");
     await _filterBicikli("Kreirani");
     await _filterDijelovi("Kreirani");
     await _filterServiseri("Kreirani");
+    await _filterPromocije("Kreirani");
   }
 
   List<Map<String, dynamic>> _listaBikeKategorije = [];
@@ -117,15 +139,47 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
     _filterKategorije("Kreirane");
   }
 
+  List<dynamic> promovisaniBicikl = [];
+  List<dynamic> promovisaniDijelovi = [];
+  String ukupnaCijenaString = "";
+  Future<void> getPromovisani() async {
+    promovisaniBicikl = await _promocijaBicikliService.getPromocijaBicikli();
+    promovisaniDijelovi = await _promocijaDijeloviService.getPromocijaDijelovi();
+
+    double ukupnaCijena = 0;
+
+    if (promovisaniBicikl != null && promovisaniBicikl.isNotEmpty) {
+      for (var item in promovisaniBicikl) {
+        ukupnaCijena += item['cijenaPromocije'];
+      }
+    }
+
+    if (promovisaniDijelovi != null && promovisaniDijelovi.isNotEmpty) {
+      for (var item in promovisaniDijelovi) {
+        ukupnaCijena += item['cijenaPromocije'];
+      }
+    }
+
+    ukupnaCijenaString = formatCijena(ukupnaCijena);
+  }
+
+  String formatCijena(double cijena) {
+    if (cijena >= 1000) {
+      return '${(cijena / 1000).toStringAsFixed(2)}K';
+    }
+    return cijena.toStringAsFixed(2);
+  }
+
   void _loadAdministratori(int page) {
     setState(() {
       _currentPageAdministrator = page;
     });
   }
 
-  _filterKorisnici(String status) async {
+  _filterPromocije(String status) async {
     String _status;
-    _currentPageKorisnik = 0;
+    _currentPagePromocijeB = 0;
+    _currentPagePromocijeD = 0;
     switch (status) {
       case 'Kreirani':
         _status = 'kreiran';
@@ -135,6 +189,9 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
         break;
       case 'Aktivni':
         _status = 'aktivan';
+        break;
+      case 'Zavrseni':
+        _status = 'zavrseno';
         break;
       case 'Obrisani':
         _status = 'obrisan';
@@ -147,9 +204,11 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
     }
 
     setState(() {
-      _selectedStatus = status;
-      _prikazaniKorisnici = _listaKorisnika.where((korisnik) => korisnik['status'] == _status).toList();
-      _brojPrikazanihKorisnika = _prikazaniKorisnici.length;
+      _selectedStatusPromocijeB = status;
+      _prikazaniPromocijeB = promovisaniBicikl.where((promocija) => promocija['status'] == _status).toList();
+      _brojPrikazanihPromocijeB = _prikazaniPromocijeB.length;
+      _prikazaniPromocijeD = promovisaniDijelovi.where((promocija) => promocija['status'] == _status).toList();
+      _brojPrikazanihPromocijeD = _prikazaniPromocijeD.length;
     });
   }
 
@@ -243,6 +302,36 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
     });
   }
 
+  _filterKorisnici(String status) async {
+    String _status;
+    _currentPageKorisnik = 0;
+    switch (status) {
+      case 'Kreirani':
+        _status = 'kreiran';
+        break;
+      case 'Izmijenjeni':
+        _status = 'izmijenjen';
+        break;
+      case 'Aktivni':
+        _status = 'aktivan';
+        break;
+      case 'Obrisani':
+        _status = 'obrisan';
+        break;
+      case 'Vraceni':
+        _status = 'vracen';
+        break;
+      default:
+        _status = '';
+    }
+
+    setState(() {
+      _selectedStatus = status;
+      _prikazaniKorisnici = _listaKorisnika.where((korisnik) => korisnik['status'] == _status).toList();
+      _brojPrikazanihKorisnika = _prikazaniKorisnici.length;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -284,7 +373,7 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
   Widget _buildNavDio() {
     return Container(
       width: MediaQuery.of(context).size.width * 0.25,
-      height: MediaQuery.of(context).size.height * 0.95,
+      height: MediaQuery.of(context).size.height * 1,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -313,7 +402,7 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
           //DonjiDio
           Container(
             width: double.infinity,
-            height: MediaQuery.of(context).size.height * 0.70,
+            height: MediaQuery.of(context).size.height * 0.75,
             decoration: BoxDecoration(
               border: Border(
                 top: BorderSide(
@@ -327,7 +416,7 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                 //Dugmici
                 Container(
                   width: double.infinity,
-                  height: MediaQuery.of(context).size.height * 0.55,
+                  height: MediaQuery.of(context).size.height * 0.7,
                   color: const Color.fromARGB(0, 68, 137, 255),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -340,19 +429,17 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                       SizedBox(height: 15),
                       _buildNavButton('Dijelovi'),
                       SizedBox(height: 15),
+                      _buildNavButton('Promocije'),
+                      SizedBox(height: 15),
                       _buildNavButton('Serviseri'),
                       SizedBox(height: 15),
                       _buildNavButton('Kategorije'),
                       SizedBox(height: 15),
                       _buildNavButton('Dodaj Administratora'),
+                      SizedBox(height: 15),
+                      _buildNavButton('Izvjestaj'),
                     ],
                   ),
-                ),
-                //prazniDIo
-                Container(
-                  width: double.infinity,
-                  height: MediaQuery.of(context).size.height * 0.10,
-                  color: Color.fromARGB(0, 105, 240, 175),
                 ),
               ],
             ),
@@ -542,6 +629,10 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
     switch (_selectedSection) {
       case 'Home':
         return _buildHome();
+      case 'Izvjestaj':
+        return _buildIzvjestaj();
+      case 'Promocije':
+        return _buildPromocije();
       case 'Korisnici':
         return _buildKorisnici();
       case 'Bicikli':
@@ -562,6 +653,10 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
         return _buildServiserInfo();
       case 'Kategorije':
         return _buildKategorije(context);
+      case 'Promocija info bicikl':
+        return _buildBicikliPromocijaInfo();
+      case 'Promocija info dijelovi':
+        return _buildDijeloviPromocijaInfo();
       default:
         return _buildHome();
     }
@@ -809,6 +904,460 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                           ),
                           textAlign: TextAlign.center,
                         ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildIzvjestaj() {
+    return Center(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  //_selectedSection = 'Korisnici';
+                });
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.2,
+                height: MediaQuery.of(context).size.height * 0.35,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color.fromARGB(255, 82, 205, 210),
+                      Color.fromARGB(255, 7, 161, 235),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  children: [
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.1,
+                      height: MediaQuery.of(context).size.height * 0.065,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Promocije',
+                          style: TextStyle(
+                            fontSize: 24,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: double.infinity,
+                      height: MediaQuery.of(context).size.height * 0.26,
+                      child: Column(
+                        children: [
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                          Container(
+                            width: double.infinity,
+                            height: MediaQuery.of(context).size.height * 0.08,
+                            color: const Color.fromARGB(0, 244, 67, 54),
+                            child: Center(
+                                child: Container(
+                              width: MediaQuery.of(context).size.width * 0.17,
+                              height: MediaQuery.of(context).size.height * 0.07,
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(color: Colors.white),
+                                  right: BorderSide(color: Colors.white),
+                                  left: BorderSide(color: Colors.white),
+                                ),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              child: Center(
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    "Broj promocija ${promovisaniBicikl.length + promovisaniDijelovi.length}",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: MediaQuery.of(context).size.width * 0.017,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )),
+                          ),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                          Container(
+                            width: double.infinity,
+                            height: MediaQuery.of(context).size.height * 0.08,
+                            color: const Color.fromARGB(0, 76, 175, 79),
+                            child: Center(
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.17,
+                                height: MediaQuery.of(context).size.height * 0.07,
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(color: Colors.white),
+                                    right: BorderSide(color: Colors.white),
+                                    left: BorderSide(color: Colors.white),
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: Center(
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      "$ukupnaCijenaString KM",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: MediaQuery.of(context).size.width * 0.017,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: double.infinity,
+                            height: MediaQuery.of(context).size.height * 0.08,
+                            child: Center(
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.1,
+                                height: MediaQuery.of(context).size.height * 0.06,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Color.fromARGB(255, 82, 205, 210),
+                                      Color.fromARGB(255, 7, 161, 235),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "Izvjestaj",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: MediaQuery.of(context).size.width * 0.017,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  //_selectedSection = 'Korisnici';
+                });
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.2,
+                height: MediaQuery.of(context).size.height * 0.35,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color.fromARGB(255, 82, 205, 210),
+                      Color.fromARGB(255, 7, 161, 235),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  children: [
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.1,
+                      height: MediaQuery.of(context).size.height * 0.065,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Promocije',
+                          style: TextStyle(
+                            fontSize: 24,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: double.infinity,
+                      height: MediaQuery.of(context).size.height * 0.26,
+                      child: Column(
+                        children: [
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                          Container(
+                            width: double.infinity,
+                            height: MediaQuery.of(context).size.height * 0.08,
+                            color: const Color.fromARGB(0, 244, 67, 54),
+                            child: Center(
+                                child: Container(
+                              width: MediaQuery.of(context).size.width * 0.17,
+                              height: MediaQuery.of(context).size.height * 0.07,
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(color: Colors.white),
+                                  right: BorderSide(color: Colors.white),
+                                  left: BorderSide(color: Colors.white),
+                                ),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              child: Center(
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    "Broj Servisera ${promovisaniBicikl.length + promovisaniDijelovi.length}",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: MediaQuery.of(context).size.width * 0.017,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )),
+                          ),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                          Container(
+                            width: double.infinity,
+                            height: MediaQuery.of(context).size.height * 0.08,
+                            color: const Color.fromARGB(0, 76, 175, 79),
+                            child: Center(
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.17,
+                                height: MediaQuery.of(context).size.height * 0.07,
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(color: Colors.white),
+                                    right: BorderSide(color: Colors.white),
+                                    left: BorderSide(color: Colors.white),
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: Center(
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      "Zarada servisera KM",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: MediaQuery.of(context).size.width * 0.017,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: double.infinity,
+                            height: MediaQuery.of(context).size.height * 0.08,
+                            child: Center(
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.1,
+                                height: MediaQuery.of(context).size.height * 0.06,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Color.fromARGB(255, 82, 205, 210),
+                                      Color.fromARGB(255, 7, 161, 235),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "Izvjestaj",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: MediaQuery.of(context).size.width * 0.017,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  //_selectedSection = 'Korisnici';
+                });
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.2,
+                height: MediaQuery.of(context).size.height * 0.35,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color.fromARGB(255, 82, 205, 210),
+                      Color.fromARGB(255, 7, 161, 235),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  children: [
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.1,
+                      height: MediaQuery.of(context).size.height * 0.065,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Ostalo',
+                          style: TextStyle(
+                            fontSize: 24,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: double.infinity,
+                      height: MediaQuery.of(context).size.height * 0.26,
+                      child: Column(
+                        children: [
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                          Container(
+                            width: double.infinity,
+                            height: MediaQuery.of(context).size.height * 0.08,
+                            color: const Color.fromARGB(0, 244, 67, 54),
+                            child: Center(
+                                child: Container(
+                              width: MediaQuery.of(context).size.width * 0.17,
+                              height: MediaQuery.of(context).size.height * 0.07,
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(color: Colors.white),
+                                  right: BorderSide(color: Colors.white),
+                                  left: BorderSide(color: Colors.white),
+                                ),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              child: Center(
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    "Broj korisnika ${promovisaniBicikl.length + promovisaniDijelovi.length}",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: MediaQuery.of(context).size.width * 0.017,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )),
+                          ),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                          Container(
+                            width: double.infinity,
+                            height: MediaQuery.of(context).size.height * 0.08,
+                            color: const Color.fromARGB(0, 76, 175, 79),
+                            child: Center(
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.17,
+                                height: MediaQuery.of(context).size.height * 0.07,
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(color: Colors.white),
+                                    right: BorderSide(color: Colors.white),
+                                    left: BorderSide(color: Colors.white),
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: Center(
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      "Broj proizvoda",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: MediaQuery.of(context).size.width * 0.017,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: double.infinity,
+                            height: MediaQuery.of(context).size.height * 0.08,
+                            child: Center(
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.1,
+                                height: MediaQuery.of(context).size.height * 0.06,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Color.fromARGB(255, 82, 205, 210),
+                                      Color.fromARGB(255, 7, 161, 235),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "Izvjestaj",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: MediaQuery.of(context).size.width * 0.017,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
                       ),
                     ),
                   ],
@@ -1421,6 +1970,264 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
     );
   }
 
+  Widget _buildPromocije() {
+    int startIndexB = _currentPagePromocijeB * _pageSizePromocijeB;
+    int endIndexB = startIndexB + _pageSizePromocijeB;
+    List currentPromocijeB = _prikazaniPromocijeB.sublist(
+      startIndexB,
+      endIndexB > _prikazaniPromocijeB.length ? _prikazaniPromocijeB.length : endIndexB,
+    );
+
+    int startIndexD = _currentPagePromocijeD * _pageSizePromocijeD;
+    int endIndexD = startIndexD + _pageSizePromocijeD;
+    List currentPromocijeD = _prikazaniPromocijeD.sublist(
+      startIndexD,
+      endIndexD > _prikazaniPromocijeD.length ? _prikazaniPromocijeD.length : endIndexD,
+    );
+
+    return Column(
+      children: [
+        Expanded(
+          flex: 15,
+          child: Container(
+            width: double.infinity,
+            color: Colors.grey[200],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text(
+                  'Promocije',
+                  style: TextStyle(fontSize: 24, color: Colors.black),
+                ),
+                _buildStatusButtonPromocije('Kreirani'),
+                _buildStatusButtonPromocije('Izmijenjeni'),
+                _buildStatusButtonPromocije('Aktivni'),
+                _buildStatusButtonPromocije('Zavrseni'),
+                _buildStatusButtonPromocije('Obrisani'),
+                _buildStatusButtonPromocije('Vraceni'),
+              ],
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 85,
+          child: Container(
+            width: double.infinity,
+            color: Colors.grey[300],
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: ListView.builder(
+                          physics: ClampingScrollPhysics(),
+                          itemCount: currentPromocijeB.length,
+                          itemBuilder: (context, index) {
+                            final promocijeB = currentPromocijeB[index];
+                            final backgroundColor = Color.fromARGB(255, 235, 237, 237);
+
+                            return Column(
+                              children: [
+                                if (index != 0) SizedBox(height: 10),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(15),
+                                  child: Container(
+                                    color: backgroundColor,
+                                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                                    width: MediaQuery.of(context).size.width * 0.4,
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.directions_bike,
+                                          size: 24,
+                                          color: Colors.grey[700],
+                                        ),
+                                        SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            promocijeB['datumPocetka'].split('T')[0].replaceAll('-', '.'),
+                                            style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 0, 0, 0)),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            promocijeB['datumZavrsetka'].split('T')[0].replaceAll('-', '.'),
+                                            style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 0, 0, 0)),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            promocijeB['status'],
+                                            style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 0, 0, 0)),
+                                            textAlign: TextAlign.end,
+                                          ),
+                                        ),
+                                        SizedBox(width: 10),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              selectedPromocija = promocijeB;
+
+                                              _selectedSection = "Promocija info bicikl";
+                                            });
+                                          },
+                                          child: Text(
+                                            "Više informacija",
+                                            style: TextStyle(color: Color.fromARGB(255, 87, 202, 255)),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            onPressed: _currentPagePromocijeB > 0
+                                ? () {
+                                    setState(() {
+                                      _currentPagePromocijeB--;
+                                    });
+                                  }
+                                : null,
+                            child: Text('<'),
+                          ),
+                          SizedBox(width: 10),
+                          ElevatedButton(
+                            onPressed: endIndexB < _prikazaniPromocijeB.length
+                                ? () {
+                                    setState(() {
+                                      _currentPagePromocijeB++;
+                                    });
+                                  }
+                                : null,
+                            child: Text('>'),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 2),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: ListView.builder(
+                          physics: ClampingScrollPhysics(),
+                          itemCount: currentPromocijeD.length,
+                          itemBuilder: (context, index) {
+                            final promocijeD = currentPromocijeD[index];
+                            final backgroundColor = Color.fromARGB(255, 235, 237, 237);
+
+                            return Column(
+                              children: [
+                                if (index != 0) SizedBox(height: 10),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(15),
+                                  child: Container(
+                                    color: backgroundColor,
+                                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                                    width: MediaQuery.of(context).size.width * 0.4,
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.settings,
+                                          size: 24,
+                                          color: Colors.grey[700],
+                                        ),
+                                        SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            promocijeD['datumPocetka'].split('T')[0].replaceAll('-', '.'),
+                                            style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 0, 0, 0)),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            promocijeD['datumZavrsetka'].split('T')[0].replaceAll('-', '.'),
+                                            style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 0, 0, 0)),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            promocijeD['status'],
+                                            style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 0, 0, 0)),
+                                            textAlign: TextAlign.end,
+                                          ),
+                                        ),
+                                        SizedBox(width: 10),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              selectedPromocija = promocijeD;
+
+                                              _selectedSection = "Promocija info dijelovi";
+                                            });
+                                          },
+                                          child: Text(
+                                            "Više informacija",
+                                            style: TextStyle(color: Color.fromARGB(255, 87, 202, 255)),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            onPressed: _currentPagePromocijeD > 0
+                                ? () {
+                                    setState(() {
+                                      _currentPagePromocijeD--;
+                                    });
+                                  }
+                                : null,
+                            child: Text('<'),
+                          ),
+                          SizedBox(width: 10),
+                          ElevatedButton(
+                            onPressed: endIndexD < _prikazaniPromocijeD.length
+                                ? () {
+                                    setState(() {
+                                      _currentPagePromocijeD++;
+                                    });
+                                  }
+                                : null,
+                            child: Text('>'),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 2),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  late Map<String, dynamic> selectedPromocija;
+
   final _usernameController = TextEditingController();
   final _lozinkaController = TextEditingController();
   final _lozinkaPotvrdaController = TextEditingController();
@@ -1595,7 +2402,12 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                       SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: dodajAdministratora,
-                        child: Text('Dodaj'),
+                        child: Text(
+                          'Dodaj',
+                          style: TextStyle(
+                            color: Colors.blue,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -1705,6 +2517,40 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
       } catch (e) {
         PorukaHelper.prikaziPorukuGreske(context, "Greška pri azuriranju servisera: $e");
       }
+    }
+    if (objekat == "DijeloviPromocija") {
+      DijeloviPromocijaModel promocija = DijeloviPromocijaModel(
+        stanje: _status,
+        ak: 1,
+        promocijaDijeloviId: selectedPromocija['promocijaDijeloviId'],
+      );
+      try {
+        await _promocijaDijeloviService.upravljanjePromocijomDijelovi(promocija);
+        PorukaHelper.prikaziPorukuUspjeha(context, "Promocija uspješno azuriran.");
+        await _fetchPodatci();
+      } catch (e) {
+        PorukaHelper.prikaziPorukuGreske(context, "Greška pri azuriranju promocije: $e");
+      }
+      setState(() {
+        _selectedSection = "Promocije";
+      });
+    }
+    if (objekat == "BicikliPromocija") {
+      BicikliPromocijaModel promocija = BicikliPromocijaModel(
+        stanje: _status,
+        ak: 1,
+        promocijaBicikliId: selectedPromocija['promocijaBicikliId'],
+      );
+      try {
+        await _promocijaBicikliService.upravljanjePromocijomBicikl(promocija);
+        PorukaHelper.prikaziPorukuUspjeha(context, "Promocija uspješno azuriran.");
+        await _fetchPodatci();
+      } catch (e) {
+        PorukaHelper.prikaziPorukuGreske(context, "Greška pri azuriranju promocije: $e");
+      }
+      setState(() {
+        _selectedSection = "Promocije";
+      });
     }
   }
 
@@ -2104,6 +2950,376 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                                   SizedBox(width: 10),
                                 ],
                                 _buildSetStatusButton("Obrisi", "Bicikl"),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  Widget _buildBicikliPromocijaInfo() {
+    return FutureBuilder(
+      future: _bicikliService.getBiciklById(selectedPromocija['biciklId']),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text(
+              'Greska prilikom pronalazenja bicikla',
+              style: TextStyle(fontSize: 24, color: Colors.black),
+            ),
+          );
+        } else if ((!snapshot.hasData || snapshot.data == null)) {
+          return Center(
+            child: Text(
+              'Biciklo nije pronađen',
+              style: TextStyle(fontSize: 24, color: Colors.black),
+            ),
+          );
+        } else {
+          var bicikl = snapshot.data as Map;
+          var slikeBiciklis = bicikl['slikeBiciklis'];
+          return Center(
+            child: Container(
+              width: double.infinity,
+              height: double.infinity,
+              color: Colors.transparent,
+              child: Center(
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.72,
+                  height: MediaQuery.of(context).size.height * 0.50,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color.fromARGB(255, 236, 230, 230),
+                        Color.fromARGB(255, 188, 188, 188),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(15)), // Zaobljene ivice za cijeli dio
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: MediaQuery.of(context).size.height * 0.54 * 0.8,
+                        decoration: BoxDecoration(
+                          color: Color.fromARGB(0, 33, 149, 243), // Pozadina za "GorniDio"
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(15), // Zaobljene gornje ivice
+                          ),
+                        ),
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.2,
+                                height: MediaQuery.of(context).size.height * 0.45 * 0.8,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color.fromARGB(255, 82, 205, 210),
+                                      Color.fromARGB(255, 7, 161, 235),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    _buildDetailContainer('Naziv', bicikl['naziv']),
+                                    SizedBox(
+                                      height: MediaQuery.of(context).size.height * 0.008,
+                                    ),
+                                    _buildDetailContainer('Cijena', bicikl['cijena']),
+                                    SizedBox(
+                                      height: MediaQuery.of(context).size.height * 0.008,
+                                    ),
+                                    _buildDetailContainer('Kolicina', bicikl['kolicina']),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.25,
+                                height: MediaQuery.of(context).size.height * 0.45 * 0.8,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color.fromARGB(255, 82, 205, 210),
+                                      Color.fromARGB(255, 7, 161, 235),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Container(
+                                  width: MediaQuery.of(context).size.width * 0.25,
+                                  child: ImageCarousel(
+                                    slikeBiciklis: slikeBiciklis,
+                                    initialIndex: 0,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.2,
+                                height: MediaQuery.of(context).size.height * 0.45 * 0.8,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color.fromARGB(255, 82, 205, 210),
+                                      Color.fromARGB(255, 7, 161, 235),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    _buildDetailContainer('Promovisan od:', selectedPromocija['datumPocetka'].split('T')[0].replaceAll('-', '.')),
+                                    SizedBox(
+                                      height: MediaQuery.of(context).size.height * 0.008,
+                                    ),
+                                    _buildDetailContainer('Promovisan do:', selectedPromocija['datumZavrsetka'].split('T')[0].replaceAll('-', '.')),
+                                    SizedBox(
+                                      height: MediaQuery.of(context).size.height * 0.008,
+                                    ),
+                                    _buildDetailContainer('Status', selectedPromocija['status']),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        height: MediaQuery.of(context).size.height * 0.15 * 0.45,
+                        decoration: BoxDecoration(
+                          color: Color.fromARGB(0, 76, 175, 79), // Pozadina za "DonjiDio"
+                          borderRadius: BorderRadius.vertical(
+                            bottom: Radius.circular(15), // Zaobljene donje ivice
+                          ),
+                        ),
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (selectedPromocija['status'] != "zavrseno") ...[
+                                if (selectedPromocija['status'] == "kreiran" || bicikl['status'] == "izmijenjen") ...[
+                                  _buildSetStatusButton("Aktiviraj", "BicikliPromocija"),
+                                  SizedBox(width: 10),
+                                ], //tu dodat
+                                if (selectedPromocija['status'] != "obrisan") ...[
+                                  if (selectedPromocija['status'] != "vracen") ...[
+                                    _buildSetStatusButton("Vrati", "BicikliPromocija"),
+                                    SizedBox(width: 10),
+                                  ],
+                                  _buildSetStatusButton("Obrisi", "BicikliPromocija"),
+                                ],
+                              ],
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  Widget _buildDijeloviPromocijaInfo() {
+    return FutureBuilder(
+      future: _dijeloviService.getDijeloviById(selectedPromocija['dijeloviId']),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text(
+              'Greska prilikom pronalazenja dijela',
+              style: TextStyle(fontSize: 24, color: Colors.black),
+            ),
+          );
+        } else if ((!snapshot.hasData || snapshot.data == null)) {
+          return Center(
+            child: Text(
+              'Dio nije pronađen',
+              style: TextStyle(fontSize: 24, color: Colors.black),
+            ),
+          );
+        } else {
+          var dio = snapshot.data as Map;
+          var slikeDijelovis = dio['slikeDijelovis'];
+          return Center(
+            child: Container(
+              width: double.infinity,
+              height: double.infinity,
+              color: Colors.transparent,
+              child: Center(
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.72,
+                  height: MediaQuery.of(context).size.height * 0.50,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color.fromARGB(255, 236, 230, 230),
+                        Color.fromARGB(255, 188, 188, 188),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(15)), // Zaobljene ivice za cijeli dio
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: MediaQuery.of(context).size.height * 0.54 * 0.8,
+                        decoration: BoxDecoration(
+                          color: Color.fromARGB(0, 33, 149, 243), // Pozadina za "GorniDio"
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(15), // Zaobljene gornje ivice
+                          ),
+                        ),
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.2,
+                                height: MediaQuery.of(context).size.height * 0.45 * 0.8,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color.fromARGB(255, 82, 205, 210),
+                                      Color.fromARGB(255, 7, 161, 235),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    _buildDetailContainer('Naziv', dio['naziv']),
+                                    SizedBox(
+                                      height: MediaQuery.of(context).size.height * 0.008,
+                                    ),
+                                    _buildDetailContainer('Cijena', dio['cijena']),
+                                    SizedBox(
+                                      height: MediaQuery.of(context).size.height * 0.008,
+                                    ),
+                                    _buildDetailContainer('Kolicina', dio['kolicina']),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.25,
+                                height: MediaQuery.of(context).size.height * 0.45 * 0.8,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color.fromARGB(255, 82, 205, 210),
+                                      Color.fromARGB(255, 7, 161, 235),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Container(
+                                  width: MediaQuery.of(context).size.width * 0.25,
+                                  child: ImageCarousel(
+                                    slikeBiciklis: slikeDijelovis,
+                                    initialIndex: 0,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.2,
+                                height: MediaQuery.of(context).size.height * 0.45 * 0.8,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color.fromARGB(255, 82, 205, 210),
+                                      Color.fromARGB(255, 7, 161, 235),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    _buildDetailContainer('Promovisan od:', selectedPromocija['datumPocetka'].split('T')[0].replaceAll('-', '.')),
+                                    SizedBox(
+                                      height: MediaQuery.of(context).size.height * 0.008,
+                                    ),
+                                    _buildDetailContainer('Promovisan do:', selectedPromocija['datumZavrsetka'].split('T')[0].replaceAll('-', '.')),
+                                    SizedBox(
+                                      height: MediaQuery.of(context).size.height * 0.008,
+                                    ),
+                                    _buildDetailContainer('Status', selectedPromocija['status']),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        height: MediaQuery.of(context).size.height * 0.15 * 0.45,
+                        decoration: BoxDecoration(
+                          color: Color.fromARGB(0, 76, 175, 79), // Pozadina za "DonjiDio"
+                          borderRadius: BorderRadius.vertical(
+                            bottom: Radius.circular(15), // Zaobljene donje ivice
+                          ),
+                        ),
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (selectedPromocija['status'] != "zavrseno") ...[
+                                if (selectedPromocija['status'] == "kreiran" || selectedPromocija['status'] == "izmijenjen") ...[
+                                  _buildSetStatusButton("Aktiviraj", "DijeloviPromocija"),
+                                  SizedBox(width: 10),
+                                ],
+                                if (selectedPromocija['status'] != "obrisan") ...[
+                                  if (selectedPromocija['status'] != "vracen") ...[
+                                    _buildSetStatusButton("Vrati", "DijeloviPromocija"),
+                                    SizedBox(width: 10),
+                                  ],
+                                  _buildSetStatusButton("Obrisi", "DijeloviPromocija"),
+                                ],
                               ],
                             ],
                           ),
@@ -4488,6 +5704,27 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
           title,
           style: TextStyle(
             color: _selectedStatusServisera == title ? Colors.white : Colors.blue,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusButtonPromocije(String title) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.1,
+      height: MediaQuery.of(context).size.height * 0.05,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: _selectedStatusPromocijeB == title ? Color.fromARGB(255, 87, 202, 255) : const Color.fromARGB(255, 242, 242, 242),
+        ),
+        onPressed: () {
+          _filterPromocije(title);
+        },
+        child: Text(
+          title,
+          style: TextStyle(
+            color: _selectedStatusPromocijeB == title ? Colors.white : Colors.blue,
           ),
         ),
       ),

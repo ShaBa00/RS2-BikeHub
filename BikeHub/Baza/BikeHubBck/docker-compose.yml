@@ -1,0 +1,91 @@
+version: '3'
+services:
+  # mssql docker
+  bikehub-sql:
+    image: mcr.microsoft.com/mssql/server:2017-latest-ubuntu
+    restart: unless-stopped
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${SQL_PASSWORD}
+      - MSSQL_PID=Developer
+    ports:
+      - 1401:1433
+    expose:
+      - 1433
+    networks:
+      - bikehubnet2024
+
+  # bikehub API docker
+  bikehub-api:
+    restart: unless-stopped
+    build:
+      context: .
+    environment:
+      - ConnectionStrings:BikeHubConnectionString=Server=${SQL_HOST},1433;Database=${SQL_DATABASE};User=${SQL_USER};Password=${SQL_PASSWORD};ConnectRetryCount=0;TrustServerCertificate=True
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RabbitMQ:HostName=${RABBITMQ_HOST}
+      - RabbitMQ:Username=${RABBITMQ_USER}
+      - RabbitMQ:Password=${RABBITMQ_PASSWORD}
+      - RabbitMQ:VirtualHost=${RABBITMQ_VIRTUALHOST}
+      - RabbitMQ:Port=${RABBITMQ_PORT}
+    ports:
+      - 7077:7077
+    networks:
+      - bikehubnet2024
+    links:
+      - bikehub-sql
+    depends_on:
+      - bikehub-sql
+      - rabbitmq
+
+  # rabbitmq docker
+  rabbitmq:
+    image: rabbitmq:3.8-management-alpine
+    hostname: rabbitmq
+    restart: unless-stopped
+    ports:
+      - 5672:5672
+      - 15672:15672
+      - 15692:15692
+    expose:
+      - 5672
+      - 15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+    networks:
+      - bikehubnet2024
+    volumes:
+      - ./docker_data/rabbitmq_data:/var/lib/rabbitmq
+      - ./docker_data/rabbitmq_logs:/var/log/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # bikehub subscribe docker
+  bikehub-subscribe:
+    build:
+      context: .
+      dockerfile: DockerfileSubscribe
+    environment:
+      - ConnectionStrings:BikeHubConnectionString=Server=${SQL_HOST},1433;Database=${SQL_DATABASE};User=${SQL_USER};Password=${SQL_PASSWORD};ConnectRetryCount=0;TrustServerCertificate=True
+      - RabbitMQ:HostName=${RABBITMQ_HOST}
+      - RabbitMQ:Username=${RABBITMQ_USER}
+      - RabbitMQ:Password=${RABBITMQ_PASSWORD}
+      - RabbitMQ:VirtualHost=${RABBITMQ_VIRTUALHOST}
+      - RabbitMQ:Port=${RABBITMQ_PORT}
+    ports:
+      - 7078:7078
+    links:
+      - bikehub-sql
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - bikehubnet2024
+
+networks:
+  bikehubnet2024:
+    driver: bridge

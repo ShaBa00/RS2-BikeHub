@@ -32,7 +32,7 @@ class SpaseniBicikliService {
     }
     // Generiraj Authorization header
     final authHeader = _korisnikService.encodeBasicAuth(username, password);
-    _dio.options.headers['Authorization'] = authHeader; 
+    _dio.options.headers['Authorization'] = authHeader;
   }
 
   Future<List<Map<String, dynamic>>> getSpaseniBicikli({
@@ -56,19 +56,13 @@ class SpaseniBicikliService {
 
       if (response.statusCode == 200) {
         count = response.data['count'];
-        final List<Map<String, dynamic>> spaseniBicikli =
-            List<Map<String, dynamic>>.from(response.data['resultsList']);
+        final List<Map<String, dynamic>> spaseniBicikli = List<Map<String, dynamic>>.from(response.data['resultsList']);
 
         List<Map<String, dynamic>> filtriraniBicikli = spaseniBicikli.toList();
-        if(status.isEmpty){
-          filtriraniBicikli = filtriraniBicikli
-          .where((bicikl) => bicikl['status'] != 'obrisan')
-          .toList();
-        }
-        else{
-          filtriraniBicikli = filtriraniBicikli
-          .where((bicikl) => bicikl['status'] == 'obrisan')
-          .toList();
+        if (status.isEmpty) {
+          filtriraniBicikli = filtriraniBicikli.where((bicikl) => bicikl['status'] != 'obrisan').toList();
+        } else {
+          filtriraniBicikli = filtriraniBicikli.where((bicikl) => bicikl['status'] == 'obrisan').toList();
           return filtriraniBicikli;
         }
 
@@ -84,6 +78,32 @@ class SpaseniBicikliService {
       return [];
     }
   }
+
+  Future<Map<String, dynamic>?> isBiciklSacuvan({required int korisnikId, required int biciklId}) async {
+    await _addAuthorizationHeader();
+
+    final queryParameters = <String, dynamic>{
+      'korisnikId': korisnikId,
+      if (biciklId != 0) 'BiciklId': biciklId,
+    };
+
+    final response = await _dio.get(
+      '${HelperService.baseUrl}/SpaseniBicikli',
+      queryParameters: queryParameters,
+    );
+
+    if (response.statusCode == 200) {
+      count = response.data['count'];
+      if (count == 0) {
+        return null;
+      }
+      final List<Map<String, dynamic>> spaseniBicikli = List<Map<String, dynamic>>.from(response.data['resultsList']);
+      return spaseniBicikli[0];
+    } else {
+      throw Exception('Failed to load spaseni bicikli');
+    }
+  }
+
   Future<void> removeSpaseniBicikl(int idSpasenogBicikla) async {
     try {
       await _addAuthorizationHeader();
@@ -103,6 +123,7 @@ class SpaseniBicikliService {
       logger.e('Greška pri uklanjanju sačuvanog bicikla: $e');
     }
   }
+
   Future<void> updateSpaseniBicikl(int idSpasenogBicikla, int biciklId, String datumSpasavanja, int korisnikId) async {
     try {
       await _addAuthorizationHeader();
@@ -133,7 +154,7 @@ class SpaseniBicikliService {
       logger.e('Greška pri ažuriranju sačuvanog bicikla: $e');
     }
   }
-  
+
   Future<bool> addSpaseniBicikl(BuildContext context, int biciklID, int korisnikId) async {
     String trenutniDatum = DateTime.now().toIso8601String().split('T').first;
     var spaseniBicikli = await getSpaseniBicikli(
@@ -142,8 +163,7 @@ class SpaseniBicikliService {
       biciklId: biciklID,
     );
 
-    bool postojiBicikl = spaseniBicikli.any((bicikl) =>
-        bicikl['biciklId'] == biciklID && bicikl['status'] == 'obrisan');
+    bool postojiBicikl = spaseniBicikli.any((bicikl) => bicikl['biciklId'] == biciklID && bicikl['status'] == 'obrisan');
     if (postojiBicikl) {
       int idSpasenogBicikla = spaseniBicikli[0]['spaseniBicikliId'];
       await updateSpaseniBicikl(idSpasenogBicikla, biciklID, trenutniDatum, korisnikId);
@@ -178,11 +198,10 @@ class SpaseniBicikliService {
           errorMessage = errorData['errors']['userError'][0];
         }
       }
-      
+
       logger.e('Greška pri čuvanju bicikla: $errorMessage');
       PorukaHelper.prikaziPorukuGreske(context, errorMessage); // Prikazuje grešku korisniku
       return false; // Neuspješno
     }
   }
-
 }

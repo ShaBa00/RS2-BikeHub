@@ -32,21 +32,16 @@ class SpaseniDijeloviService {
     }
     // Generiraj Authorization header
     final authHeader = _korisnikService.encodeBasicAuth(username, password);
-    _dio.options.headers['Authorization'] = authHeader; 
+    _dio.options.headers['Authorization'] = authHeader;
   }
 
-  Future<List<Map<String, dynamic>>> getSpaseniDijelovi({
-    required int korisnikId,
-    required String status,
-    required int dijeloviId
-  }) async {
+  Future<List<Map<String, dynamic>>> getSpaseniDijelovi({required int korisnikId, required String status, required int dijeloviId}) async {
     try {
-
       await _addAuthorizationHeader();
 
       final queryParameters = <String, dynamic>{
         'KorisnikId': korisnikId,
-        if (dijeloviId != 0) 'BiciklId': dijeloviId,
+        if (dijeloviId != 0) 'dijeloviId': dijeloviId,
       };
 
       final response = await _dio.get(
@@ -56,19 +51,13 @@ class SpaseniDijeloviService {
 
       if (response.statusCode == 200) {
         count = response.data['count'];
-        final List<Map<String, dynamic>> spaseniDijelovi =
-            List<Map<String, dynamic>>.from(response.data['resultsList']);
-            
+        final List<Map<String, dynamic>> spaseniDijelovi = List<Map<String, dynamic>>.from(response.data['resultsList']);
+
         List<Map<String, dynamic>> filtriraniDijelovi = spaseniDijelovi.toList();
-        if(status.isEmpty){
-          filtriraniDijelovi = filtriraniDijelovi
-          .where((dijelovi) => dijelovi['status'] != 'obrisan')
-          .toList();
-        }
-        else{
-          filtriraniDijelovi = filtriraniDijelovi
-          .where((dijelovi) => dijelovi['status'] == 'obrisan')
-          .toList();
+        if (status.isEmpty) {
+          filtriraniDijelovi = filtriraniDijelovi.where((dijelovi) => dijelovi['status'] != 'obrisan').toList();
+        } else {
+          filtriraniDijelovi = filtriraniDijelovi.where((dijelovi) => dijelovi['status'] == 'obrisan').toList();
           return filtriraniDijelovi;
         }
 
@@ -94,7 +83,7 @@ class SpaseniDijeloviService {
 
       if (response.statusCode == 200) {
         listaUcitanihSpasenihDijelova.value.removeWhere((dijelovi) => dijelovi['id'] == idSpasenogDijelovi);
-        
+
         listaUcitanihSpasenihDijelova.notifyListeners();
         logger.i('Sačuvani dio uspješno uklonjen.');
       } else {
@@ -106,7 +95,6 @@ class SpaseniDijeloviService {
   }
 
   Future<bool> addSpaseniDijelovi(BuildContext context, int dijeloviId, int korisnikId) async {
-
     String trenutniDatum = DateTime.now().toIso8601String().split('T').first;
     var spaseniDijelovi = await getSpaseniDijelovi(
       korisnikId: korisnikId,
@@ -114,11 +102,10 @@ class SpaseniDijeloviService {
       dijeloviId: dijeloviId,
     );
 
-    bool postojiDio = spaseniDijelovi.any((dijelovi) =>
-        dijelovi['dijeloviId'] == dijeloviId && dijelovi['status'] == 'obrisan');
+    bool postojiDio = spaseniDijelovi.any((dijelovi) => dijelovi['dijeloviId'] == dijeloviId && dijelovi['status'] == 'obrisan');
     if (postojiDio) {
       int idSpasenogDijela = spaseniDijelovi[0]['spaseniDijeloviId'];
-      await updateSpaseniBicikl(idSpasenogDijela, dijeloviId, trenutniDatum, korisnikId);
+      await updateSpaseniDijelovi(idSpasenogDijela, dijeloviId, trenutniDatum, korisnikId);
       PorukaHelper.prikaziPorukuUspjeha(context, 'Dijelovi uspješno sačuvan.');
       return true;
     }
@@ -144,20 +131,20 @@ class SpaseniDijeloviService {
       }
     } catch (e) {
       String errorMessage = 'Došlo je do greške pri čuvanja dijelova.';
-      if (e is DioException  && e.response != null && e.response!.data != null) {
+      if (e is DioException && e.response != null && e.response!.data != null) {
         var errorData = e.response!.data;
         if (errorData['errors'] != null && errorData['errors']['userError'] != null) {
           errorMessage = errorData['errors']['userError'][0];
         }
       }
-      
+
       logger.e('Greška pri čuvanju dijelova: $errorMessage');
       PorukaHelper.prikaziPorukuGreske(context, errorMessage); // Prikazuje grešku korisniku
       return false; // Neuspješno
     }
   }
 
-  Future<void> updateSpaseniBicikl(int idSpasenogDijela, int dijeloviId, String datumSpasavanja, int korisnikId) async {
+  Future<void> updateSpaseniDijelovi(int idSpasenogDijela, int dijeloviId, String datumSpasavanja, int korisnikId) async {
     try {
       await _addAuthorizationHeader();
 
@@ -188,4 +175,28 @@ class SpaseniDijeloviService {
     }
   }
 
+  Future<Map<String, dynamic>?> isdIOSacuvan({required int korisnikId, required int dijeloviId}) async {
+    await _addAuthorizationHeader();
+
+    final queryParameters = <String, dynamic>{
+      'korisnikId': korisnikId,
+      if (dijeloviId != 0) 'dijeloviId': dijeloviId,
+    };
+
+    final response = await _dio.get(
+      '${HelperService.baseUrl}/SpaseniDijelovi',
+      queryParameters: queryParameters,
+    );
+
+    if (response.statusCode == 200) {
+      count = response.data['count'];
+      if (count == 0) {
+        return null;
+      }
+      final List<Map<String, dynamic>> spaseniDijelovi = List<Map<String, dynamic>>.from(response.data['resultsList']);
+      return spaseniDijelovi[0];
+    } else {
+      throw Exception('Failed to load spaseni dijelovi');
+    }
+  }
 }

@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
 import 'package:bikehub_desktop/screens/ostalo/poruka_helper.dart';
 import 'package:bikehub_desktop/services/korisnik/korisnik_service.dart';
@@ -15,9 +15,8 @@ class RezervacijeKorisnika extends StatefulWidget {
 }
 
 class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
-  
   late final int korisnikId;
-  
+
   final RezervacijaServisaService _rezervacijaServisaService = RezervacijaServisaService();
   final KorisnikService korisnikService = KorisnikService();
 
@@ -42,26 +41,25 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
   }
 
   void _nextPage() {
-    if(_rezervacijaServisaService.count>(_pageSize*(_currentPage+1))){
-       if(_rezervacijaServisaService.lista_ucitanih_rezervacija.value.length==_pageSize){
-          _currentPage++;
-          tipRezervacije(zadnjiStatus);
-        }
+    if (_rezervacijaServisaService.count > (_pageSize * (_currentPage + 1))) {
+      if (_rezervacijaServisaService.lista_ucitanih_rezervacija.value.length == _pageSize) {
+        _currentPage++;
+        tipRezervacije(zadnjiStatus);
       }
     }
-  
+  }
+
   void _previousPage() {
-    if (_currentPage > 0) 
-    {
+    if (_currentPage > 0) {
       _currentPage--;
       tipRezervacije(zadnjiStatus);
     }
   }
 
-  void postaviStanje(int idRezervacije, String stanje) async{
+  void postaviStanje(int idRezervacije, String stanje) async {
     try {
       bool result = await _rezervacijaServisaService.postaviStanje(idRezervacije, stanje);
-      if (result) {        
+      if (result) {
         tipRezervacije(zadnjiStatus);
 
         //print('Rezervacija uspješno ažurirana.');
@@ -75,15 +73,13 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
 
   // ignore: no_leading_underscores_for_local_identifiers
   void tipRezervacije(String _status) async {
-
     if (korisnikId == 0) {
       //logger.e('Serviser ID nije pronađen u serviserData');
       return;
     }
 
-    zadnjiStatus=_status;
+    zadnjiStatus = _status;
 
-    
     final data = await _rezervacijaServisaService.getRezervacije(
       korisnikId: korisnikId,
       status: zadnjiStatus,
@@ -109,7 +105,6 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
     } else {
       PorukaHelper.prikaziPorukuGreske(context, "Greška pri brisanju rezervacije.");
     }
-
   }
 
   @override
@@ -123,14 +118,14 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
     return DateFormat('dd.MM.yyyy').format(parsedDate);
   }
 
-  void dodajOcjenu(int ocjena,int rezervacijaID) async{
-  try {
-    await _rezervacijaServisaService.dodajOcjenu(rezervacijaID, ocjena);
-    PorukaHelper.prikaziPorukuUspjeha(context, "Ocjena $ocjena je uspješno dodana");
-    tipRezervacije(zadnjiStatus);
+  void dodajOcjenu(int ocjena, int rezervacijaID) async {
+    try {
+      await _rezervacijaServisaService.dodajOcjenu(rezervacijaID, ocjena);
+      PorukaHelper.prikaziPorukuUspjeha(context, "Ocjena $ocjena je uspješno dodana");
+      tipRezervacije(zadnjiStatus);
     } catch (e) {
-    PorukaHelper.prikaziPorukuGreske(context, "Greška prilikom dodavanja ocjene: $e");
-  }
+      PorukaHelper.prikaziPorukuGreske(context, "Greška prilikom dodavanja ocjene: $e");
+    }
   }
 
   void showRatingDialog(BuildContext context, int rezervacijaId) {
@@ -149,7 +144,7 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
                   DropdownButton<int>(
                     value: odabranaOcjena,
                     hint: const Text(
-                       "Ocijenite",
+                      "Ocijenite",
                       style: TextStyle(color: Colors.white),
                     ),
                     dropdownColor: Colors.blue.shade900,
@@ -232,49 +227,73 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            const SizedBox(width: 30), 
+                            const SizedBox(width: 30),
                             ElevatedButton(
                               onPressed: () {
-                                _currentPage=0;
+                                _currentPage = 0;
                                 tipRezervacije("kreiran");
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: zadnjiStatus=="kreiran" ? Colors.blue : Colors.grey,
+                                backgroundColor:
+                                    zadnjiStatus == "kreiran" ? Color.fromARGB(255, 87, 202, 255) : const Color.fromARGB(255, 242, 242, 242),
                               ),
-                              child: const Text('Zahtjevi'),
+                              child: Text(
+                                'Zahtjevi',
+                                style: TextStyle(
+                                  color: zadnjiStatus == "kreiran" ? Colors.white : Colors.blue,
+                                ),
+                              ),
                             ),
                             const SizedBox(width: 20),
                             ElevatedButton(
                               onPressed: () {
-                                _currentPage=0;
+                                _currentPage = 0;
                                 tipRezervacije("aktivan");
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: zadnjiStatus=="aktivan" ? Colors.blue : Colors.grey,
+                                backgroundColor:
+                                    zadnjiStatus == "aktivan" ? Color.fromARGB(255, 87, 202, 255) : const Color.fromARGB(255, 242, 242, 242),
                               ),
-                              child: const Text('Aktivne'),
+                              child: Text(
+                                'Aktivne',
+                                style: TextStyle(
+                                  color: zadnjiStatus == "aktivan" ? Colors.white : Colors.blue,
+                                ),
+                              ),
                             ),
                             const SizedBox(width: 20),
-                            ElevatedButton(                                        
-                            onPressed: () {
-                              _currentPage=0;
-                              tipRezervacije("zavrseno");
-                            },                                      
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: zadnjiStatus=="zavrseno" ? Colors.blue : Colors.grey,
-                            ),
-                              child: const Text('Završene'),
+                            ElevatedButton(
+                              onPressed: () {
+                                _currentPage = 0;
+                                tipRezervacije("zavrseno");
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    zadnjiStatus == "zavrseno" ? Color.fromARGB(255, 87, 202, 255) : const Color.fromARGB(255, 242, 242, 242),
+                              ),
+                              child: Text(
+                                'Završene',
+                                style: TextStyle(
+                                  color: zadnjiStatus == "zavrseno" ? Colors.white : Colors.blue,
+                                ),
+                              ),
                             ),
                             const SizedBox(width: 20),
-                            ElevatedButton(                                        
-                            onPressed: () {
-                              _currentPage=0;
-                              tipRezervacije("vracen");
-                            },                                      
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: zadnjiStatus=="vracen" ? Colors.blue : Colors.grey,
-                            ),
-                              child: const Text('Vracene'),
+                            ElevatedButton(
+                              onPressed: () {
+                                _currentPage = 0;
+                                tipRezervacije("vracen");
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    zadnjiStatus == "vracen" ? Color.fromARGB(255, 87, 202, 255) : const Color.fromARGB(255, 242, 242, 242),
+                              ),
+                              child: Text(
+                                'Vracene',
+                                style: TextStyle(
+                                  color: zadnjiStatus == "vracen" ? Colors.white : Colors.blue,
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -285,8 +304,8 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
                         width: MediaQuery.of(context).size.width * 0.1,
                         height: double.infinity,
                         child: isZavrseneSelected == false
-                            ? _buildDetailContainer('Broj zahtjeva', _rezervacijaServisaService.count,0.002)
-                            : _buildDetailContainer('Broj zavrsenih', _rezervacijaServisaService.count,0.002),
+                            ? _buildDetailContainer('Broj zahtjeva', _rezervacijaServisaService.count, 0.002)
+                            : _buildDetailContainer('Broj zavrsenih', _rezervacijaServisaService.count, 0.002),
                       ),
                     ],
                   ),
@@ -358,11 +377,12 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
       ),
     );
   }
+
   Widget _buildDetailContainer(String label, dynamic value, double sirina) {
     return Container(
       width: MediaQuery.of(context).size.width * sirina,
       padding: const EdgeInsets.all(8.0),
-      decoration: BoxDecoration(        
+      decoration: BoxDecoration(
         border: Border(
           left: BorderSide(color: Colors.blue.shade900, width: 2.0),
           bottom: BorderSide(color: Colors.blue.shade900, width: 2.0),
@@ -375,17 +395,17 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
         children: [
           Text(
             '$label: ',
-            // ignore: prefer_const_constructors
             style: TextStyle(color: Colors.white),
-          ),   
+          ),
           Text(
             '$value',
             style: const TextStyle(color: Colors.white),
-          ),                           
+          ),
         ],
       ),
     );
   }
+
   Widget buildRezervacijeList() {
     final rezervacije = rezervacijeList ?? [];
 
@@ -394,102 +414,111 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
       itemBuilder: (context, index) {
         final rezervacija = rezervacije[index];
 
-      return Container(
-        width: MediaQuery.of(context).size.width * 0.8,
-        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
-        margin: const EdgeInsets.only(top: 8.0),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [
-              Color.fromARGB(255, 92, 225, 230),
-              Color.fromARGB(255, 7, 181, 255),
+        return Container(
+          width: MediaQuery.of(context).size.width * 0.8,
+          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+          margin: const EdgeInsets.only(top: 8.0),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [
+                Color.fromARGB(255, 92, 225, 230),
+                Color.fromARGB(255, 7, 181, 255),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(8.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: const Offset(0, 3),
+              ),
             ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(8.0),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 2,
-              blurRadius: 5,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            // ignore: sized_box_for_whitespace
-            Container(
-              width: MediaQuery.of(context).size.width * 0.5, 
-              child: Column(
-                children: [
-                  // ignore: sized_box_for_whitespace
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.048,
-                    child: Row(
-                      children: [
-                        const SizedBox(width: 10.0),
-                        _buildDetailContainer('Serviser ID', {rezervacija['serviserId']},0.1),
-                        const SizedBox(width: 10.0),
-                        _buildDetailContainer('Datum kreiranja', formatDate(rezervacija['datumKreiranja']),0.18),
-                        const SizedBox(width: 10.0),
-                        if (rezervacija['status'] == 'zavrseno' && rezervacija['ocjena'] != null)
-                          _buildDetailContainer('Ocjena', {rezervacija['ocjena']},0.08),
-                      ],
+          child: Row(
+            children: [
+              // ignore: sized_box_for_whitespace
+              Container(
+                width: MediaQuery.of(context).size.width * 0.5,
+                child: Column(
+                  children: [
+                    // ignore: sized_box_for_whitespace
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.048,
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 10.0),
+                          _buildDetailContainer('Serviser ID', {rezervacija['serviserId']}, 0.1),
+                          const SizedBox(width: 10.0),
+                          _buildDetailContainer('Datum kreiranja', formatDate(rezervacija['datumKreiranja']), 0.18),
+                          const SizedBox(width: 10.0),
+                          if (rezervacija['status'] == 'zavrseno' && rezervacija['ocjena'] != null)
+                            _buildDetailContainer('Ocjena', {rezervacija['ocjena']}, 0.08),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 10.0),
-                  // ignore: sized_box_for_whitespace
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.048, // 50% of KL's height
-                    child: Row(
-                    children: [
-                      const SizedBox(width: 10.0),
-                      _buildDetailContainer('Status', rezervacija['status'], 0.1),
-                      const SizedBox(width: 10.0),
-                      _buildDetailContainer('Datum', formatDate(rezervacija['datumRezervacije']), 0.18),
-                      const SizedBox(width: 10.0),
-                    ],
+                    const SizedBox(height: 10.0),
+                    // ignore: sized_box_for_whitespace
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.048, // 50% of KL's height
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 10.0),
+                          _buildDetailContainer('Status', rezervacija['status'], 0.1),
+                          const SizedBox(width: 10.0),
+                          _buildDetailContainer('Datum', formatDate(rezervacija['datumRezervacije']), 0.18),
+                          const SizedBox(width: 10.0),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            // ignore: sized_box_for_whitespace
-            Container(
-              width: MediaQuery.of(context).size.width * 0.2, 
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (rezervacija['status'] == 'kreiran')
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            obrisi(rezervacija['rezervacijaId']);
-                          },
-                          child: const Text('Obriši'),
-                        ),
-                      ],
-                    ),
-                  const SizedBox(width: 8),
-                  if (rezervacija['status'] == 'zavrseno' &&
-                   (rezervacija['ocjena'] == null || rezervacija['ocjena']==0) )
-                    ElevatedButton(
-                      onPressed: () {
-                        showRatingDialog(context,rezervacija['rezervacijaId']);
-                        //postaviStanje(rezervacija['rezervacijaId'],"zavrseno");
+              // ignore: sized_box_for_whitespace
+              Container(
+                width: MediaQuery.of(context).size.width * 0.2,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (rezervacija['status'] == 'kreiran')
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              obrisi(rezervacija['rezervacijaId']);
+                            },
+                            child: Text(
+                              'Obriši',
+                              style: TextStyle(
+                                color: Colors.blue,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    const SizedBox(width: 8),
+                    if (rezervacija['status'] == 'zavrseno' && (rezervacija['ocjena'] == null || rezervacija['ocjena'] == 0))
+                      ElevatedButton(
+                        onPressed: () {
+                          showRatingDialog(context, rezervacija['rezervacijaId']);
+                          //postaviStanje(rezervacija['rezervacijaId'],"zavrseno");
                         },
-                      child: const Text('Dodaj ocjenu'),
-                    ),
-                ],
+                        child: Text(
+                          'Dodaj ocjenu',
+                          style: TextStyle(
+                            color: Colors.blue,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-      );
+            ],
+          ),
+        );
       },
     );
   }

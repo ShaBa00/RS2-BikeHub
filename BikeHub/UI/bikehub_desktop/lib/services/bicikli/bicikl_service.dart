@@ -15,10 +15,10 @@ class BiciklService {
   // ignore: non_constant_identifier_names
   final ValueNotifier<List<Map<String, dynamic>>> lista_ucitanih_bicikala = ValueNotifier([]);
   List<dynamic> listaBicikala = [];
-  int count=0;
+  int count = 0;
   Future<List<Map<String, dynamic>>> getBicikli({
     String? naziv,
-    String? status,//="aktivan",
+    String? status, //="aktivan",
     double? pocetnaCijena,
     double? krajnjaCijena,
     int? kolicina,
@@ -28,9 +28,9 @@ class BiciklService {
     int? brojBrzina,
     int? kategorijaId,
     List<int>? korisniciId,
-    int? page =0,
-    int? pageSize =10,
-    bool isSlikaIncluded=true,
+    int? page = 0,
+    int? pageSize = 10,
+    bool isSlikaIncluded = true,
   }) async {
     try {
       final queryParameters = <String, dynamic>{};
@@ -64,22 +64,21 @@ class BiciklService {
           final filteredBicikli = bicikli.where((bicikl) {
             return korisniciId.contains(bicikl['korisnikId']);
           }).toList();
-          
+
           lista_ucitanih_bicikala.value = filteredBicikli;
-          bicikli=lista_ucitanih_bicikala.value;
-        }
-        else{
-        lista_ucitanih_bicikala.value = bicikli;
+          bicikli = lista_ucitanih_bicikala.value;
+        } else {
+          lista_ucitanih_bicikala.value = bicikli;
         }
         // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
         lista_ucitanih_bicikala.notifyListeners();
-        return bicikli; 
+        return bicikli;
       } else {
         throw Exception('Failed to load bicikli');
       }
     } catch (e) {
       logger.e('Greška: $e');
-      return []; 
+      return [];
     }
   }
 
@@ -99,7 +98,7 @@ class BiciklService {
       return [];
     }
   }
-  
+
   Future<void> _addAuthorizationHeader() async {
     // Provjera da li je korisnik prijavljen
     final isLoggedIn = await _korisnikService.isLoggedIn();
@@ -117,7 +116,7 @@ class BiciklService {
     }
     // Generiraj Authorization header
     final authHeader = _korisnikService.encodeBasicAuth(username, password);
-    _dio.options.headers['Authorization'] = authHeader; 
+    _dio.options.headers['Authorization'] = authHeader;
   }
 
   Future<Map<String, dynamic>?> postBicikl(Bicikl biciklData) async {
@@ -209,7 +208,7 @@ class BiciklService {
             throw Exception('Greška pri brisanju Bicikla');
           }
         }
-      } 
+      }
     } catch (e) {
       logger.e('Greška: $e');
       // ignore: use_rethrow_when_possible
@@ -228,6 +227,103 @@ class BiciklService {
         return bicikl;
       } else {
         throw Exception('Failed to load bicikl');
+      }
+    } catch (e) {
+      logger.e('Greška: $e');
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> putBicikl(
+    int biciklId,
+    String naziv,
+    int cijena,
+    String velicinaRama,
+    String velicinaTocka,
+    int brojBrzina,
+    int kategorijaId,
+    int korisnikId,
+    int kolicina,
+  ) async {
+    if (biciklId == 0 || korisnikId == 0) {
+      return null;
+    }
+    if (naziv.isEmpty && cijena == 0 && velicinaRama.isEmpty && velicinaTocka.isEmpty && brojBrzina == 0 && kategorijaId == 0 && kolicina == 0) {
+      return null;
+    }
+    try {
+      await _addAuthorizationHeader();
+
+      final data = <String, dynamic>{};
+      data['korisnikId'] = korisnikId;
+
+      if (naziv.isNotEmpty) {
+        data['naziv'] = naziv;
+      }
+      if (cijena != 0) {
+        data['cijena'] = cijena;
+      }
+      if (velicinaRama.isNotEmpty) {
+        data['velicinaRama'] = velicinaRama;
+      }
+      if (velicinaTocka.isNotEmpty) {
+        data['velicinaTocka'] = velicinaTocka;
+      }
+      if (brojBrzina != 0) {
+        data['brojBrzina'] = brojBrzina;
+      }
+      if (kategorijaId != 0) {
+        data['kategorijaId'] = kategorijaId;
+      }
+      if (kolicina != 0) {
+        data['kolicina'] = kolicina;
+      }
+
+      final response = await _dio.put(
+        '${HelperService.baseUrl}/Bicikli/$biciklId',
+        options: Options(
+          headers: {
+            'accept': 'text/plain',
+            'Content-Type': 'application/json',
+          },
+        ),
+        data: data,
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> result = response.data;
+        return result;
+      } else {
+        throw Exception('Failed to upload image');
+      }
+    } catch (e) {
+      logger.e('Greška: $e');
+      return null;
+    }
+  }
+
+  Future<String?> deleteBicikl(int biciklId) async {
+    if (biciklId == 0) {
+      return null;
+    }
+    try {
+      await _addAuthorizationHeader();
+
+      final response = await _dio.delete(
+        '${HelperService.baseUrl}/Bicikli/$biciklId',
+        options: Options(
+          headers: {
+            'accept': 'text/plain',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final String result = response.data;
+        return result;
+      } else {
+        throw Exception('Failed to delete image');
       }
     } catch (e) {
       logger.e('Greška: $e');

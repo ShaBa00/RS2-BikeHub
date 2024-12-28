@@ -29,10 +29,10 @@ class DijeloviService {
     }
     // Generiraj Authorization header
     final authHeader = _korisnikService.encodeBasicAuth(username, password);
-    _dio.options.headers['Authorization'] = authHeader; 
+    _dio.options.headers['Authorization'] = authHeader;
   }
- 
- Future<Map<String, dynamic>?> postDijelovi(Dijelovi dijeloviData) async {
+
+  Future<Map<String, dynamic>?> postDijelovi(Dijelovi dijeloviData) async {
     try {
       await _addAuthorizationHeader();
 
@@ -62,11 +62,11 @@ class DijeloviService {
   // ignore: non_constant_identifier_names
   final ValueNotifier<List<Map<String, dynamic>>> lista_ucitanih_dijelova = ValueNotifier([]);
   List<dynamic> listaDijelova = [];
-  int count=0;
+  int count = 0;
   Future<List<Map<String, dynamic>>> getDijelovi({
     String? naziv,
     int? korisnikId,
-    String? status="aktivan",
+    String? status = "aktivan",
     double? pocetnaCijena,
     double? krajnjaCijena,
     int? kolicina,
@@ -75,14 +75,14 @@ class DijeloviService {
     List<int>? korisniciId,
     int? page = 0,
     int? pageSize = 10,
-    bool isSlikaIncluded=true,
+    bool isSlikaIncluded = true,
   }) async {
     try {
       final queryParameters = <String, dynamic>{};
 
       if (naziv != null) queryParameters['Naziv'] = naziv;
       if (korisnikId != null) queryParameters['KorisnikId'] = korisnikId;
-      if (status != null) queryParameters['Status'] = status;      
+      if (status != null) queryParameters['Status'] = status;
       if (pocetnaCijena != null) queryParameters['pocetnaCijena'] = pocetnaCijena;
       if (krajnjaCijena != null) queryParameters['krajnjaCijena'] = krajnjaCijena;
       if (kolicina != null) queryParameters['Kolicina'] = kolicina;
@@ -100,23 +100,22 @@ class DijeloviService {
       );
 
       if (response.statusCode == 200) {
-        listaDijelova= response.data['resultsList'] ?? [];
+        listaDijelova = response.data['resultsList'] ?? [];
         count = response.data['count'];
         List<Map<String, dynamic>> dijelovi = List<Map<String, dynamic>>.from(response.data['resultsList']);
-          if (korisniciId != null && korisniciId.isNotEmpty) {
-            final filteredDijelovi = dijelovi.where((dio) {
+        if (korisniciId != null && korisniciId.isNotEmpty) {
+          final filteredDijelovi = dijelovi.where((dio) {
             return korisniciId.contains(dio['korisnikId']);
-            }).toList();
-          
-            lista_ucitanih_dijelova.value = filteredDijelovi;
-            dijelovi=lista_ucitanih_dijelova.value;
-          }
-          else{
+          }).toList();
+
+          lista_ucitanih_dijelova.value = filteredDijelovi;
+          dijelovi = lista_ucitanih_dijelova.value;
+        } else {
           lista_ucitanih_dijelova.value = dijelovi;
-          }
+        }
         // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
         lista_ucitanih_dijelova.notifyListeners();
-        return dijelovi; 
+        return dijelovi;
       } else {
         throw Exception('Failed to load dijelovi');
       }
@@ -125,6 +124,7 @@ class DijeloviService {
       return [];
     }
   }
+
   Future<Map<String, dynamic>?> getDijeloviById(int dioId) async {
     try {
       final response = await _dio.get(
@@ -205,11 +205,100 @@ class DijeloviService {
             throw Exception('Greška pri brisanju Dijelova');
           }
         }
-      } 
+      }
     } catch (e) {
       logger.e('Greška: $e');
       // ignore: use_rethrow_when_possible
       throw e;
+    }
+  }
+
+  Future<Map<String, dynamic>?> putDijelovi(
+    int dijeloviId,
+    String naziv,
+    int cijena,
+    String opis,
+    int kategorijaId,
+    int korisnikId,
+    int kolicina,
+  ) async {
+    if (dijeloviId == 0 || korisnikId == 0) {
+      return null;
+    }
+    if (naziv.isEmpty && cijena == 0 && opis.isEmpty && kolicina == 0 && kategorijaId == 0 && kolicina == 0) {
+      return null;
+    }
+    try {
+      await _addAuthorizationHeader();
+
+      final data = <String, dynamic>{};
+      data['korisnikId'] = korisnikId;
+
+      if (naziv.isNotEmpty) {
+        data['naziv'] = naziv;
+      }
+      if (cijena != 0) {
+        data['cijena'] = cijena;
+      }
+      if (opis.isNotEmpty) {
+        data['opis'] = opis;
+      }
+      if (kategorijaId != 0) {
+        data['kategorijaId'] = kategorijaId;
+      }
+      if (kolicina != 0) {
+        data['kolicina'] = kolicina;
+      }
+
+      final response = await _dio.put(
+        '${HelperService.baseUrl}/Dijelovi/$dijeloviId',
+        options: Options(
+          headers: {
+            'accept': 'text/plain',
+            'Content-Type': 'application/json',
+          },
+        ),
+        data: data,
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> result = response.data;
+        return result;
+      } else {
+        throw Exception('Failed to upload image');
+      }
+    } catch (e) {
+      logger.e('Greška: $e');
+      return null;
+    }
+  }
+
+  Future<String?> deleteDijelovi(int dijeloviId) async {
+    if (dijeloviId == 0) {
+      return null;
+    }
+    try {
+      await _addAuthorizationHeader();
+
+      final response = await _dio.delete(
+        '${HelperService.baseUrl}/Dijelovi/$dijeloviId',
+        options: Options(
+          headers: {
+            'accept': 'text/plain',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final String result = response.data;
+        return result;
+      } else {
+        throw Exception('Failed to delete image');
+      }
+    } catch (e) {
+      logger.e('Greška: $e');
+      return null;
     }
   }
 }

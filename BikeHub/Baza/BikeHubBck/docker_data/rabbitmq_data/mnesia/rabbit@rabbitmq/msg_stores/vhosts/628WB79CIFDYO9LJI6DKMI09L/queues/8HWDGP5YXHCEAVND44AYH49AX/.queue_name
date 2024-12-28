@@ -1,0 +1,2 @@
+VHOST: /
+QUEUE: BikeHub.Model.BicikliFM.BiciklAndEmails, BikeHub.Model_EmailBicikl

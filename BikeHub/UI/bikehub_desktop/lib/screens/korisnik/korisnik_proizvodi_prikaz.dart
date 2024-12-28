@@ -12,8 +12,7 @@ class KorisnikProizvodiPrikaz extends StatefulWidget {
 
   @override
   // ignore: library_private_types_in_public_api
-  _KorisnikProizvodiPrikazState createState() =>
-      _KorisnikProizvodiPrikazState();
+  _KorisnikProizvodiPrikazState createState() => _KorisnikProizvodiPrikazState();
 }
 
 class _KorisnikProizvodiPrikazState extends State<KorisnikProizvodiPrikaz> {
@@ -23,8 +22,7 @@ class _KorisnikProizvodiPrikazState extends State<KorisnikProizvodiPrikaz> {
   final int _itemsPerPage = 8;
 
   Widget _buildBicikliList(List<Map<String, dynamic>> bicikli) {
-    final displayedBicikli =
-        bicikli.skip(_currentPage * _itemsPerPage).take(_itemsPerPage).toList();
+    final displayedBicikli = bicikli.skip(_currentPage * _itemsPerPage).take(_itemsPerPage).toList();
 
     return Column(
       children: [
@@ -52,8 +50,7 @@ class _KorisnikProizvodiPrikazState extends State<KorisnikProizvodiPrikaz> {
                     final biciklId = item['biciklId'] ?? 0;
                     final korisnikId = item['korisnikId'] ?? 0;
                     Uint8List? imageBytes;
-                    if (item['slikeBiciklis'] != null &&
-                        item['slikeBiciklis'].isNotEmpty) {
+                    if (item['slikeBiciklis'] != null && item['slikeBiciklis'].isNotEmpty) {
                       final base64Image = item['slikeBiciklis'][0]['slika'];
                       imageBytes = base64Decode(base64Image);
                     }
@@ -87,32 +84,25 @@ class _KorisnikProizvodiPrikazState extends State<KorisnikProizvodiPrikaz> {
                                     topRight: Radius.circular(12.0),
                                   ),
                                   child: imageBytes != null
-                                      ? Image.memory(imageBytes,
-                                          fit: BoxFit.cover)
-                                      : const Icon(Icons.image_not_supported,
-                                          size: 50),
+                                      ? Image.memory(imageBytes, fit: BoxFit.cover)
+                                      : const Icon(Icons.image_not_supported, size: 50),
                                 ),
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(naziv,
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold)),
+                                        Text(naziv, style: const TextStyle(fontWeight: FontWeight.bold)),
                                         const SizedBox(height: 4),
                                         Text('Cijena: $cijena KM'),
                                       ],
                                     ),
                                     IconButton(
-                                      icon: const Icon(Icons.delete,
-                                          color: Colors.red),
+                                      icon: const Icon(Icons.delete, color: Colors.red),
                                       onPressed: () => _removeBicikl(biciklId),
                                     ),
                                   ],
@@ -145,10 +135,7 @@ class _KorisnikProizvodiPrikazState extends State<KorisnikProizvodiPrikaz> {
   }
 
   Widget _buildDijeloviList(List<Map<String, dynamic>> dijelovi) {
-    final displayedDijelovi = dijelovi
-        .skip(_currentPage * _itemsPerPage)
-        .take(_itemsPerPage)
-        .toList();
+    final displayedDijelovi = dijelovi.skip(_currentPage * _itemsPerPage).take(_itemsPerPage).toList();
 
     return Column(
       children: [
@@ -176,8 +163,7 @@ class _KorisnikProizvodiPrikazState extends State<KorisnikProizvodiPrikaz> {
                     final dijeloviId = item['dijeloviId'] ?? 0;
                     final korisnikId = item['korisnikId'] ?? 0;
                     Uint8List? imageBytes;
-                    if (item['slikeDijelovis'] != null &&
-                        item['slikeDijelovis'].isNotEmpty) {
+                    if (item['slikeDijelovis'] != null && item['slikeDijelovis'].isNotEmpty) {
                       final base64Image = item['slikeDijelovis'][0]['slika'];
                       imageBytes = base64Decode(base64Image);
                     }
@@ -189,8 +175,7 @@ class _KorisnikProizvodiPrikazState extends State<KorisnikProizvodiPrikaz> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => DijeloviPrikaz(
-                                  dioId: dijeloviId, korisnikId: korisnikId),
+                              builder: (context) => DijeloviPrikaz(dioId: dijeloviId, korisnikId: korisnikId),
                             ),
                           );
                         },
@@ -208,32 +193,25 @@ class _KorisnikProizvodiPrikazState extends State<KorisnikProizvodiPrikaz> {
                                     topRight: Radius.circular(12.0),
                                   ),
                                   child: imageBytes != null
-                                      ? Image.memory(imageBytes,
-                                          fit: BoxFit.cover)
-                                      : const Icon(Icons.image_not_supported,
-                                          size: 50),
+                                      ? Image.memory(imageBytes, fit: BoxFit.cover)
+                                      : const Icon(Icons.image_not_supported, size: 50),
                                 ),
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(naziv,
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold)),
+                                        Text(naziv, style: const TextStyle(fontWeight: FontWeight.bold)),
                                         const SizedBox(height: 4),
                                         Text('Cijena: $cijena KM'),
                                       ],
                                     ),
                                     IconButton(
-                                      icon: const Icon(Icons.delete,
-                                          color: Colors.red),
+                                      icon: const Icon(Icons.delete, color: Colors.red),
                                       onPressed: () => _removeDio(dijeloviId),
                                     ),
                                   ],
@@ -268,26 +246,24 @@ class _KorisnikProizvodiPrikazState extends State<KorisnikProizvodiPrikaz> {
   @override
   void initState() {
     super.initState();
-    _proizvodi = _fetchSacuvaniProizvodi();
+    _proizvodi = _fetchProizvodi();
   }
 
   void _removeBicikl(int biciklId) async {
     await BiciklService().removeBicikl(biciklId);
     setState(() {
-      _proizvodi = _fetchSacuvaniProizvodi();
+      _proizvodi = _fetchProizvodi();
     });
   }
 
   void _removeDio(int dijeloviId) async {
     await DijeloviService().removeDijelovi(dijeloviId);
     setState(() {
-      _proizvodi = _fetchSacuvaniProizvodi();
+      _proizvodi = _fetchProizvodi();
     });
   }
 
-  // ignore: unused_element
-  Future<Map<String, List<Map<String, dynamic>>>>
-      _fetchSacuvaniProizvodi() async {
+  Future<Map<String, List<Map<String, dynamic>>>> _fetchProizvodi() async {
     final KorisnikService korisnikService = KorisnikService();
     final DijeloviService dijeloviService = DijeloviService();
     final BiciklService biciklService = BiciklService();
@@ -295,15 +271,16 @@ class _KorisnikProizvodiPrikazState extends State<KorisnikProizvodiPrikaz> {
     final korisnikInfo = await korisnikService.getUserInfo();
     final korisnikId = int.parse(korisnikInfo['korisnikId'] ?? '0');
 
-    final korisnikoviDijelovi =
-        await dijeloviService.getDijelovi(korisnikId: korisnikId, status: "");
+    final korisnikoviDijelovi = await dijeloviService.getDijelovi(korisnikId: korisnikId, status: "");
+    final korisnikoviBicikli = await biciklService.getBicikli(korisnikId: korisnikId, status: "");
 
-    final korisnikoviBicikli =
-        await biciklService.getBicikli(korisnikId: korisnikId, status: "");
+    // Filtriranje dijelova i bicikala koji nisu obrisani
+    final filtriraniDijelovi = korisnikoviDijelovi.where((dio) => dio['status'] != 'obrisan').toList();
+    final filtriraniBicikli = korisnikoviBicikli.where((bicikl) => bicikl['status'] != 'obrisan').toList();
 
     return {
-      'dijelovi': korisnikoviDijelovi,
-      'bicikli': korisnikoviBicikli,
+      'dijelovi': filtriraniDijelovi,
+      'bicikli': filtriraniBicikli,
     };
   }
 
@@ -370,10 +347,8 @@ class _KorisnikProizvodiPrikazState extends State<KorisnikProizvodiPrikaz> {
                               });
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  _showBicikli ? Colors.blue : Colors.white,
-                              foregroundColor:
-                                  _showBicikli ? Colors.white : Colors.blue,
+                              backgroundColor: _showBicikli ? Colors.blue : Colors.white,
+                              foregroundColor: _showBicikli ? Colors.white : Colors.blue,
                             ),
                             child: const Text("Bicikli"),
                           ),
@@ -390,10 +365,8 @@ class _KorisnikProizvodiPrikazState extends State<KorisnikProizvodiPrikaz> {
                               });
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  _showBicikli ? Colors.white : Colors.blue,
-                              foregroundColor:
-                                  _showBicikli ? Colors.blue : Colors.white,
+                              backgroundColor: _showBicikli ? Colors.white : Colors.blue,
+                              foregroundColor: _showBicikli ? Colors.blue : Colors.white,
                             ),
                             child: const Text("Dijelovi"),
                           ),
@@ -413,21 +386,15 @@ class _KorisnikProizvodiPrikazState extends State<KorisnikProizvodiPrikaz> {
                       ),
                     ),
                     alignment: Alignment.center,
-                    child:
-                        FutureBuilder<Map<String, List<Map<String, dynamic>>>>(
+                    child: FutureBuilder<Map<String, List<Map<String, dynamic>>>>(
                       future: _proizvodi,
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                              child: CircularProgressIndicator());
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
                         } else if (snapshot.hasError) {
-                          return Center(
-                              child: Text('Greška: ${snapshot.error}'));
-                        } else if (!snapshot.hasData ||
-                            snapshot.data!.isEmpty) {
-                          return const Center(
-                              child: Text('Nema kreiranih proizvoda.'));
+                          return Center(child: Text('Greška: ${snapshot.error}'));
+                        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                          return const Center(child: Text('Nema kreiranih proizvoda.'));
                         }
 
                         final proizvodi = snapshot.data!;
@@ -435,10 +402,8 @@ class _KorisnikProizvodiPrikazState extends State<KorisnikProizvodiPrikaz> {
                         final korisnikoviDijelovi = proizvodi['dijelovi']!;
 
                         return Container(
-                          width:
-                              MediaQuery.of(context).size.width * 0.85 * 0.90,
-                          height:
-                              MediaQuery.of(context).size.height * 0.85 * 0.85,
+                          width: MediaQuery.of(context).size.width * 0.85 * 0.90,
+                          height: MediaQuery.of(context).size.height * 0.85 * 0.85,
                           decoration: const BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(10)),
                             gradient: LinearGradient(
@@ -451,9 +416,7 @@ class _KorisnikProizvodiPrikazState extends State<KorisnikProizvodiPrikaz> {
                             ),
                           ),
                           alignment: Alignment.center,
-                          child: _showBicikli
-                              ? _buildBicikliList(korisnikoviBicikli)
-                              : _buildDijeloviList(korisnikoviDijelovi),
+                          child: _showBicikli ? _buildBicikliList(korisnikoviBicikli) : _buildDijeloviList(korisnikoviDijelovi),
                         );
                       },
                     ),

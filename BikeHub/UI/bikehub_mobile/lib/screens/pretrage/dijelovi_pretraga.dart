@@ -16,8 +16,7 @@ class DijeloviPretraga extends StatefulWidget {
   _DijeloviPretragaState createState() => _DijeloviPretragaState();
 }
 
-class _DijeloviPretragaState extends State<DijeloviPretraga>
-    with SingleTickerProviderStateMixin {
+class _DijeloviPretragaState extends State<DijeloviPretraga> with SingleTickerProviderStateMixin {
   bool isPopupVisibleFilter = false;
   bool isPopupVisibleSort = false;
   late AnimationController _controller;
@@ -43,8 +42,11 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
   }
 
   void _togglePopupFilter() {
-    if (!mounted) return; // Provjera da li je widget još uvijek montiran
+    if (!mounted) return;
     setState(() {
+      if (isPopupVisibleSort) {
+        _togglePopupSort(); // Zatvori drugi popup ako je prikazan
+      }
       if (isPopupVisibleFilter) {
         _controller.reverse();
       } else {
@@ -55,8 +57,11 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
   }
 
   void _togglePopupSort() {
-    if (!mounted) return; // Provjera da li je widget još uvijek montiran
+    if (!mounted) return;
     setState(() {
+      if (isPopupVisibleFilter) {
+        _togglePopupFilter(); // Zatvori drugi popup ako je prikazan
+      }
       if (isPopupVisibleSort) {
         _controller.reverse();
       } else {
@@ -69,8 +74,7 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
   @override
   void dispose() {
     _controllerNaziv.dispose();
-    _controller
-        .dispose(); // Zatvara AnimationController da spriječi curenje memorije
+    _controller.dispose(); // Zatvara AnimationController da spriječi curenje memorije
     super.dispose();
   }
 
@@ -78,8 +82,7 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        FocusScope.of(context)
-            .unfocus(); // Sakrij tastaturu kada se klikne na bilo koji dio prozora
+        FocusScope.of(context).unfocus(); // Sakrij tastaturu kada se klikne na bilo koji dio prozora
       },
       child: Scaffold(
         resizeToAvoidBottomInset: false, // Dodano svojstvo
@@ -129,16 +132,12 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
         // Prvi dio
         Container(
           width: double.infinity,
-          height:
-              MediaQuery.of(context).size.height * 0.12, // 10% visine ekrana
-          color: const Color.fromARGB(
-              0, 244, 67, 54), // Zamijenite s bojom po želji
+          height: MediaQuery.of(context).size.height * 0.12, // 10% visine ekrana
+          color: const Color.fromARGB(0, 244, 67, 54), // Zamijenite s bojom po želji
           alignment: Alignment.bottomCenter,
           child: Container(
-            width:
-                MediaQuery.of(context).size.width * 0.85, // 85% širine ekrana
-            height: MediaQuery.of(context).size.height *
-                0.06, // Smanjena visina search bara
+            width: MediaQuery.of(context).size.width * 0.85, // 85% širine ekrana
+            height: MediaQuery.of(context).size.height * 0.06, // Smanjena visina search bara
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -168,16 +167,12 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
         // Drugi dio
         Container(
           width: double.infinity,
-          height:
-              MediaQuery.of(context).size.height * 0.11, // 11% visine ekrana
-          color: const Color.fromARGB(
-              0, 255, 235, 59), // Zamijenite s bojom po želji
+          height: MediaQuery.of(context).size.height * 0.11, // 11% visine ekrana
+          color: const Color.fromARGB(0, 255, 235, 59), // Zamijenite s bojom po želji
           child: Center(
             child: Container(
-              width:
-                  MediaQuery.of(context).size.width * 0.95, // 95% širine ekrana
-              height:
-                  MediaQuery.of(context).size.height * 0.09, // 9% visine ekrana
+              width: MediaQuery.of(context).size.width * 0.95, // 95% širine ekrana
+              height: MediaQuery.of(context).size.height * 0.09, // 9% visine ekrana
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(25.0),
@@ -186,39 +181,30 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
                 children: [
                   // dD
                   Container(
-                    width: MediaQuery.of(context).size.width *
-                        0.40, // 40% širine ekrana
-                    height: MediaQuery.of(context).size.height *
-                        0.09, // 9% visine ekrana
-                    color: const Color.fromARGB(
-                        0, 244, 67, 54), // Zamijenite s bojom po želji
+                    width: MediaQuery.of(context).size.width * 0.40, // 40% širine ekrana
+                    height: MediaQuery.of(context).size.height * 0.09, // 9% visine ekrana
+                    color: const Color.fromARGB(0, 244, 67, 54), // Zamijenite s bojom po želji
                     child: Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.arrow_back,
-                              color: Colors.black), // Ikone crne boje
+                          icon: const Icon(Icons.arrow_back, color: Colors.black), // Ikone crne boje
                           iconSize: 24.0, // Veličina ikone
                           onPressed: () {
                             Navigator.pushReplacement(
                               context,
-                              MaterialPageRoute(
-                                  builder: (context) => const GlavniProzor()),
+                              MaterialPageRoute(builder: (context) => const GlavniProzor()),
                             );
                           },
                         ),
-                        const Text('Dijelovi',
-                            style: TextStyle(fontSize: 20)), // Povećan font
+                        const Text('Dijelovi', style: TextStyle(fontSize: 20)), // Povećan font
                       ],
                     ),
                   ),
                   // lD
                   Container(
-                    width: MediaQuery.of(context).size.width *
-                        0.55, // 55% širine ekrana
-                    height: MediaQuery.of(context).size.height *
-                        0.09, // 9% visine ekrana
-                    color: const Color.fromARGB(
-                        0, 33, 149, 243), // Zamijenite s bojom po želji
+                    width: MediaQuery.of(context).size.width * 0.55, // 55% širine ekrana
+                    height: MediaQuery.of(context).size.height * 0.09, // 9% visine ekrana
+                    color: const Color.fromARGB(0, 33, 149, 243), // Zamijenite s bojom po želji
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -235,10 +221,8 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
                             padding: EdgeInsets.zero,
                           ),
                           child: Container(
-                            width: MediaQuery.of(context).size.width *
-                                0.24, // Smanjena širina dugmića
-                            height: MediaQuery.of(context).size.height *
-                                0.07, // 7% visine ekrana
+                            width: MediaQuery.of(context).size.width * 0.24, // Smanjena širina dugmića
+                            height: MediaQuery.of(context).size.height * 0.07, // 7% visine ekrana
                             alignment: Alignment.center,
                             child: const Text(
                               'Poredaj',
@@ -248,8 +232,7 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
                         ),
                         Container(
                           width: 2.0, // Plava linija između dugmića
-                          height: MediaQuery.of(context).size.height *
-                              0.07, // Visina linije
+                          height: MediaQuery.of(context).size.height * 0.07, // Visina linije
                           color: Colors.blue,
                         ),
                         ElevatedButton(
@@ -265,10 +248,8 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
                             padding: EdgeInsets.zero,
                           ),
                           child: Container(
-                            width: MediaQuery.of(context).size.width *
-                                0.24, // Smanjena širina dugmića
-                            height: MediaQuery.of(context).size.height *
-                                0.07, // 7% visine ekrana
+                            width: MediaQuery.of(context).size.width * 0.24, // Smanjena širina dugmića
+                            height: MediaQuery.of(context).size.height * 0.07, // 7% visine ekrana
                             alignment: Alignment.center,
                             child: const Text(
                               'Filtriraj',
@@ -303,8 +284,7 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
               Container(
                 width: double.infinity,
                 height: MediaQuery.of(context).size.height * 0.59,
-                color: const Color.fromARGB(
-                    0, 244, 67, 54), // Zamijenite s bojom po želji
+                color: const Color.fromARGB(0, 244, 67, 54), // Zamijenite s bojom po želji
                 child: Center(
                   child: loadingZapisi
                       ? CircularProgressIndicator() // Kružic za učitavanje
@@ -318,8 +298,7 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
               Container(
                 width: double.infinity,
                 height: MediaQuery.of(context).size.height * 0.06,
-                color: const Color.fromARGB(
-                    0, 33, 149, 243), // Zamijenite s bojom po želji
+                color: const Color.fromARGB(0, 33, 149, 243), // Zamijenite s bojom po želji
                 child: Row(
                   children: [
                     Expanded(
@@ -515,13 +494,11 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
                     if (firstIndex < listaZapisa.length)
                       GestureDetector(
                         onTap: () {
-                          int dijeloviId =
-                              listaZapisa[firstIndex]['dijeloviId'];
+                          int dijeloviId = listaZapisa[firstIndex]['dijeloviId'];
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  DijeloviPrikaz(dijeloviId: dijeloviId),
+                              builder: (context) => DijeloviPrikaz(dijeloviId: dijeloviId),
                             ),
                           );
                         },
@@ -536,8 +513,7 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
                             children: [
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.45,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.16,
+                                height: MediaQuery.of(context).size.height * 0.16,
                                 decoration: BoxDecoration(
                                   color: const Color.fromARGB(0, 244, 67, 54),
                                   borderRadius: BorderRadius.only(
@@ -545,28 +521,16 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
                                     topRight: Radius.circular(10.0),
                                   ),
                                 ),
-                                child: listaZapisa[firstIndex]
-                                                ['slikeDijelovis'] !=
-                                            null &&
-                                        listaZapisa[firstIndex]
-                                                ['slikeDijelovis']
-                                            .isNotEmpty
+                                child: listaZapisa[firstIndex]['slikeDijelovis'] != null && listaZapisa[firstIndex]['slikeDijelovis'].isNotEmpty
                                     ? ClipRRect(
                                         borderRadius: BorderRadius.only(
                                           topLeft: Radius.circular(10.0),
                                           topRight: Radius.circular(10.0),
                                         ),
                                         child: Image.memory(
-                                          base64Decode(listaZapisa[firstIndex]
-                                              ['slikeDijelovis'][0]['slika']),
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.45,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.16,
+                                          base64Decode(listaZapisa[firstIndex]['slikeDijelovis'][0]['slika']),
+                                          width: MediaQuery.of(context).size.width * 0.45,
+                                          height: MediaQuery.of(context).size.height * 0.16,
                                           fit: BoxFit.cover,
                                         ),
                                       )
@@ -580,21 +544,17 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
                               ),
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.45,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.04,
+                                height: MediaQuery.of(context).size.height * 0.04,
                                 color: const Color.fromARGB(0, 33, 149, 243),
                                 child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Expanded(
                                       child: Center(
                                         child: Text(
-                                          listaZapisa[firstIndex]['naziv'] ??
-                                              'N/A',
+                                          listaZapisa[firstIndex]['naziv'] ?? 'N/A',
                                           style: TextStyle(
-                                            color: const Color.fromARGB(
-                                                255, 0, 0, 0),
+                                            color: const Color.fromARGB(255, 0, 0, 0),
                                           ),
                                           overflow: TextOverflow.ellipsis,
                                           softWrap: false,
@@ -604,13 +564,9 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
                                     Expanded(
                                       child: Center(
                                         child: Text(
-                                          listaZapisa[firstIndex]['cijena'] !=
-                                                  null
-                                              ? "${listaZapisa[firstIndex]['cijena'].toString()} KM"
-                                              : 'N/A',
+                                          listaZapisa[firstIndex]['cijena'] != null ? "${listaZapisa[firstIndex]['cijena'].toString()} KM" : 'N/A',
                                           style: TextStyle(
-                                            color: const Color.fromARGB(
-                                                255, 0, 0, 0),
+                                            color: const Color.fromARGB(255, 0, 0, 0),
                                           ),
                                           overflow: TextOverflow.ellipsis,
                                           softWrap: false,
@@ -627,13 +583,11 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
                     if (secondIndex < listaZapisa.length)
                       GestureDetector(
                         onTap: () {
-                          int dijeloviId =
-                              listaZapisa[secondIndex]['dijeloviId'];
+                          int dijeloviId = listaZapisa[secondIndex]['dijeloviId'];
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  DijeloviPrikaz(dijeloviId: dijeloviId),
+                              builder: (context) => DijeloviPrikaz(dijeloviId: dijeloviId),
                             ),
                           );
                         },
@@ -642,15 +596,13 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
                           height: MediaQuery.of(context).size.height * 0.2,
                           decoration: BoxDecoration(
                             color: const Color.fromARGB(244, 255, 255, 255),
-                            borderRadius: BorderRadius.circular(
-                                10.0), // Dodano zaobljenje ivica
+                            borderRadius: BorderRadius.circular(10.0), // Dodano zaobljenje ivica
                           ),
                           child: Column(
                             children: [
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.45,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.16,
+                                height: MediaQuery.of(context).size.height * 0.16,
                                 decoration: BoxDecoration(
                                   color: const Color.fromARGB(0, 244, 67, 54),
                                   borderRadius: const BorderRadius.only(
@@ -658,28 +610,16 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
                                     topRight: Radius.circular(10.0),
                                   ), // Zaobljene gornje ivice
                                 ),
-                                child: listaZapisa[secondIndex]
-                                                ['slikeDijelovis'] !=
-                                            null &&
-                                        listaZapisa[secondIndex]
-                                                ['slikeDijelovis']
-                                            .isNotEmpty
+                                child: listaZapisa[secondIndex]['slikeDijelovis'] != null && listaZapisa[secondIndex]['slikeDijelovis'].isNotEmpty
                                     ? ClipRRect(
                                         borderRadius: const BorderRadius.only(
                                           topLeft: Radius.circular(10.0),
                                           topRight: Radius.circular(10.0),
                                         ),
                                         child: Image.memory(
-                                          base64Decode(listaZapisa[secondIndex]
-                                              ['slikeDijelovis'][0]['slika']),
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.45,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.16,
+                                          base64Decode(listaZapisa[secondIndex]['slikeDijelovis'][0]['slika']),
+                                          width: MediaQuery.of(context).size.width * 0.45,
+                                          height: MediaQuery.of(context).size.height * 0.16,
                                           fit: BoxFit.cover,
                                         ),
                                       )
@@ -693,21 +633,17 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
                               ),
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.45,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.04,
+                                height: MediaQuery.of(context).size.height * 0.04,
                                 color: const Color.fromARGB(0, 33, 149, 243),
                                 child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Expanded(
                                       child: Center(
                                         child: Text(
-                                          listaZapisa[secondIndex]['naziv'] ??
-                                              'N/A',
+                                          listaZapisa[secondIndex]['naziv'] ?? 'N/A',
                                           style: TextStyle(
-                                            color: const Color.fromARGB(
-                                                255, 0, 0, 0),
+                                            color: const Color.fromARGB(255, 0, 0, 0),
                                           ),
                                           overflow: TextOverflow.ellipsis,
                                           softWrap: false,
@@ -717,13 +653,9 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
                                     Expanded(
                                       child: Center(
                                         child: Text(
-                                          listaZapisa[secondIndex]['cijena'] !=
-                                                  null
-                                              ? "${listaZapisa[secondIndex]['cijena'].toString()} KM"
-                                              : 'N/A',
+                                          listaZapisa[secondIndex]['cijena'] != null ? "${listaZapisa[secondIndex]['cijena'].toString()} KM" : 'N/A',
                                           style: TextStyle(
-                                            color: const Color.fromARGB(
-                                                255, 0, 0, 0),
+                                            color: const Color.fromARGB(255, 0, 0, 0),
                                           ),
                                           overflow: TextOverflow.ellipsis,
                                           softWrap: false,
@@ -815,10 +747,8 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
                               child: Column(
                                 children: [
                                   Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.6,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.03,
+                                    width: MediaQuery.of(context).size.width * 0.6,
+                                    height: MediaQuery.of(context).size.height * 0.03,
                                     child: Center(
                                       child: Text(
                                         "Cijena",
@@ -827,27 +757,65 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
                                     ),
                                   ),
                                   Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.6,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.06,
-                                    child: RangeSlider(
-                                      values: RangeValues(
-                                          pocetnaCijena.toDouble(),
-                                          krajnjaCijena.toDouble()),
-                                      min: 0,
-                                      max: 2000,
-                                      divisions: 200,
-                                      labels: RangeLabels(
-                                        pocetnaCijena.toString(),
-                                        krajnjaCijena.toString(),
-                                      ),
-                                      onChanged: (RangeValues values) {
-                                        setState(() {
-                                          pocetnaCijena = values.start.round();
-                                          krajnjaCijena = values.end.round();
-                                        });
-                                      },
+                                    width: MediaQuery.of(context).size.width * 0.6,
+                                    height: MediaQuery.of(context).size.height * 0.06,
+                                    child: Row(
+                                      children: [
+                                        SizedBox(width: MediaQuery.of(context).size.width * 0.03),
+                                        Container(
+                                          width: MediaQuery.of(context).size.width * 0.25,
+                                          height: MediaQuery.of(context).size.height * 0.06,
+                                          decoration: BoxDecoration(
+                                            color: Color(0xFF6650A5),
+                                            borderRadius: BorderRadius.circular(8.0),
+                                          ),
+                                          child: TextFormField(
+                                            keyboardType: TextInputType.number,
+                                            decoration: InputDecoration(
+                                              border: InputBorder.none,
+                                              hintText: 'Od',
+                                              floatingLabelBehavior: FloatingLabelBehavior.auto,
+                                              labelText: 'Od',
+                                              contentPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                                              hintStyle: TextStyle(color: Colors.white70),
+                                              labelStyle: TextStyle(color: Colors.white),
+                                            ),
+                                            style: TextStyle(color: Colors.white),
+                                            onChanged: (value) {
+                                              if (value.isNotEmpty && int.tryParse(value) != null) {
+                                                pocetnaCijena = int.parse(value);
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                        SizedBox(width: MediaQuery.of(context).size.width * 0.04),
+                                        Container(
+                                          width: MediaQuery.of(context).size.width * 0.25,
+                                          height: MediaQuery.of(context).size.height * 0.06,
+                                          decoration: BoxDecoration(
+                                            color: Color(0xFF6650A5),
+                                            borderRadius: BorderRadius.circular(8.0),
+                                          ),
+                                          child: TextFormField(
+                                            keyboardType: TextInputType.number,
+                                            decoration: InputDecoration(
+                                              border: InputBorder.none,
+                                              hintText: 'Do',
+                                              floatingLabelBehavior: FloatingLabelBehavior.auto,
+                                              labelText: 'Do',
+                                              contentPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                                              hintStyle: TextStyle(color: Colors.white70),
+                                              labelStyle: TextStyle(color: Colors.white),
+                                            ),
+                                            style: TextStyle(color: Colors.white),
+                                            onChanged: (value) {
+                                              if (value.isNotEmpty && int.tryParse(value) != null) {
+                                                krajnjaCijena = int.parse(value);
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
@@ -871,10 +839,8 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
                               child: Column(
                                 children: [
                                   Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.6,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.03,
+                                    width: MediaQuery.of(context).size.width * 0.6,
+                                    height: MediaQuery.of(context).size.height * 0.03,
                                     child: Center(
                                       child: Text(
                                         "Kategorija",
@@ -883,64 +849,41 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
                                     ),
                                   ),
                                   Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.6,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.06,
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 16.0),
+                                    width: MediaQuery.of(context).size.width * 0.6,
+                                    height: MediaQuery.of(context).size.height * 0.06,
+                                    padding: EdgeInsets.symmetric(horizontal: 16.0),
                                     decoration: BoxDecoration(
                                       color: Color(0xFF6650A5),
                                       borderRadius: BorderRadius.circular(10.0),
                                     ),
                                     child: DropdownButtonHideUnderline(
                                       child: DropdownButton<String>(
-                                        value: _odabranaKategorija != null
-                                            ? _odabranaKategorija!['naziv'] ??
-                                                'N/A'
-                                            : null,
+                                        value: _odabranaKategorija != null ? _odabranaKategorija!['naziv'] ?? 'N/A' : null,
                                         hint: Text(
                                           "prazno",
                                           style: TextStyle(color: Colors.white),
                                         ),
-                                        icon: Icon(Icons.arrow_downward,
-                                            color: Colors.white),
+                                        icon: Icon(Icons.arrow_downward, color: Colors.white),
                                         iconSize: 24,
                                         elevation: 16,
                                         style: TextStyle(color: Colors.white),
                                         dropdownColor: Color(0xFF6650A5),
                                         onChanged: (String? newValue) {
                                           setState(() {
-                                            _odabranaKategorija =
-                                                _kategorije?.firstWhere(
-                                                    (kategorija) =>
-                                                        kategorija['naziv'] ==
-                                                        newValue,
-                                                    orElse: () =>
-                                                        {'naziv': 'N/A'});
+                                            _odabranaKategorija = _kategorije?.firstWhere((kategorija) => kategorija['naziv'] == newValue,
+                                                orElse: () => {'naziv': 'N/A'});
                                           });
                                         },
-                                        items: _kategorije
-                                                ?.map<DropdownMenuItem<String>>(
-                                                    (kategorija) {
+                                        items: _kategorije?.map<DropdownMenuItem<String>>((kategorija) {
                                               return DropdownMenuItem<String>(
-                                                value: kategorija['naziv'] ??
-                                                    'N/A',
+                                                value: kategorija['naziv'] ?? 'N/A',
                                                 child: Container(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.3,
-                                                  height: MediaQuery.of(context)
-                                                          .size
-                                                          .height *
-                                                      0.04,
+                                                  width: MediaQuery.of(context).size.width * 0.3,
+                                                  height: MediaQuery.of(context).size.height * 0.04,
                                                   child: Center(
                                                     child: Text(
-                                                      kategorija['naziv'] ??
-                                                          'N/A',
-                                                      style: TextStyle(
-                                                          color: Colors.white),
+                                                      kategorija['naziv'] ?? 'N/A',
+                                                      style: TextStyle(color: Colors.white),
                                                     ),
                                                   ),
                                                 ),
@@ -1034,31 +977,19 @@ class _DijeloviPretragaState extends State<DijeloviPretraga>
                           child: Center(
                             // Centriranje dropdown-a
                             child: SizedBox(
-                              width: MediaQuery.of(context).size.width *
-                                  0.5, // Ograničavanje širine
+                              width: MediaQuery.of(context).size.width * 0.5, // Ograničavanje širine
                               child: DropdownButtonFormField<String>(
-                                value: selectedValue.isNotEmpty
-                                    ? selectedValue
-                                    : null, // Omogućavanje praznog odabira
+                                value: selectedValue.isNotEmpty ? selectedValue : null, // Omogućavanje praznog odabira
                                 onChanged: (String? newValue) {
-                                  selectedValue = newValue ??
-                                      ''; // Postavljanje prazne vrijednosti ako je odabrano prazno
+                                  selectedValue = newValue ?? ''; // Postavljanje prazne vrijednosti ako je odabrano prazno
                                 },
-                                items: [
-                                  "",
-                                  "CIJENA RASTUCA",
-                                  "CIJENA OPADAJUCA"
-                                ].map<DropdownMenuItem<String>>((String value) {
+                                items: ["", "CIJENA RASTUCA", "CIJENA OPADAJUCA"].map<DropdownMenuItem<String>>((String value) {
                                   return DropdownMenuItem<String>(
                                     value: value,
                                     child: Text(
-                                      value.isNotEmpty
-                                          ? value.toUpperCase()
-                                          : "Prazno",
+                                      value.isNotEmpty ? value.toUpperCase() : "Prazno",
                                       style: TextStyle(
-                                        color: value.isNotEmpty
-                                            ? Colors.black
-                                            : Colors.grey,
+                                        color: value.isNotEmpty ? Colors.black : Colors.grey,
                                       ),
                                     ),
                                   );

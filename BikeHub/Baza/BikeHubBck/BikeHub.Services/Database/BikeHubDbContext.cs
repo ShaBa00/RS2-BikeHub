@@ -51,8 +51,9 @@ public partial class BikeHubDbContext : DbContext
 
     public virtual DbSet<SpaseniDijelovi> SpaseniDijelovis { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-     => optionsBuilder.UseSqlServer("Data Source=localhost;Initial Catalog=BikeHubDb;Integrated Security=True;TrustServerCertificate=True");
+    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    // => optionsBuilder.UseSqlServer("Data Source=localhost;Initial Catalog=BikeHubDb;Integrated Security=True;TrustServerCertificate=True");
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

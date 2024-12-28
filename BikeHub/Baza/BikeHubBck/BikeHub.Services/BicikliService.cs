@@ -2,6 +2,7 @@
 using BikeHub.Model.BicikliFM;
 using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
+using EasyNetQ;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -92,7 +93,7 @@ namespace BikeHub.Services
 
             if (search.isSlikaIncluded==true)
             {
-                 NoviQuery = NoviQuery.Include(x => x.SlikeBiciklis);
+                NoviQuery = NoviQuery.Include(x => x.SlikeBiciklis.Where(s => s.Status != "obrisan"));
             }
 
             return NoviQuery;
@@ -101,8 +102,9 @@ namespace BikeHub.Services
         public override Bicikli GetById(int id)
         {
             var result = Context.Set<Database.Bicikl>()
-                                .Include(b => b.SlikeBiciklis) 
+                                .Include(b => b.SlikeBiciklis.Where(s => s.Status != "obrisan"))
                                 .FirstOrDefault(b => b.BiciklId == id);
+
             if (result == null)
             {
                 return null;
@@ -193,7 +195,22 @@ namespace BikeHub.Services
                 {
                     throw new UserException("Cijena bicikla mora biti veća od nule");
                 }
-                entity.Cijena = request.Cijena.Value; 
+                if(request.Cijena < entity.Cijena)
+                {
+                    var bus = RabbitHutch.CreateBus("host=rabbitmq;virtualHost=/;username=guest;password=guest;port=5672");
+                    var korisnici = _context.Korisniks
+                        .Where(k => k.SpaseniBiciklis.Any(sb => sb.BiciklId == entity.BiciklId))
+                        .ToListAsync().Result;
+                    var korisniciEmails = korisnici.Select(k => k.Email).ToList();
+                    var mappedEntity = Mapper.Map<Model.BicikliFM.Bicikli>(entity);
+                    bus.PubSub.Publish(new BiciklAndEmails
+                    {
+                        Bicikl = mappedEntity,
+                        Emails = korisniciEmails
+                    });
+
+                }
+                entity.Cijena = request.Cijena.Value;
             }
             if (request.Kolicina.HasValue)
             {
@@ -256,11 +273,15 @@ namespace BikeHub.Services
             {
                 throw new UserException("Entitet sa datim ID-om ne postoji.");
             }
-            var slikeBicikli = _context.SlikeBiciklis.Where(x => x.BiciklId == entity.BiciklId).ToList();
-            foreach(var slika in slikeBicikli)
+            var slikeBicikli = _context.SlikeBiciklis
+    .Where(x => x.BiciklId == entity.BiciklId && x.Status != "obrisan")
+    .ToList();
+
+            foreach (var slika in slikeBicikli)
             {
                 _slikeBicikliService.SoftDelete(slika.SlikeBicikliId);
             }
+
             var state = _basePrvaGrupaState.CreateState(entity.Status);
             state.Delete(id);
         }
@@ -289,7 +310,7 @@ namespace BikeHub.Services
         public List<object> GetPromotedItems()
         {
             var promotedBicikli = _context.Bicikls
-                .Where(b => b.PromocijaBiciklis.Any(pb => pb.Status != "zavrseno" && pb.Status != "obrisan" && pb.Status != "vracen"))
+                .Where(b => b.PromocijaBiciklis.Any(pb => pb.Status == "aktivan"))
                 .Select(b => new
                 {
                     b.BiciklId,
@@ -364,6 +385,8 @@ namespace BikeHub.Services
 
             return promotedBicikli.Cast<object>().Concat(promotedDijelovi.Cast<object>()).ToList();
         }
+
+
 
     }
 }

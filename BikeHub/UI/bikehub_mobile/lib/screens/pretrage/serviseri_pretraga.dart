@@ -13,8 +13,7 @@ class ServiseriPretraga extends StatefulWidget {
   _ServiseriPretragastate createState() => _ServiseriPretragastate();
 }
 
-class _ServiseriPretragastate extends State<ServiseriPretraga>
-    with SingleTickerProviderStateMixin {
+class _ServiseriPretragastate extends State<ServiseriPretraga> with SingleTickerProviderStateMixin {
   bool isPopupVisibleFilter = false;
   bool isPopupVisibleSort = false;
   late AnimationController _controller;
@@ -80,8 +79,11 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
   }
 
   void _togglePopupFilter() {
-    if (!mounted) return; // Provjera da li je widget još uvijek montiran
+    if (!mounted) return;
     setState(() {
+      if (isPopupVisibleSort) {
+        _togglePopupSort(); // Zatvori drugi popup ako je prikazan
+      }
       if (isPopupVisibleFilter) {
         _controller.reverse();
       } else {
@@ -92,8 +94,11 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
   }
 
   void _togglePopupSort() {
-    if (!mounted) return; // Provjera da li je widget još uvijek montiran
+    if (!mounted) return;
     setState(() {
+      if (isPopupVisibleFilter) {
+        _togglePopupFilter(); // Zatvori drugi popup ako je prikazan
+      }
       if (isPopupVisibleSort) {
         _controller.reverse();
       } else {
@@ -105,8 +110,7 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
 
   @override
   void dispose() {
-    _controller
-        .dispose(); // Zatvara AnimationController da spriječi curenje memorije
+    _controller.dispose(); // Zatvara AnimationController da spriječi curenje memorije
     super.dispose();
   }
 
@@ -200,8 +204,7 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        FocusScope.of(context)
-            .unfocus(); // Sakrij tastaturu kada se klikne na bilo koji dio prozora
+        FocusScope.of(context).unfocus(); // Sakrij tastaturu kada se klikne na bilo koji dio prozora
       },
       child: Scaffold(
         resizeToAvoidBottomInset: false, // Dodano svojstvo
@@ -251,16 +254,12 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
         // Prvi dio
         Container(
           width: double.infinity,
-          height:
-              MediaQuery.of(context).size.height * 0.12, // 10% visine ekrana
-          color: const Color.fromARGB(
-              0, 244, 67, 54), // Zamijenite s bojom po želji
+          height: MediaQuery.of(context).size.height * 0.12, // 10% visine ekrana
+          color: const Color.fromARGB(0, 244, 67, 54), // Zamijenite s bojom po želji
           alignment: Alignment.bottomCenter,
           child: Container(
-            width:
-                MediaQuery.of(context).size.width * 0.85, // 85% širine ekrana
-            height: MediaQuery.of(context).size.height *
-                0.06, // Smanjena visina search bara
+            width: MediaQuery.of(context).size.width * 0.85, // 85% širine ekrana
+            height: MediaQuery.of(context).size.height * 0.06, // Smanjena visina search bara
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -290,16 +289,12 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
         // Drugi dio
         Container(
           width: double.infinity,
-          height:
-              MediaQuery.of(context).size.height * 0.11, // 11% visine ekrana
-          color: const Color.fromARGB(
-              0, 255, 235, 59), // Zamijenite s bojom po želji
+          height: MediaQuery.of(context).size.height * 0.11, // 11% visine ekrana
+          color: const Color.fromARGB(0, 255, 235, 59), // Zamijenite s bojom po želji
           child: Center(
             child: Container(
-              width:
-                  MediaQuery.of(context).size.width * 0.95, // 95% širine ekrana
-              height:
-                  MediaQuery.of(context).size.height * 0.09, // 9% visine ekrana
+              width: MediaQuery.of(context).size.width * 0.95, // 95% širine ekrana
+              height: MediaQuery.of(context).size.height * 0.09, // 9% visine ekrana
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(25.0),
@@ -308,39 +303,30 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
                 children: [
                   // dD
                   Container(
-                    width: MediaQuery.of(context).size.width *
-                        0.40, // 40% širine ekrana
-                    height: MediaQuery.of(context).size.height *
-                        0.09, // 9% visine ekrana
-                    color: const Color.fromARGB(
-                        0, 244, 67, 54), // Zamijenite s bojom po želji
+                    width: MediaQuery.of(context).size.width * 0.40, // 40% širine ekrana
+                    height: MediaQuery.of(context).size.height * 0.09, // 9% visine ekrana
+                    color: const Color.fromARGB(0, 244, 67, 54), // Zamijenite s bojom po želji
                     child: Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.arrow_back,
-                              color: Colors.black), // Ikone crne boje
+                          icon: const Icon(Icons.arrow_back, color: Colors.black), // Ikone crne boje
                           iconSize: 24.0, // Veličina ikone
                           onPressed: () {
                             Navigator.pushReplacement(
                               context,
-                              MaterialPageRoute(
-                                  builder: (context) => const GlavniProzor()),
+                              MaterialPageRoute(builder: (context) => const GlavniProzor()),
                             );
                           },
                         ),
-                        const Text('Serviseri',
-                            style: TextStyle(fontSize: 20)), // Povećan font
+                        const Text('Serviseri', style: TextStyle(fontSize: 20)), // Povećan font
                       ],
                     ),
                   ),
                   // lD
                   Container(
-                    width: MediaQuery.of(context).size.width *
-                        0.55, // 55% širine ekrana
-                    height: MediaQuery.of(context).size.height *
-                        0.09, // 9% visine ekrana
-                    color: const Color.fromARGB(
-                        0, 33, 149, 243), // Zamijenite s bojom po želji
+                    width: MediaQuery.of(context).size.width * 0.55, // 55% širine ekrana
+                    height: MediaQuery.of(context).size.height * 0.09, // 9% visine ekrana
+                    color: const Color.fromARGB(0, 33, 149, 243), // Zamijenite s bojom po želji
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -357,10 +343,8 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
                             padding: EdgeInsets.zero,
                           ),
                           child: Container(
-                            width: MediaQuery.of(context).size.width *
-                                0.24, // Smanjena širina dugmića
-                            height: MediaQuery.of(context).size.height *
-                                0.07, // 7% visine ekrana
+                            width: MediaQuery.of(context).size.width * 0.24, // Smanjena širina dugmića
+                            height: MediaQuery.of(context).size.height * 0.07, // 7% visine ekrana
                             alignment: Alignment.center,
                             child: const Text(
                               'Poredaj',
@@ -370,8 +354,7 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
                         ),
                         Container(
                           width: 2.0, // Plava linija između dugmića
-                          height: MediaQuery.of(context).size.height *
-                              0.07, // Visina linije
+                          height: MediaQuery.of(context).size.height * 0.07, // Visina linije
                           color: Colors.blue,
                         ),
                         ElevatedButton(
@@ -387,10 +370,8 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
                             padding: EdgeInsets.zero,
                           ),
                           child: Container(
-                            width: MediaQuery.of(context).size.width *
-                                0.24, // Smanjena širina dugmića
-                            height: MediaQuery.of(context).size.height *
-                                0.07, // 7% visine ekrana
+                            width: MediaQuery.of(context).size.width * 0.24, // Smanjena širina dugmića
+                            height: MediaQuery.of(context).size.height * 0.07, // 7% visine ekrana
                             alignment: Alignment.center,
                             child: const Text(
                               'Filtriraj',
@@ -438,15 +419,12 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
                               onTap: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
-                                      builder: (context) => ServiserPrikaz(
-                                          serviserId: serviser['serviserId'])),
+                                  MaterialPageRoute(builder: (context) => ServiserPrikaz(serviserId: serviser['serviserId'])),
                                 );
                               },
                               child: Container(
                                 width: MediaQuery.of(context).size.width * 0.9,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.06,
+                                height: MediaQuery.of(context).size.height * 0.06,
                                 margin: EdgeInsets.symmetric(vertical: 5.0),
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
@@ -462,64 +440,42 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
                                 child: Row(
                                   children: [
                                     Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.3,
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.06,
-                                      color:
-                                          const Color.fromARGB(0, 33, 149, 243),
+                                      width: MediaQuery.of(context).size.width * 0.3,
+                                      height: MediaQuery.of(context).size.height * 0.06,
+                                      color: const Color.fromARGB(0, 33, 149, 243),
                                       child: Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 8.0),
+                                        padding: const EdgeInsets.only(left: 8.0),
                                         child: Align(
                                           alignment: Alignment.centerLeft,
                                           child: Text(
-                                            serviser['grad'] != null
-                                                ? serviser['grad']
-                                                : "N/A",
-                                            style:
-                                                TextStyle(color: Colors.white),
+                                            serviser['grad'] != null ? serviser['grad'] : "N/A",
+                                            style: TextStyle(color: Colors.white),
                                           ),
                                         ),
                                       ),
                                     ),
                                     Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.3,
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.06,
-                                      color:
-                                          const Color.fromARGB(0, 76, 175, 79),
+                                      width: MediaQuery.of(context).size.width * 0.3,
+                                      height: MediaQuery.of(context).size.height * 0.06,
+                                      color: const Color.fromARGB(0, 76, 175, 79),
                                       child: Center(
                                         child: Text(
-                                          serviser['username'] != null
-                                              ? serviser['username']
-                                              : "N/A",
+                                          serviser['username'] != null ? serviser['username'] : "N/A",
                                           style: TextStyle(color: Colors.white),
                                         ),
                                       ),
                                     ),
                                     Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.3,
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.06,
-                                      color:
-                                          const Color.fromARGB(0, 255, 153, 0),
+                                      width: MediaQuery.of(context).size.width * 0.3,
+                                      height: MediaQuery.of(context).size.height * 0.06,
+                                      color: const Color.fromARGB(0, 255, 153, 0),
                                       child: Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 8.0),
+                                        padding: const EdgeInsets.only(right: 8.0),
                                         child: Align(
                                           alignment: Alignment.centerRight,
                                           child: Text(
-                                            serviser['cijena'] != null
-                                                ? serviser['cijena'].toString()
-                                                : "N/A",
-                                            style:
-                                                TextStyle(color: Colors.white),
+                                            serviser['cijena'] != null ? serviser['cijena'].toString() : "N/A",
+                                            style: TextStyle(color: Colors.white),
                                           ),
                                         ),
                                       ),
@@ -627,8 +583,7 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
                             children: [
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.6,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.03,
+                                height: MediaQuery.of(context).size.height * 0.03,
                                 child: Center(
                                   child: Text(
                                     "Cijena",
@@ -638,11 +593,9 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
                               ),
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.6,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.06,
+                                height: MediaQuery.of(context).size.height * 0.06,
                                 child: RangeSlider(
-                                  values: RangeValues(pocetnaCijena.toDouble(),
-                                      krajnjaCijena.toDouble()),
+                                  values: RangeValues(pocetnaCijena.toDouble(), krajnjaCijena.toDouble()),
                                   min: 0,
                                   max: 100,
                                   divisions: 100,
@@ -680,8 +633,7 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
                             children: [
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.6,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.03,
+                                height: MediaQuery.of(context).size.height * 0.03,
                                 child: Center(
                                   child: Text(
                                     "Broj servisa",
@@ -691,12 +643,9 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
                               ),
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.6,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.06,
+                                height: MediaQuery.of(context).size.height * 0.06,
                                 child: RangeSlider(
-                                  values: RangeValues(
-                                      pocetniBrojServisa.toDouble(),
-                                      krajnjiBrojServisa.toDouble()),
+                                  values: RangeValues(pocetniBrojServisa.toDouble(), krajnjiBrojServisa.toDouble()),
                                   min: 0,
                                   max: 100,
                                   divisions: 100,
@@ -734,8 +683,7 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
                             children: [
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.6,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.03,
+                                height: MediaQuery.of(context).size.height * 0.03,
                                 child: Center(
                                   child: Text(
                                     "Ocjena",
@@ -745,11 +693,9 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
                               ),
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.6,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.06,
+                                height: MediaQuery.of(context).size.height * 0.06,
                                 child: RangeSlider(
-                                  values: RangeValues(pocetnaOcjena.toDouble(),
-                                      krajnjaOcjena.toDouble()),
+                                  values: RangeValues(pocetnaOcjena.toDouble(), krajnjaOcjena.toDouble()),
                                   min: 0,
                                   max: 5,
                                   divisions: 5,
@@ -847,31 +793,19 @@ class _ServiseriPretragastate extends State<ServiseriPretraga>
                           child: Center(
                             // Centriranje dropdown-a
                             child: SizedBox(
-                              width: MediaQuery.of(context).size.width *
-                                  0.5, // Ograničavanje širine
+                              width: MediaQuery.of(context).size.width * 0.5, // Ograničavanje širine
                               child: DropdownButtonFormField<String>(
-                                value: selectedValue.isNotEmpty
-                                    ? selectedValue
-                                    : null, // Omogućavanje praznog odabira
+                                value: selectedValue.isNotEmpty ? selectedValue : null, // Omogućavanje praznog odabira
                                 onChanged: (String? newValue) {
-                                  selectedValue = newValue ??
-                                      ''; // Postavljanje prazne vrijednosti ako je odabrano prazno
+                                  selectedValue = newValue ?? ''; // Postavljanje prazne vrijednosti ako je odabrano prazno
                                 },
-                                items: [
-                                  "",
-                                  "CIJENA RASTUCA",
-                                  "CIJENA OPADAJUCA"
-                                ].map<DropdownMenuItem<String>>((String value) {
+                                items: ["", "CIJENA RASTUCA", "CIJENA OPADAJUCA"].map<DropdownMenuItem<String>>((String value) {
                                   return DropdownMenuItem<String>(
                                     value: value,
                                     child: Text(
-                                      value.isNotEmpty
-                                          ? value.toUpperCase()
-                                          : "Prazno",
+                                      value.isNotEmpty ? value.toUpperCase() : "Prazno",
                                       style: TextStyle(
-                                        color: value.isNotEmpty
-                                            ? Colors.black
-                                            : Colors.grey,
+                                        color: value.isNotEmpty ? Colors.black : Colors.grey,
                                       ),
                                     ),
                                   );

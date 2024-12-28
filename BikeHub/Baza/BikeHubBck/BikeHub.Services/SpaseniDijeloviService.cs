@@ -81,7 +81,7 @@ namespace BikeHub.Services
              .Any(sb => sb.DijeloviId == request.DijeloviId && sb.KorisnikId == request.KorisnikId);
             if (diolVećSačuvan)
             {
-                throw new UserException("Korisnik je već sačuvao ovo biciklo.");
+                throw new UserException("Korisnik je već sačuvao ovaj dio.");
             }
             entity.DijeloviId = request.DijeloviId;
             entity.KorisnikId = request.KorisnikId;

@@ -1,8 +1,10 @@
 ﻿using BikeHub.Model;
+using BikeHub.Model.BicikliFM;
 using BikeHub.Model.DijeloviFM;
 using BikeHub.Model.KorisnikFM;
 using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
+using EasyNetQ;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -89,8 +91,8 @@ namespace BikeHub.Services
         public override Model.DijeloviFM.Dijelovi GetById(int id)
         {
             var result = Context.Set<Database.Dijelovi>()
-                .Include(b => b.SlikeDijelovis.Where(s => s.Status != "obrisan"))
-                .FirstOrDefault(b => b.DijeloviId == id);
+                    .Include(b => b.SlikeDijelovis.Where(s => s.Status != "obrisan"))
+                    .FirstOrDefault(b => b.DijeloviId == id);
 
             if (result == null)
             {
@@ -171,6 +173,21 @@ namespace BikeHub.Services
                 {
                     throw new UserException("Cijena dijela mora biti veća od nule");
                 }
+                if (request.Cijena < entity.Cijena)
+                {
+                    var bus = RabbitHutch.CreateBus("host=rabbitmq;virtualHost=/;username=guest;password=guest;port=5672");
+                    var korisnici = _context.Korisniks
+                        .Where(k => k.SpaseniDijelovis.Any(sb => sb.DijeloviId == entity.DijeloviId))
+                        .ToListAsync().Result;
+                    var korisniciEmails = korisnici.Select(k => k.Email).ToList();
+                    var mappedEntity = Mapper.Map<Model.DijeloviFM.Dijelovi>(entity);
+                    bus.PubSub.Publish(new DijeloviAndEmailscs
+                    {
+                        Dijelovi = mappedEntity,
+                        Emails = korisniciEmails
+                    });
+
+                }
                 entity.Cijena = request.Cijena.Value;
             }
             if (request.Kolicina.HasValue)
@@ -218,11 +235,15 @@ namespace BikeHub.Services
             {
                 throw new UserException("Entity not found.");
             }
-            var slikeDijelovi = _context.SlikeDijelovis.Where(x => x.DijeloviId == entity.DijeloviId).ToList();
+            var slikeDijelovi = _context.SlikeDijelovis
+                .Where(x => x.DijeloviId == entity.DijeloviId && x.Status != "obrisan")
+                .ToList();
+
             foreach (var slika in slikeDijelovi)
             {
                 _slikeDijeloviService.SoftDelete(slika.SlikeDijeloviId);
             }
+
             var state = _basePrvaGrupaState.CreateState(entity.Status);
             state.Delete(id);
         }

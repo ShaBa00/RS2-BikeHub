@@ -30,12 +30,12 @@ class _BiciklDodajProzorState extends State<BiciklDodajProzor> {
 
   int? selectedKategorijaId;
   int? kategorijaId;
-  String? selectedVelicinaRama;
-  String? selectedVelicinaTocka;
   final TextEditingController nazivController = TextEditingController();
   final TextEditingController cijenaController = TextEditingController();
   final TextEditingController kolicinaController = TextEditingController();
   final TextEditingController brojBrzinaController = TextEditingController();
+  final TextEditingController velicinaRamaController = TextEditingController();
+  final TextEditingController selectedVelicinaTockaController = TextEditingController();
 
   List<Uint8List> slikeBicikli = []; // Lista slika
   int currentIndex = 0;
@@ -118,7 +118,6 @@ class _BiciklDodajProzorState extends State<BiciklDodajProzor> {
         biciklFinal.kolicina <= 0 ||
         biciklFinal.korisnikId <= 0 ||
         biciklFinal.naziv.isEmpty) {
-      //logger.e('Nedostaju obavezni podaci.');
       return;
     }
 
@@ -134,8 +133,8 @@ class _BiciklDodajProzorState extends State<BiciklDodajProzor> {
         }
         setState(() {
           kategorijaId = null;
-          selectedVelicinaRama = null;
-          selectedVelicinaTocka = null;
+          velicinaRamaController.clear();
+          selectedVelicinaTockaController.clear();
           nazivController.clear();
           cijenaController.clear();
           kolicinaController.clear();
@@ -163,6 +162,8 @@ class _BiciklDodajProzorState extends State<BiciklDodajProzor> {
     final cijena = double.tryParse(cijenaController.text) ?? 0.0;
     final kolicina = int.tryParse(kolicinaController.text) ?? 0;
     final brojBrzina = int.tryParse(brojBrzinaController.text) ?? 0;
+    final velicinaRama = velicinaRamaController.text;
+    final velicinaTocka = selectedVelicinaTockaController.text;
 
     if (naziv.isEmpty) {
       PorukaHelper.prikaziPorukuUpozorenja(context, "Naziv ne može biti prazan");
@@ -188,11 +189,11 @@ class _BiciklDodajProzorState extends State<BiciklDodajProzor> {
       PorukaHelper.prikaziPorukuUpozorenja(context, "Moguce je dodati maximalno 8 slika");
       return;
     }
-    if (selectedVelicinaRama == null) {
+    if (velicinaRama.isEmpty) {
       PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je odabrati veličinu rama");
       return;
     }
-    if (selectedVelicinaTocka == null) {
+    if (velicinaTocka.isEmpty) {
       PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je odabrati veličinu točka");
       return;
     }
@@ -206,8 +207,8 @@ class _BiciklDodajProzorState extends State<BiciklDodajProzor> {
       biciklId: 0,
       naziv: naziv,
       cijena: cijena,
-      velicinaRama: selectedVelicinaRama ?? "M",
-      velicinaTocka: selectedVelicinaTocka ?? "26",
+      velicinaRama: velicinaRama,
+      velicinaTocka: velicinaTocka,
       brojBrzina: brojBrzina,
       kategorijaId: selectedKategorijaId ?? 1,
       stanje: "",
@@ -431,38 +432,21 @@ class _BiciklDodajProzorState extends State<BiciklDodajProzor> {
                                           color: Colors.white, // Bijela pozadina
                                           borderRadius: BorderRadius.circular(8.0), // Zaobljeni okviri
                                         ),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            const Text(
-                                              "Velicina rama",
-                                              style: TextStyle(color: Colors.black), // Crni tekst
+                                        child: TextField(
+                                          controller: velicinaRamaController,
+                                          keyboardType: TextInputType.number,
+                                          decoration: const InputDecoration(
+                                            labelText: "Velicina rama",
+                                            labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                                            enabledBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(color: Color.fromARGB(255, 0, 0, 0)),
                                             ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(left: 8.0),
-                                              child: SizedBox(
-                                                width: 0.05 * MediaQuery.of(context).size.width,
-                                                child: DropdownButton<String>(
-                                                  hint: const Text(""),
-                                                  isExpanded: true,
-                                                  value: selectedVelicinaRama, // Poveži sa varijablom
-                                                  items: const [
-                                                    DropdownMenuItem(value: "XS", child: Text("XS")),
-                                                    DropdownMenuItem(value: "S", child: Text("S")),
-                                                    DropdownMenuItem(value: "M", child: Text("M")),
-                                                    DropdownMenuItem(value: "L", child: Text("L")),
-                                                    DropdownMenuItem(value: "XL", child: Text("XL")),
-                                                    DropdownMenuItem(value: "XXL", child: Text("XXL")),
-                                                  ],
-                                                  onChanged: (String? value) {
-                                                    setState(() {
-                                                      selectedVelicinaRama = value;
-                                                    });
-                                                  },
-                                                ),
-                                              ),
+                                            focusedBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(color: Colors.white),
                                             ),
-                                          ],
+                                            fillColor: Colors.white,
+                                            filled: true,
+                                          ),
                                         ),
                                       ),
 
@@ -477,41 +461,21 @@ class _BiciklDodajProzorState extends State<BiciklDodajProzor> {
                                           color: Colors.white, // Bijela pozadina
                                           borderRadius: BorderRadius.circular(8.0), // Zaobljeni okviri
                                         ),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            const Text(
-                                              "Velicina tocka",
-                                              style: TextStyle(color: Colors.black), // Crni tekst
+                                        child: TextField(
+                                          controller: selectedVelicinaTockaController,
+                                          keyboardType: TextInputType.number,
+                                          decoration: const InputDecoration(
+                                            labelText: "Velicina tocka",
+                                            labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                                            enabledBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(color: Color.fromARGB(255, 0, 0, 0)),
                                             ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(left: 8.0),
-                                              child: SizedBox(
-                                                width: 0.05 * MediaQuery.of(context).size.width,
-                                                child: DropdownButton<String>(
-                                                  hint: const Text(""),
-                                                  isExpanded: true,
-                                                  value: selectedVelicinaTocka, // Poveži sa varijablom
-                                                  items: const [
-                                                    DropdownMenuItem(value: "12", child: Text("12")),
-                                                    DropdownMenuItem(value: "14", child: Text("14")),
-                                                    DropdownMenuItem(value: "16", child: Text("16")),
-                                                    DropdownMenuItem(value: "20", child: Text("20")),
-                                                    DropdownMenuItem(value: "24", child: Text("24")),
-                                                    DropdownMenuItem(value: "26", child: Text("26")),
-                                                    DropdownMenuItem(value: "27.5", child: Text("27.5")),
-                                                    DropdownMenuItem(value: "28", child: Text("28")),
-                                                    DropdownMenuItem(value: "29", child: Text("29")),
-                                                  ],
-                                                  onChanged: (String? value) {
-                                                    setState(() {
-                                                      selectedVelicinaTocka = value;
-                                                    });
-                                                  },
-                                                ),
-                                              ),
+                                            focusedBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(color: Colors.white),
                                             ),
-                                          ],
+                                            fillColor: Colors.white,
+                                            filled: true,
+                                          ),
                                         ),
                                       ),
 

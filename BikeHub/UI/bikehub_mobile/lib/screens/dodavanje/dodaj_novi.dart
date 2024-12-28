@@ -412,13 +412,10 @@ class _DodajNoviState extends State<DodajNovi> {
                               top: 10,
                               right: 10,
                               child: IconButton(
-                                icon: Icon(Icons.delete,
-                                    color:
-                                        const Color.fromARGB(255, 255, 0, 0)),
+                                icon: Icon(Icons.delete, color: const Color.fromARGB(255, 255, 0, 0)),
                                 onPressed: () {
                                   setState(() {
-                                    slike.removeAt(
-                                        index); // Izbriši trenutno prikazanu sliku
+                                    slike.removeAt(index); // Izbriši trenutno prikazanu sliku
                                   });
                                 },
                               ),
@@ -446,8 +443,7 @@ class _DodajNoviState extends State<DodajNovi> {
                   String odabranaSlika = await odaberiSlikuIzGalerije();
                   if (odabranaSlika.isNotEmpty) {
                     setState(() {
-                      slike.insert(
-                          0, odabranaSlika); // Dodaj novu sliku na prvo mjesto
+                      slike.insert(0, odabranaSlika); // Dodaj novu sliku na prvo mjesto
                     });
                   }
                 },
@@ -458,8 +454,7 @@ class _DodajNoviState extends State<DodajNovi> {
                   'Dodaj sljedeću',
                   style: TextStyle(
                     color: Colors.lightBlue,
-                    fontSize: MediaQuery.of(context).size.width *
-                        0.04, // Rensponsivni tekst
+                    fontSize: MediaQuery.of(context).size.width * 0.04, // Rensponsivni tekst
                   ),
                 ),
               )
@@ -671,29 +666,143 @@ class _DodajNoviState extends State<DodajNovi> {
                       ),
                       borderRadius: BorderRadius.circular(10.0),
                     ),
-                    child: DropdownButton<String>(
-                      isExpanded: true,
-                      value: selectedRam.isNotEmpty ? selectedRam : null,
-                      hint: Text(
-                        'Velicina rama',
-                        style: TextStyle(color: Colors.white),
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.75,
+                      height: MediaQuery.of(context).size.height * 0.05,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.blue, Colors.purple],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(10.0),
                       ),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          selectedRam = newValue!;
-                        });
-                      },
-                      items: <String>['', 'S', 'M', 'L', 'XL', 'XXL']
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      dropdownColor: Colors.blue[700],
-                      iconEnabledColor: Colors.white,
-                      style: TextStyle(color: Colors.white),
-                      underline: Container(),
+                      child: TextField(
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          hintText: "Velicina rama",
+                          hintStyle: TextStyle(color: Colors.white),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                        ),
+                        style: TextStyle(color: Colors.white),
+                        onChanged: (text) {
+                          selectedRam = text;
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width * 0.85,
+                height: MediaQuery.of(context).size.height * 0.07,
+                margin: EdgeInsets.symmetric(vertical: 5.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20.0),
+                  border: Border(
+                    bottom: BorderSide(color: Colors.white),
+                    right: BorderSide(color: Colors.white),
+                    left: BorderSide(color: Colors.white),
+                  ),
+                ),
+                child: Center(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.75,
+                    height: MediaQuery.of(context).size.height * 0.05,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.blue, Colors.purple],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.75,
+                      height: MediaQuery.of(context).size.height * 0.05,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.blue, Colors.purple],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: TextField(
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          hintText: "Velicina tocka",
+                          hintStyle: TextStyle(color: Colors.white),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                        ),
+                        style: TextStyle(color: Colors.white),
+                        onChanged: (text) {
+                          selectedVelicina = text;
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width * 0.85,
+                height: MediaQuery.of(context).size.height * 0.07,
+                margin: EdgeInsets.symmetric(vertical: 5.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20.0),
+                  border: Border(
+                    bottom: BorderSide(color: Colors.white),
+                    right: BorderSide(color: Colors.white),
+                    left: BorderSide(color: Colors.white),
+                  ),
+                ),
+                child: Center(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.75,
+                    height: MediaQuery.of(context).size.height * 0.05,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.blue, Colors.purple],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.75,
+                      height: MediaQuery.of(context).size.height * 0.05,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.blue, Colors.purple],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: TextField(
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          hintText: "Broj brzina",
+                          hintStyle: TextStyle(color: Colors.white),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                        ),
+                        style: TextStyle(color: Colors.white),
+                        onChanged: (text) {
+                          brojBrzina = int.tryParse(text) ?? 0;
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -724,112 +833,7 @@ class _DodajNoviState extends State<DodajNovi> {
                     ),
                     child: DropdownButton<String>(
                       isExpanded: true,
-                      value:
-                          selectedVelicina.isNotEmpty ? selectedVelicina : null,
-                      hint: Text(
-                        'Velicina tocka',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          selectedVelicina = newValue!;
-                        });
-                      },
-                      items: <String>['', '21', '26', '27.5', '29']
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      dropdownColor: Colors.blue[700],
-                      iconEnabledColor: Colors.white,
-                      style: TextStyle(color: Colors.white),
-                      underline: Container(),
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                width: MediaQuery.of(context).size.width * 0.85,
-                height: MediaQuery.of(context).size.height * 0.07,
-                margin: EdgeInsets.symmetric(vertical: 5.0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20.0),
-                  border: Border(
-                    bottom: BorderSide(color: Colors.white),
-                    right: BorderSide(color: Colors.white),
-                    left: BorderSide(color: Colors.white),
-                  ),
-                ),
-                child: Center(
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.75,
-                    height: MediaQuery.of(context).size.height * 0.05,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.blue, Colors.purple],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    child: DropdownButton<String>(
-                      isExpanded: true,
-                      value: brojBrzina != 0 ? brojBrzina.toString() : null,
-                      hint: Text(
-                        'Broj brzina',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          brojBrzina = int.parse(newValue!);
-                        });
-                      },
-                      items: <String>['', '16', '18', '21', '24', '27', '31']
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      dropdownColor: Colors.blue[700],
-                      iconEnabledColor: Colors.white,
-                      style: TextStyle(color: Colors.white),
-                      underline: Container(),
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                width: MediaQuery.of(context).size.width * 0.85,
-                height: MediaQuery.of(context).size.height * 0.07,
-                margin: EdgeInsets.symmetric(vertical: 5.0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20.0),
-                  border: Border(
-                    bottom: BorderSide(color: Colors.white),
-                    right: BorderSide(color: Colors.white),
-                    left: BorderSide(color: Colors.white),
-                  ),
-                ),
-                child: Center(
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.75,
-                    height: MediaQuery.of(context).size.height * 0.05,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.blue, Colors.purple],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    child: DropdownButton<String>(
-                      isExpanded: true,
-                      value: _odabranaKategorijaBicikli != null
-                          ? _odabranaKategorijaBicikli!['naziv'] ?? 'N/A'
-                          : null,
+                      value: _odabranaKategorijaBicikli != null ? _odabranaKategorijaBicikli!['naziv'] ?? 'N/A' : null,
                       hint: Text(
                         'Kategorija',
                         style: TextStyle(color: Colors.white),
@@ -837,20 +841,15 @@ class _DodajNoviState extends State<DodajNovi> {
                       onChanged: (String? newValue) {
                         setState(() {
                           _odabranaKategorijaBicikli =
-                              _kategorijeBicikl?.firstWhere(
-                                  (kategorija) =>
-                                      kategorija['naziv'] == newValue,
-                                  orElse: () => {'naziv': 'N/A'});
+                              _kategorijeBicikl?.firstWhere((kategorija) => kategorija['naziv'] == newValue, orElse: () => {'naziv': 'N/A'});
                         });
                       },
-                      items: _kategorijeBicikl
-                              ?.map<DropdownMenuItem<String>>((kategorija) {
+                      items: _kategorijeBicikl?.map<DropdownMenuItem<String>>((kategorija) {
                             return DropdownMenuItem<String>(
                               value: kategorija['naziv'] ?? 'N/A',
                               child: Container(
                                 width: MediaQuery.of(context).size.width * 0.3,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.04,
+                                height: MediaQuery.of(context).size.height * 0.04,
                                 child: Center(
                                   child: Text(
                                     kategorija['naziv'] ?? 'N/A',
@@ -1163,9 +1162,7 @@ class _DodajNoviState extends State<DodajNovi> {
                               top: 10,
                               right: 10,
                               child: IconButton(
-                                icon: Icon(Icons.delete,
-                                    color:
-                                        const Color.fromARGB(255, 255, 0, 0)),
+                                icon: Icon(Icons.delete, color: const Color.fromARGB(255, 255, 0, 0)),
                                 onPressed: () {
                                   setState(() {
                                     slikeDijelovi.removeAt(index);
@@ -1207,8 +1204,7 @@ class _DodajNoviState extends State<DodajNovi> {
                   'Dodaj sljedeću',
                   style: TextStyle(
                     color: Colors.lightBlue,
-                    fontSize: MediaQuery.of(context).size.width *
-                        0.04, // Rensponsivni tekst
+                    fontSize: MediaQuery.of(context).size.width * 0.04, // Rensponsivni tekst
                   ),
                 ),
               )
@@ -1464,9 +1460,7 @@ class _DodajNoviState extends State<DodajNovi> {
                     ),
                     child: DropdownButton<String>(
                       isExpanded: true,
-                      value: _odabranaKategorijaDijelovi != null
-                          ? _odabranaKategorijaDijelovi!['naziv'] ?? 'N/A'
-                          : null,
+                      value: _odabranaKategorijaDijelovi != null ? _odabranaKategorijaDijelovi!['naziv'] ?? 'N/A' : null,
                       hint: Text(
                         'Kategorija',
                         style: TextStyle(color: Colors.white),
@@ -1474,20 +1468,15 @@ class _DodajNoviState extends State<DodajNovi> {
                       onChanged: (String? newValue) {
                         setState(() {
                           _odabranaKategorijaDijelovi =
-                              _kategorijeDijelovi?.firstWhere(
-                                  (kategorija) =>
-                                      kategorija['naziv'] == newValue,
-                                  orElse: () => {'naziv': 'N/A'});
+                              _kategorijeDijelovi?.firstWhere((kategorija) => kategorija['naziv'] == newValue, orElse: () => {'naziv': 'N/A'});
                         });
                       },
-                      items: _kategorijeDijelovi
-                              ?.map<DropdownMenuItem<String>>((kategorija) {
+                      items: _kategorijeDijelovi?.map<DropdownMenuItem<String>>((kategorija) {
                             return DropdownMenuItem<String>(
                               value: kategorija['naziv'] ?? 'N/A',
                               child: Container(
                                 width: MediaQuery.of(context).size.width * 0.3,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.04,
+                                height: MediaQuery.of(context).size.height * 0.04,
                                 child: Center(
                                   child: Text(
                                     kategorija['naziv'] ?? 'N/A',
