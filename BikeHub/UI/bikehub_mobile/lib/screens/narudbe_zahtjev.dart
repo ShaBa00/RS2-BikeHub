@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:bikehub_mobile/screens/glavni_prozor.dart';
 import 'package:bikehub_mobile/screens/nav_bar.dart';
+import 'package:bikehub_mobile/screens/ostalo/confirm_prozor.dart';
 import 'package:bikehub_mobile/screens/prijava/log_in.dart';
 import 'package:bikehub_mobile/screens/prikaz/bicikli_prikaz.dart';
 import 'package:bikehub_mobile/screens/prikaz/dijelovi_prikaz.dart';
@@ -25,8 +26,7 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
   final KorisnikServis _korisnikService = KorisnikServis();
   final NarudbaService _narudbaService = NarudbaService();
   final NarudbaBiciklService _narudbaBiciklService = NarudbaBiciklService();
-  final NarudbaDijeloviService _narudbaDijeloviService =
-      NarudbaDijeloviService();
+  final NarudbaDijeloviService _narudbaDijeloviService = NarudbaDijeloviService();
   final BiciklService _biciklService = BiciklService();
   final DijeloviService _dijeloviService = DijeloviService();
 
@@ -116,16 +116,13 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
         // Drugi dio
         Container(
           width: double.infinity,
-          height:
-              MediaQuery.of(context).size.height * 0.10, // 10% visine ekrana
+          height: MediaQuery.of(context).size.height * 0.10, // 10% visine ekrana
           color: Color.fromARGB(0, 255, 235, 59), // Zamijenite s bojom po želji
           child: Align(
             alignment: Alignment.bottomCenter,
             child: Container(
-              width:
-                  MediaQuery.of(context).size.width * 0.95, // 95% širine ekrana
-              height:
-                  MediaQuery.of(context).size.height * 0.05, // 5% visine ekrana
+              width: MediaQuery.of(context).size.width * 0.95, // 95% širine ekrana
+              height: MediaQuery.of(context).size.height * 0.05, // 5% visine ekrana
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(25.0),
@@ -136,19 +133,16 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                   Container(
                     width: MediaQuery.of(context).size.width * 0.80,
                     height: MediaQuery.of(context).size.height * 0.09,
-                    color: const Color.fromARGB(
-                        0, 244, 67, 54), // Zamijenite s bojom po želji
+                    color: const Color.fromARGB(0, 244, 67, 54), // Zamijenite s bojom po želji
                     child: Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.arrow_back,
-                              color: Colors.black), // Ikone crne boje
+                          icon: const Icon(Icons.arrow_back, color: Colors.black), // Ikone crne boje
                           iconSize: 24.0, // Veličina ikone
                           onPressed: () {
                             Navigator.pushReplacement(
                               context,
-                              MaterialPageRoute(
-                                  builder: (context) => const GlavniProzor()),
+                              MaterialPageRoute(builder: (context) => const GlavniProzor()),
                             );
                           },
                         ),
@@ -161,12 +155,9 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                   ),
                   // lD
                   Container(
-                    width: MediaQuery.of(context).size.width *
-                        0.10, // 55% širine ekrana
-                    height: MediaQuery.of(context).size.height *
-                        0.09, // 9% visine ekrana
-                    color: const Color.fromARGB(
-                        0, 33, 149, 243), // Zamijenite s bojom po želji
+                    width: MediaQuery.of(context).size.width * 0.10, // 55% širine ekrana
+                    height: MediaQuery.of(context).size.height * 0.09, // 9% visine ekrana
+                    color: const Color.fromARGB(0, 33, 149, 243), // Zamijenite s bojom po želji
                   ),
                 ],
               ),
@@ -177,17 +168,13 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
         //dP
         Container(
           width: MediaQuery.of(context).size.width, // 100% širine ekrana
-          height:
-              MediaQuery.of(context).size.height * 0.12, // 15% visine ekrana
-          color: const Color.fromARGB(
-              0, 255, 153, 0), // Zamijenite s bojom po želji
+          height: MediaQuery.of(context).size.height * 0.12, // 15% visine ekrana
+          color: const Color.fromARGB(0, 255, 153, 0), // Zamijenite s bojom po želji
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              customButton(context, 'bicikl', Icons.directions_bike,
-                  _selectedSection, _updateSection),
-              customButton(context, 'dijelovi', Icons.handyman,
-                  _selectedSection, _updateSection),
+              customButton(context, 'bicikl', Icons.directions_bike, _selectedSection, _updateSection),
+              customButton(context, 'dijelovi', Icons.handyman, _selectedSection, _updateSection),
             ],
           ),
         ),
@@ -248,23 +235,16 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                                         setState(() {
                                           zapisUcitan = false;
                                           _selectedSection = "biciklPrikaz";
-                                          _odabraniId =
-                                              narudzba['narudzbaBicikliId'];
+                                          _odabraniId = narudzba['narudzbaBicikliId'];
                                         });
                                         await getBicikl();
                                       },
                                       child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.85,
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
-                                        margin:
-                                            EdgeInsets.symmetric(vertical: 5),
+                                        width: MediaQuery.of(context).size.width * 0.85,
+                                        height: MediaQuery.of(context).size.height * 0.06,
+                                        margin: EdgeInsets.symmetric(vertical: 5),
                                         decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(10),
                                           gradient: const LinearGradient(
                                             colors: [
                                               Color.fromARGB(255, 82, 205, 210),
@@ -277,8 +257,7 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                                         child: Center(
                                           child: Text(
                                             'Cijena: ${narudzba['cijena']}KM, Kolicina: ${narudzba['kolicina']}',
-                                            style:
-                                                TextStyle(color: Colors.white),
+                                            style: TextStyle(color: Colors.white),
                                           ),
                                         ),
                                       ),
@@ -303,21 +282,18 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                             height: MediaQuery.of(context).size.height * 0.05,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Color.fromARGB(255, 87, 202, 255),
+                                backgroundColor: Color.fromARGB(255, 87, 202, 255),
                               ),
                               onPressed: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const LogIn()),
+                                  MaterialPageRoute(builder: (context) => const LogIn()),
                                 );
                               },
                               child: Text(
                                 "Prijava",
                                 style: TextStyle(
-                                  color:
-                                      const Color.fromARGB(255, 255, 255, 255),
+                                  color: const Color.fromARGB(255, 255, 255, 255),
                                   fontSize: 18,
                                 ),
                               ),
@@ -423,8 +399,7 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                               child: Center(
                                   child: Container(
                                 width: MediaQuery.of(context).size.width * 0.37,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.19,
+                                height: MediaQuery.of(context).size.height * 0.19,
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: [
@@ -441,22 +416,17 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => BicikliPrikaz(
-                                            biciklId: bicikl['biciklId']),
+                                        builder: (context) => BicikliPrikaz(biciklId: bicikl['biciklId']),
                                       ),
                                     );
                                   },
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(20.0),
                                     child: bicikl['slikeBiciklis'] != null &&
-                                            bicikl['slikeBiciklis']
-                                                .isNotEmpty &&
-                                            bicikl['slikeBiciklis'][0]
-                                                    ['slika'] !=
-                                                null
+                                            bicikl['slikeBiciklis'].isNotEmpty &&
+                                            bicikl['slikeBiciklis'][0]['slika'] != null
                                         ? Image.memory(
-                                            base64Decode(bicikl['slikeBiciklis']
-                                                [0]['slika']),
+                                            base64Decode(bicikl['slikeBiciklis'][0]['slika']),
                                             fit: BoxFit.cover,
                                           )
                                         : Icon(
@@ -474,33 +444,20 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                               child: Column(
                                 children: [
                                   Container(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.77,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.065,
+                                    width: MediaQuery.of(context).size.width * 0.77,
+                                    height: MediaQuery.of(context).size.height * 0.065,
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                       children: [
                                         Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.3,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.055,
+                                          width: MediaQuery.of(context).size.width * 0.3,
+                                          height: MediaQuery.of(context).size.height * 0.055,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10.0),
+                                            borderRadius: BorderRadius.circular(10.0),
                                             border: Border(
-                                              bottom: BorderSide(
-                                                  color: Colors.white),
-                                              right: BorderSide(
-                                                  color: Colors.white),
-                                              left: BorderSide(
-                                                  color: Colors.white),
+                                              bottom: BorderSide(color: Colors.white),
+                                              right: BorderSide(color: Colors.white),
+                                              left: BorderSide(color: Colors.white),
                                             ),
                                           ),
                                           child: Center(
@@ -508,31 +465,20 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                                               fit: BoxFit.scaleDown,
                                               child: Text(
                                                 'Kolicina: ${biciklNarudba['kolicina'] ?? 'N/A'}',
-                                                style: TextStyle(
-                                                    color: Colors.white),
+                                                style: TextStyle(color: Colors.white),
                                               ),
                                             ),
                                           ),
                                         ),
                                         Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.3,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.055,
+                                          width: MediaQuery.of(context).size.width * 0.3,
+                                          height: MediaQuery.of(context).size.height * 0.055,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10.0),
+                                            borderRadius: BorderRadius.circular(10.0),
                                             border: Border(
-                                              bottom: BorderSide(
-                                                  color: Colors.white),
-                                              right: BorderSide(
-                                                  color: Colors.white),
-                                              left: BorderSide(
-                                                  color: Colors.white),
+                                              bottom: BorderSide(color: Colors.white),
+                                              right: BorderSide(color: Colors.white),
+                                              left: BorderSide(color: Colors.white),
                                             ),
                                           ),
                                           child: Center(
@@ -540,8 +486,7 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                                               fit: BoxFit.scaleDown,
                                               child: Text(
                                                 'Cijena: ${biciklNarudba['cijena'] ?? 'N/A'}',
-                                                style: TextStyle(
-                                                    color: Colors.white),
+                                                style: TextStyle(color: Colors.white),
                                               ),
                                             ),
                                           ),
@@ -550,36 +495,20 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                                     ),
                                   ),
                                   Container(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.77,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.065,
+                                    width: MediaQuery.of(context).size.width * 0.77,
+                                    height: MediaQuery.of(context).size.height * 0.065,
                                     child: Row(
                                       children: [
-                                        SizedBox(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.06),
+                                        SizedBox(width: MediaQuery.of(context).size.width * 0.06),
                                         Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.45,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.055,
+                                          width: MediaQuery.of(context).size.width * 0.45,
+                                          height: MediaQuery.of(context).size.height * 0.055,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10.0),
+                                            borderRadius: BorderRadius.circular(10.0),
                                             border: Border(
-                                              bottom: BorderSide(
-                                                  color: Colors.white),
-                                              right: BorderSide(
-                                                  color: Colors.white),
-                                              left: BorderSide(
-                                                  color: Colors.white),
+                                              bottom: BorderSide(color: Colors.white),
+                                              right: BorderSide(color: Colors.white),
+                                              left: BorderSide(color: Colors.white),
                                             ),
                                           ),
                                           child: Center(
@@ -587,8 +516,7 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                                               fit: BoxFit.scaleDown,
                                               child: Text(
                                                 'Status: ${biciklNarudba['status'] == 'vracen' ? 'Otkazana' : biciklNarudba['status'] == 'kreiran' ? 'Obrada' : biciklNarudba['status'] == 'zavrseno' || biciklNarudba['status'] == 'obrisan' ? 'Isporucena' : biciklNarudba['status'] != null ? 'U isporuci' : 'N/A'}',
-                                                style: TextStyle(
-                                                    color: Colors.white),
+                                                style: TextStyle(color: Colors.white),
                                               ),
                                             ),
                                           ),
@@ -608,8 +536,7 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                           children: [
                             Container(
                               width: MediaQuery.of(context).size.width * 0.35,
-                              height:
-                                  MediaQuery.of(context).size.height * 0.065,
+                              height: MediaQuery.of(context).size.height * 0.065,
                               decoration: BoxDecoration(
                                 color: const Color.fromARGB(0, 255, 255, 255),
                                 borderRadius: BorderRadius.circular(20.0),
@@ -617,15 +544,13 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                               child: Center(
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    posaljiNarudbom(
-                                        biciklNarudba['narudzbaId'], true);
+                                    posaljiNarudbom(biciklNarudba['narudzbaId'], true);
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.lightBlue,
                                     minimumSize: Size(
                                       MediaQuery.of(context).size.width * 0.3,
-                                      MediaQuery.of(context).size.height *
-                                          0.055,
+                                      MediaQuery.of(context).size.height * 0.055,
                                     ),
                                   ),
                                   child: FittedBox(
@@ -641,8 +566,7 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                             SizedBox(width: 10),
                             Container(
                               width: MediaQuery.of(context).size.width * 0.35,
-                              height:
-                                  MediaQuery.of(context).size.height * 0.065,
+                              height: MediaQuery.of(context).size.height * 0.065,
                               decoration: BoxDecoration(
                                 color: const Color.fromARGB(0, 255, 255, 255),
                                 borderRadius: BorderRadius.circular(20.0),
@@ -650,16 +574,13 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                               child: Center(
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    posaljiNarudbom(
-                                        biciklNarudba['narudzbaId'], false);
+                                    posaljiNarudbom(biciklNarudba['narudzbaId'], false);
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        const Color.fromARGB(255, 244, 3, 99),
+                                    backgroundColor: const Color.fromARGB(255, 244, 3, 99),
                                     minimumSize: Size(
                                       MediaQuery.of(context).size.width * 0.3,
-                                      MediaQuery.of(context).size.height *
-                                          0.055,
+                                      MediaQuery.of(context).size.height * 0.055,
                                     ),
                                   ),
                                   child: FittedBox(
@@ -687,8 +608,7 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
 
   Future<void> getBicikl() async {
     try {
-      biciklNarudba =
-          await _narudbaBiciklService.getNarudbaBiciklById(_odabraniId);
+      biciklNarudba = await _narudbaBiciklService.getNarudbaBiciklById(_odabraniId);
 
       bicikl = await _biciklService.getBiciklById(biciklNarudba['biciklId']);
       setState(() {
@@ -748,30 +668,22 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                               )
                             : SingleChildScrollView(
                                 child: Column(
-                                  children:
-                                      listaNarudbaDijelovi.map((narudzba) {
+                                  children: listaNarudbaDijelovi.map((narudzba) {
                                     return GestureDetector(
                                       onTap: () async {
                                         setState(() {
                                           zapisUcitan = false;
                                           _selectedSection = "dijeloviPrikaz";
-                                          _odabraniId =
-                                              narudzba['narudzbaDijeloviId'];
+                                          _odabraniId = narudzba['narudzbaDijeloviId'];
                                         });
                                         await getDijelovi();
                                       },
                                       child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.85,
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
-                                        margin:
-                                            EdgeInsets.symmetric(vertical: 5),
+                                        width: MediaQuery.of(context).size.width * 0.85,
+                                        height: MediaQuery.of(context).size.height * 0.06,
+                                        margin: EdgeInsets.symmetric(vertical: 5),
                                         decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(10),
                                           gradient: const LinearGradient(
                                             colors: [
                                               Color.fromARGB(255, 82, 205, 210),
@@ -784,8 +696,7 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                                         child: Center(
                                           child: Text(
                                             'Cijena: ${narudzba['cijena']}KM, Kolicina: ${narudzba['kolicina']}',
-                                            style:
-                                                TextStyle(color: Colors.white),
+                                            style: TextStyle(color: Colors.white),
                                           ),
                                         ),
                                       ),
@@ -810,21 +721,18 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                             height: MediaQuery.of(context).size.height * 0.05,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Color.fromARGB(255, 87, 202, 255),
+                                backgroundColor: Color.fromARGB(255, 87, 202, 255),
                               ),
                               onPressed: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const LogIn()),
+                                  MaterialPageRoute(builder: (context) => const LogIn()),
                                 );
                               },
                               child: Text(
                                 "Prijava",
                                 style: TextStyle(
-                                  color:
-                                      const Color.fromARGB(255, 255, 255, 255),
+                                  color: const Color.fromARGB(255, 255, 255, 255),
                                   fontSize: 18,
                                 ),
                               ),
@@ -932,10 +840,8 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                               height: MediaQuery.of(context).size.height * 0.2,
                               child: Center(
                                 child: Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.37,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.19,
+                                  width: MediaQuery.of(context).size.width * 0.37,
+                                  height: MediaQuery.of(context).size.height * 0.19,
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [
@@ -952,32 +858,24 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => DijeloviPrikaz(
-                                              dijeloviId:
-                                                  dijelovi['dijeloviId']),
+                                          builder: (context) => DijeloviPrikaz(dijeloviId: dijelovi['dijeloviId']),
                                         ),
                                       );
                                     },
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(20.0),
-                                      child:
-                                          dijelovi['slikeDijelovis'] != null &&
-                                                  dijelovi['slikeDijelovis']
-                                                      .isNotEmpty &&
-                                                  dijelovi['slikeDijelovis'][0]
-                                                          ['slika'] !=
-                                                      null
-                                              ? Image.memory(
-                                                  base64Decode(
-                                                      dijelovi['slikeDijelovis']
-                                                          [0]['slika']),
-                                                  fit: BoxFit.cover,
-                                                )
-                                              : Icon(
-                                                  Icons.image_not_supported,
-                                                  color: Colors.white,
-                                                  size: 50,
-                                                ),
+                                      child: dijelovi['slikeDijelovis'] != null &&
+                                              dijelovi['slikeDijelovis'].isNotEmpty &&
+                                              dijelovi['slikeDijelovis'][0]['slika'] != null
+                                          ? Image.memory(
+                                              base64Decode(dijelovi['slikeDijelovis'][0]['slika']),
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Icon(
+                                              Icons.image_not_supported,
+                                              color: Colors.white,
+                                              size: 50,
+                                            ),
                                     ),
                                   ),
                                 ),
@@ -989,33 +887,20 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                               child: Column(
                                 children: [
                                   Container(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.77,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.065,
+                                    width: MediaQuery.of(context).size.width * 0.77,
+                                    height: MediaQuery.of(context).size.height * 0.065,
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                       children: [
                                         Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.3,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.055,
+                                          width: MediaQuery.of(context).size.width * 0.3,
+                                          height: MediaQuery.of(context).size.height * 0.055,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10.0),
+                                            borderRadius: BorderRadius.circular(10.0),
                                             border: Border(
-                                              bottom: BorderSide(
-                                                  color: Colors.white),
-                                              right: BorderSide(
-                                                  color: Colors.white),
-                                              left: BorderSide(
-                                                  color: Colors.white),
+                                              bottom: BorderSide(color: Colors.white),
+                                              right: BorderSide(color: Colors.white),
+                                              left: BorderSide(color: Colors.white),
                                             ),
                                           ),
                                           child: Center(
@@ -1023,31 +908,20 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                                               fit: BoxFit.scaleDown,
                                               child: Text(
                                                 'Kolicina: ${dijeloviNarudba['kolicina'] ?? 'N/A'}',
-                                                style: TextStyle(
-                                                    color: Colors.white),
+                                                style: TextStyle(color: Colors.white),
                                               ),
                                             ),
                                           ),
                                         ),
                                         Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.3,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.055,
+                                          width: MediaQuery.of(context).size.width * 0.3,
+                                          height: MediaQuery.of(context).size.height * 0.055,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10.0),
+                                            borderRadius: BorderRadius.circular(10.0),
                                             border: Border(
-                                              bottom: BorderSide(
-                                                  color: Colors.white),
-                                              right: BorderSide(
-                                                  color: Colors.white),
-                                              left: BorderSide(
-                                                  color: Colors.white),
+                                              bottom: BorderSide(color: Colors.white),
+                                              right: BorderSide(color: Colors.white),
+                                              left: BorderSide(color: Colors.white),
                                             ),
                                           ),
                                           child: Center(
@@ -1055,8 +929,7 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                                               fit: BoxFit.scaleDown,
                                               child: Text(
                                                 'Cijena: ${dijeloviNarudba['cijena'] ?? 'N/A'}',
-                                                style: TextStyle(
-                                                    color: Colors.white),
+                                                style: TextStyle(color: Colors.white),
                                               ),
                                             ),
                                           ),
@@ -1065,36 +938,20 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                                     ),
                                   ),
                                   Container(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.77,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.065,
+                                    width: MediaQuery.of(context).size.width * 0.77,
+                                    height: MediaQuery.of(context).size.height * 0.065,
                                     child: Row(
                                       children: [
-                                        SizedBox(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.06),
+                                        SizedBox(width: MediaQuery.of(context).size.width * 0.06),
                                         Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.45,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.055,
+                                          width: MediaQuery.of(context).size.width * 0.45,
+                                          height: MediaQuery.of(context).size.height * 0.055,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10.0),
+                                            borderRadius: BorderRadius.circular(10.0),
                                             border: Border(
-                                              bottom: BorderSide(
-                                                  color: Colors.white),
-                                              right: BorderSide(
-                                                  color: Colors.white),
-                                              left: BorderSide(
-                                                  color: Colors.white),
+                                              bottom: BorderSide(color: Colors.white),
+                                              right: BorderSide(color: Colors.white),
+                                              left: BorderSide(color: Colors.white),
                                             ),
                                           ),
                                           child: Center(
@@ -1102,8 +959,7 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                                               fit: BoxFit.scaleDown,
                                               child: Text(
                                                 'Status: ${dijeloviNarudba['status'] == 'vracen' ? 'Otkazana' : dijeloviNarudba['status'] == 'kreiran' ? 'Obrada' : dijeloviNarudba['status'] == 'zavrseno' || dijeloviNarudba['status'] == 'obrisan' ? 'Isporucena' : dijeloviNarudba['status'] != null ? 'U isporuci' : 'N/A'}',
-                                                style: TextStyle(
-                                                    color: Colors.white),
+                                                style: TextStyle(color: Colors.white),
                                               ),
                                             ),
                                           ),
@@ -1123,8 +979,7 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                           children: [
                             Container(
                               width: MediaQuery.of(context).size.width * 0.35,
-                              height:
-                                  MediaQuery.of(context).size.height * 0.065,
+                              height: MediaQuery.of(context).size.height * 0.065,
                               decoration: BoxDecoration(
                                 color: const Color.fromARGB(0, 255, 255, 255),
                                 borderRadius: BorderRadius.circular(20.0),
@@ -1132,15 +987,13 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                               child: Center(
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    posaljiNarudbom(
-                                        dijeloviNarudba['narudzbaId'], true);
+                                    posaljiNarudbom(dijeloviNarudba['narudzbaId'], true);
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.lightBlue,
                                     minimumSize: Size(
                                       MediaQuery.of(context).size.width * 0.3,
-                                      MediaQuery.of(context).size.height *
-                                          0.055,
+                                      MediaQuery.of(context).size.height * 0.055,
                                     ),
                                   ),
                                   child: FittedBox(
@@ -1156,8 +1009,7 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                             SizedBox(width: 10),
                             Container(
                               width: MediaQuery.of(context).size.width * 0.35,
-                              height:
-                                  MediaQuery.of(context).size.height * 0.065,
+                              height: MediaQuery.of(context).size.height * 0.065,
                               decoration: BoxDecoration(
                                 color: const Color.fromARGB(0, 255, 255, 255),
                                 borderRadius: BorderRadius.circular(20.0),
@@ -1165,16 +1017,13 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                               child: Center(
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    posaljiNarudbom(
-                                        dijeloviNarudba['narudzbaId'], false);
+                                    posaljiNarudbom(dijeloviNarudba['narudzbaId'], false);
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        const Color.fromARGB(255, 244, 3, 99),
+                                    backgroundColor: const Color.fromARGB(255, 244, 3, 99),
                                     minimumSize: Size(
                                       MediaQuery.of(context).size.width * 0.3,
-                                      MediaQuery.of(context).size.height *
-                                          0.055,
+                                      MediaQuery.of(context).size.height * 0.055,
                                     ),
                                   ),
                                   child: FittedBox(
@@ -1199,11 +1048,9 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
 
   Future<void> getDijelovi() async {
     try {
-      dijeloviNarudba =
-          await _narudbaDijeloviService.getNarudbaDijeloviById(_odabraniId);
+      dijeloviNarudba = await _narudbaDijeloviService.getNarudbaDijeloviById(_odabraniId);
 
-      dijelovi =
-          await _dijeloviService.getDijeloviById(dijeloviNarudba['dijeloviId']);
+      dijelovi = await _dijeloviService.getDijeloviById(dijeloviNarudba['dijeloviId']);
       setState(() {
         zapisUcitan = true;
       });
@@ -1216,8 +1063,11 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
   //zajednicke funkcije
 
   Future<void> posaljiNarudbom(int odabranaNarudbaId, bool aktivacija) async {
-    String poruka =
-        await _narudbaService.aktivacijaNarudbe(odabranaNarudbaId, aktivacija);
+    bool? confirmed = await ConfirmProzor.prikaziConfirmProzor(context, "Da li ste sigurni da želite vratiti narudbu?");
+    if (confirmed != true) {
+      return;
+    }
+    String poruka = await _narudbaService.aktivacijaNarudbe(odabranaNarudbaId, aktivacija);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -1225,8 +1075,7 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
           poruka,
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor:
-            poruka == "Uspjesno izvrsena radnja" ? Colors.green : Colors.red,
+        backgroundColor: poruka == "Uspjesno izvrsena radnja" ? Colors.green : Colors.red,
       ),
     );
     setState(() {
@@ -1259,8 +1108,7 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
   }
 
   //dugmici
-  Widget customButton(BuildContext context, String title, IconData icon,
-      String currentSection, Function onPressed) {
+  Widget customButton(BuildContext context, String title, IconData icon, String currentSection, Function onPressed) {
     bool isSelected = currentSection == title;
     return Container(
       width: 70.0, // Povećanje veličine dugmića
@@ -1270,10 +1118,7 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
         gradient: LinearGradient(
           colors: isSelected
               ? [Colors.blue, Colors.lightBlueAccent] // Boje za odabrani dugmić
-              : [
-                  Color.fromARGB(255, 82, 205, 210),
-                  Color.fromARGB(255, 7, 161, 235)
-                ], // Boje za neodabrane dugmiće
+              : [Color.fromARGB(255, 82, 205, 210), Color.fromARGB(255, 7, 161, 235)], // Boje za neodabrane dugmiće
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../services/bicikli/bicikl_service.dart'; 
+import '../../../services/bicikli/bicikl_service.dart';
 
 class BicikliLProzor extends StatefulWidget {
   const BicikliLProzor({super.key});
@@ -52,8 +52,8 @@ class _BicikliLProzorState extends State<BicikliLProzor> {
                   velicinaRama = value;
                 },
               ),
-              const SizedBox(height: 16), // Razmak između elemenata
-              
+              const SizedBox(height: 16),
+
               TextField(
                 decoration: const InputDecoration(
                   labelText: 'Veličina Točka',
@@ -65,8 +65,8 @@ class _BicikliLProzorState extends State<BicikliLProzor> {
                   velicinaTocka = value;
                 },
               ),
-              const SizedBox(height: 16), // Razmak između elemenata
-              
+              const SizedBox(height: 16),
+
               TextField(
                 decoration: const InputDecoration(
                   labelText: 'Broj Brzina',
@@ -78,8 +78,8 @@ class _BicikliLProzorState extends State<BicikliLProzor> {
                   brojBrzina = int.tryParse(value);
                 },
               ),
-              const SizedBox(height: 16), // Razmak između elemenata
-              
+              const SizedBox(height: 16),
+
               RangeSlider(
                 values: _currentRangeValues,
                 min: 0,
@@ -102,8 +102,8 @@ class _BicikliLProzorState extends State<BicikliLProzor> {
                 'Od: ${_currentRangeValues.start.round()} do: ${_currentRangeValues.end.round()}',
                 style: const TextStyle(color: Colors.white),
               ),
-              const SizedBox(height: 16), // Razmak između elemenata
-              
+              const SizedBox(height: 16),
+
               ElevatedButton(
                 onPressed: () async {
                   await biciklService.getBicikli(
@@ -116,7 +116,7 @@ class _BicikliLProzorState extends State<BicikliLProzor> {
                 },
                 child: const Text('Pretraži'),
               ),
-              const SizedBox(height: 16), // Razmak između elemenata
+              const SizedBox(height: 16),
 
               // Prikaz liste učitanih bicikala
               ValueListenableBuilder<List<Map<String, dynamic>>>(

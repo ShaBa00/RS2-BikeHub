@@ -7,7 +7,6 @@ namespace BikeHub.Model.KorisnikFM
 {
     public class KorisnikInfoSearchObject : BaseSearchObject
     {
-        //public int? KorisnikInfoId { get; set; }
 
         public int? KorisnikId { get; set; }
 

@@ -1,6 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api, prefer_const_constructors, unused_element, sized_box_for_whitespace, unused_import, prefer_const_literals_to_create_immutables, prefer_final_fields, unused_field, use_build_context_synchronously
 
 import 'package:bikehub_mobile/screens/nav_bar.dart';
+import 'package:bikehub_mobile/screens/ostalo/confirm_prozor.dart';
 import 'package:bikehub_mobile/screens/ostalo/kalendar_rezervacije.dart';
 import 'package:bikehub_mobile/screens/ostalo/poruka_helper.dart';
 import 'package:bikehub_mobile/servisi/korisnik/korisnik_service.dart';
@@ -37,8 +38,7 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
   Future<void> _initialize() async {
     final isLoggedIn = await _korisnikService.isLoggedIn();
     if (isLoggedIn) {
-      final serviserData = await _serviserService.getServiseriDTOByKorisnikId(
-          korisnikId: widget.korisnikId);
+      final serviserData = await _serviserService.getServiseriDTOByKorisnikId(korisnikId: widget.korisnikId);
       setState(() {
         serviser = serviserData;
         loading = false;
@@ -49,8 +49,7 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset:
-          false, // Sprečava prilagođavanje prilikom prikaza tastature
+      resizeToAvoidBottomInset: false, // Sprečava prilagođavanje prilikom prikaza tastature
       backgroundColor: Colors.blueAccent,
       appBar: AppBar(
         title: Text(
@@ -65,8 +64,7 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
         ),
       ),
       body: FutureBuilder(
-        future: Future.delayed(
-            Duration(seconds: 10), () => loading ? 'timeout' : null),
+        future: Future.delayed(Duration(seconds: 10), () => loading ? 'timeout' : null),
         builder: (context, snapshot) {
           if (loading) {
             return Center(
@@ -107,16 +105,8 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              _buildButton(activeTitleP == 'home'
-                                  ? 'Edit'
-                                  : (activeTitleP == 'urediS'
-                                      ? 'Info'
-                                      : 'Edit')),
-                              _buildButton(activeTitleP == 'home'
-                                  ? 'Dodatno'
-                                  : (activeTitleP == 'Dodatno'
-                                      ? 'Info'
-                                      : 'Dodatno')),
+                              _buildButton(activeTitleP == 'home' ? 'Edit' : (activeTitleP == 'urediS' ? 'Info' : 'Edit')),
+                              _buildButton(activeTitleP == 'home' ? 'Dodatno' : (activeTitleP == 'Dodatno' ? 'Info' : 'Dodatno')),
                             ],
                           ),
                         ),
@@ -246,8 +236,7 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
       loadingLista = true;
     });
 
-    listaRezervacija = await _rezervacijaServis.getRezervacije(
-        status: status, serviserId: serviser?['serviserId']);
+    listaRezervacija = await _rezervacijaServis.getRezervacije(status: status, serviserId: serviser?['serviserId']);
 
     setState(() {
       loadingLista = false;
@@ -318,8 +307,7 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
                 final zapis = currentAdmini[index];
                 final String datumKreiranja = zapis['datumRezervacije'];
                 final DateTime parsedDate = DateTime.parse(datumKreiranja);
-                final String formattedDate =
-                    DateFormat('dd/MM/yyyy').format(parsedDate);
+                final String formattedDate = DateFormat('dd/MM/yyyy').format(parsedDate);
                 return GestureDetector(
                   onTap: () async {
                     setState(() {
@@ -330,8 +318,7 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
                     await getRezervacija();
                   },
                   child: Padding(
-                    padding: EdgeInsets.only(
-                        top: index == 0 ? 25.0 : 8.0, bottom: 8.0),
+                    padding: EdgeInsets.only(top: index == 0 ? 25.0 : 8.0, bottom: 8.0),
                     child: Align(
                       alignment: Alignment.center,
                       child: Container(
@@ -443,23 +430,19 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
                     ),
                     borderRadius: BorderRadius.circular(30),
                   ),
-                  margin: EdgeInsets.symmetric(
-                      horizontal: MediaQuery.of(context).size.width *
-                          0.025), // Centrira glavni kontejner
+                  margin: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.025), // Centrira glavni kontejner
                   child: Row(
                     children: [
                       Container(
                         width: MediaQuery.of(context).size.width * 0.475,
                         height: MediaQuery.of(context).size.height * 0.1,
-                        color: Color.fromARGB(
-                            0, 255, 255, 255), // Pozadina za prvi pod-dio
+                        color: Color.fromARGB(0, 255, 255, 255), // Pozadina za prvi pod-dio
                         child: Center(
                           child: Text(
                             'Cijena: ${serviser?['cijena'] ?? 'N/A'}',
                             style: TextStyle(
                               fontSize: 18,
-                              color: Color.fromARGB(255, 255, 255,
-                                  255), // Svijetlo plava boja teksta
+                              color: Color.fromARGB(255, 255, 255, 255), // Svijetlo plava boja teksta
                             ),
                           ),
                         ),
@@ -467,15 +450,13 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
                       Container(
                         width: MediaQuery.of(context).size.width * 0.475,
                         height: MediaQuery.of(context).size.height * 0.1,
-                        color: const Color.fromARGB(
-                            0, 255, 153, 0), // Pozadina za drugi pod-dio
+                        color: const Color.fromARGB(0, 255, 153, 0), // Pozadina za drugi pod-dio
                         child: Center(
                           child: Text(
                             'Ocjena: ${serviser?['ukupnaOcjena'] ?? 'N/A'}',
                             style: TextStyle(
                               fontSize: 18,
-                              color: Color.fromARGB(255, 255, 255,
-                                  255), // Svijetlo plava boja teksta
+                              color: Color.fromARGB(255, 255, 255, 255), // Svijetlo plava boja teksta
                             ),
                           ),
                         ),
@@ -486,28 +467,23 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
                 Container(
                   width: double.infinity,
                   height: MediaQuery.of(context).size.height * 0.415,
-                  color: const Color.fromARGB(
-                      0, 255, 235, 59), // Pozadina za drugi dio
+                  color: const Color.fromARGB(0, 255, 235, 59), // Pozadina za drugi dio
                   child: Center(
                     child: Container(
                       width: MediaQuery.of(context).size.width * 0.9,
                       height: MediaQuery.of(context).size.height * 0.37,
                       decoration: BoxDecoration(
-                        color: const Color.fromARGB(
-                            0, 155, 39, 176), // Bilo koja pozadina za novi dio
-                        borderRadius:
-                            BorderRadius.circular(20), // Zaobljene ivice
+                        color: const Color.fromARGB(0, 155, 39, 176), // Bilo koja pozadina za novi dio
+                        borderRadius: BorderRadius.circular(20), // Zaobljene ivice
                       ),
-                      child:
-                          PrikazKalendara(serviserId: serviser?['serviserId']),
+                      child: PrikazKalendara(serviserId: serviser?['serviserId']),
                     ),
                   ),
                 ),
                 Container(
                   width: double.infinity,
                   height: MediaQuery.of(context).size.height * 0.1,
-                  color: const Color.fromARGB(
-                      0, 76, 175, 79), // Pozadina za treći dio
+                  color: const Color.fromARGB(0, 76, 175, 79), // Pozadina za treći dio
                   child: Center(
                     child: Container(
                       width: MediaQuery.of(context).size.width * 0.95,
@@ -528,8 +504,7 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
                           Container(
                             width: MediaQuery.of(context).size.width * 0.475,
                             height: MediaQuery.of(context).size.height * 0.09,
-                            color: const Color.fromARGB(
-                                0, 244, 67, 54), // Pozadina za prvi pod-dio
+                            color: const Color.fromARGB(0, 244, 67, 54), // Pozadina za prvi pod-dio
                             child: Center(
                               child: Text(
                                 'Broj servisa: ${serviser?['brojServisa'] ?? 'N/A'}',
@@ -543,15 +518,12 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
                           Container(
                             width: MediaQuery.of(context).size.width * 0.475,
                             height: MediaQuery.of(context).size.height * 0.09,
-                            color: const Color.fromARGB(
-                                0, 76, 175, 79), // Pozadina za drugi pod-dio
+                            color: const Color.fromARGB(0, 76, 175, 79), // Pozadina za drugi pod-dio
                             child: Center(
                               child: Text(
                                 serviser?['status'] == 'aktivan'
                                     ? 'Verifikovan'
-                                    : (serviser?['status'] == 'obrisan'
-                                        ? 'Obrisan'
-                                        : 'Nije verifikovan'),
+                                    : (serviser?['status'] == 'obrisan' ? 'Obrisan' : 'Nije verifikovan'),
                                 style: TextStyle(
                                   fontSize: 18,
                                   color: Color.fromARGB(255, 255, 255, 255),
@@ -581,8 +553,7 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
       },
       child: Container(
         width: double.infinity,
-        color:
-            Color.fromARGB(0, 155, 39, 176), // Pozadina za editServiseraWidget
+        color: Color.fromARGB(0, 155, 39, 176), // Pozadina za editServiseraWidget
         child: Column(
           children: [
             Container(
@@ -638,8 +609,7 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
-                          borderRadius:
-                              BorderRadius.circular(20.0), // Zaobljene ivice
+                          borderRadius: BorderRadius.circular(20.0), // Zaobljene ivice
                         ),
                         child: Column(
                           children: [
@@ -653,10 +623,8 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
                                 },
                                 child: Center(
                                   child: SizedBox(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.5,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.05,
+                                    width: MediaQuery.of(context).size.width * 0.5,
+                                    height: MediaQuery.of(context).size.height * 0.05,
                                     child: TextField(
                                       controller: _cijenaController,
                                       decoration: InputDecoration(
@@ -665,12 +633,10 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
                                           color: Colors.white,
                                         ),
                                         enabledBorder: OutlineInputBorder(
-                                          borderSide:
-                                              BorderSide(color: Colors.white),
+                                          borderSide: BorderSide(color: Colors.white),
                                         ),
                                         focusedBorder: OutlineInputBorder(
-                                          borderSide:
-                                              BorderSide(color: Colors.white),
+                                          borderSide: BorderSide(color: Colors.white),
                                         ),
                                       ),
                                       style: TextStyle(
@@ -687,26 +653,17 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
                               color: const Color.fromARGB(0, 155, 39, 176),
                               child: Center(
                                 child: SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.4,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.04,
+                                  width: MediaQuery.of(context).size.width * 0.4,
+                                  height: MediaQuery.of(context).size.height * 0.04,
                                   child: ElevatedButton(
                                     onPressed: () {
                                       editServisera(context);
                                     },
                                     style: ButtonStyle(
-                                      backgroundColor:
-                                          MaterialStateProperty.all<Color>(
-                                              Colors.white),
-                                      foregroundColor:
-                                          MaterialStateProperty.all<Color>(
-                                              Colors.lightBlue),
-                                      textStyle:
-                                          MaterialStateProperty.all<TextStyle>(
-                                        TextStyle(
-                                            fontSize:
-                                                18), // Povećan font teksta
+                                      backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                                      foregroundColor: MaterialStateProperty.all<Color>(Colors.lightBlue),
+                                      textStyle: MaterialStateProperty.all<TextStyle>(
+                                        TextStyle(fontSize: 18), // Povećan font teksta
                                       ),
                                     ),
                                     child: Text("Izmjeni"),
@@ -745,16 +702,10 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
                                   obrisiServisera(context);
                                 },
                                 style: ButtonStyle(
-                                  backgroundColor:
-                                      MaterialStateProperty.all<Color>(
-                                          Colors.lightBlue),
-                                  foregroundColor:
-                                      MaterialStateProperty.all<Color>(
-                                          Colors.white),
-                                  textStyle:
-                                      MaterialStateProperty.all<TextStyle>(
-                                    TextStyle(
-                                        fontSize: 18), // Povećan font teksta
+                                  backgroundColor: MaterialStateProperty.all<Color>(Colors.lightBlue),
+                                  foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                                  textStyle: MaterialStateProperty.all<TextStyle>(
+                                    TextStyle(fontSize: 18), // Povećan font teksta
                                   ),
                                 ),
                                 child: Text("Obriši"),
@@ -785,8 +736,7 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
     }
 
     try {
-      final String? responseMessage =
-          await _serviserService.editServiser(cijena, serviser?['serviserId']);
+      final String? responseMessage = await _serviserService.editServiser(cijena, serviser?['serviserId']);
 
       if (responseMessage != null) {
         if (responseMessage.contains("uspješno")) {
@@ -808,24 +758,24 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
   }
 
   obrisiServisera(BuildContext context) async {
+    bool? confirmed = await ConfirmProzor.prikaziConfirmProzor(context, "Da li ste sigurni da želite obrisati servis?");
+    if (confirmed != true) {
+      return;
+    }
     try {
-      final response = await _serviserService.upravljanjeServiserom(
-          "obrisan", serviser?['serviserId']);
+      final response = await _serviserService.upravljanjeServiserom("obrisan", serviser?['serviserId']);
 
       if (response.statusCode == 200) {
         _initialize();
-        PorukaHelper.prikaziPorukuUspjeha(
-            context, "Serviser uspješno obrisan.");
+        PorukaHelper.prikaziPorukuUspjeha(context, "Serviser uspješno obrisan.");
         setState(() {
           activeTitleP = "home";
         });
       } else {
-        PorukaHelper.prikaziPorukuGreske(
-            context, "Neuspješno brisanje servisera: ${response.statusCode}");
+        PorukaHelper.prikaziPorukuGreske(context, "Neuspješno brisanje servisera: ${response.statusCode}");
       }
     } catch (e) {
-      PorukaHelper.prikaziPorukuGreske(
-          context, "Greška pri brisanju servisera: $e");
+      PorukaHelper.prikaziPorukuGreske(context, "Greška pri brisanju servisera: $e");
     }
   }
 
@@ -971,8 +921,7 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
                       Container(
                         width: MediaQuery.of(context).size.width * 0.85,
                         height: MediaQuery.of(context).size.height * 0.07,
-                        color: const Color.fromARGB(0, 76, 175,
-                            79), // Možete zameniti ovu boju nekom drugom
+                        color: const Color.fromARGB(0, 76, 175, 79), // Možete zameniti ovu boju nekom drugom
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -1022,8 +971,7 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
   }
 
   setStatusNarudbi(String status) async {
-    String poruka =
-        await _rezervacijaServis.upravljanjeRezervacijom(status, _odabraniId);
+    String poruka = await _rezervacijaServis.upravljanjeRezervacijom(status, _odabraniId);
     if (poruka == "Status uspješno ažuriran") {
       PorukaHelper.prikaziPorukuUspjeha(context, poruka);
       setState(() {
@@ -1072,8 +1020,7 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
                   Container(
                     width: double.infinity,
                     height: MediaQuery.of(context).size.height * 0.54,
-                    color: const Color.fromARGB(
-                        0, 33, 149, 243), // Pozadina za prvi dio
+                    color: const Color.fromARGB(0, 33, 149, 243), // Pozadina za prvi dio
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -1100,9 +1047,7 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          minimumSize: Size(
-                              MediaQuery.of(context).size.width * 0.4,
-                              MediaQuery.of(context).size.height * 0.05),
+                          minimumSize: Size(MediaQuery.of(context).size.width * 0.4, MediaQuery.of(context).size.height * 0.05),
                         ),
                         child: Text(
                           'Nazad',
@@ -1130,8 +1075,7 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
       height: MediaQuery.of(context).size.height * 0.05,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor:
-              isSelected ? Color.fromARGB(255, 87, 202, 255) : Colors.white,
+          backgroundColor: isSelected ? Color.fromARGB(255, 87, 202, 255) : Colors.white,
         ),
         onPressed: () {
           handleButtoStatusnPress(title);
@@ -1144,8 +1088,7 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
         child: Text(
           title,
           style: TextStyle(
-            color:
-                isSelected ? Colors.white : Color.fromARGB(255, 87, 202, 255),
+            color: isSelected ? Colors.white : Color.fromARGB(255, 87, 202, 255),
             fontSize: 17,
           ),
         ),

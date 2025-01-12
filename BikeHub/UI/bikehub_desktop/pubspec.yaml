@@ -28,6 +28,11 @@ dependencies:
   flutter_webview_plugin: ^0.4.0
   flutter_paypal_payment: ^1.0.6
   auto_size_text: ^3.0.0
+  pdf: ^3.3.1
+  printing: ^5.5.0
+  path_provider: ^2.0.11
+  flutter_dotenv: ^5.2.1
+  window_size: ^0.1.0
 
 dev_dependencies:
   flutter_test:

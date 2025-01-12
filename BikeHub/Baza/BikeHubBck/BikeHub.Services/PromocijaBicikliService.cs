@@ -5,6 +5,7 @@ using BikeHub.Services.Database;
 using MapsterMapper;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -78,7 +79,6 @@ namespace BikeHub.Services
             entity.CijenaPromocije = brojDana * 5;
             base.BeforeInsert(request, entity);
         }
-
 
         public override Model.PromocijaFM.PromocijaBicikli Insert(PromocijaBicikliInsertR request)
         {
@@ -172,5 +172,53 @@ namespace BikeHub.Services
             var state = _baseDrugaGrupaState.CreateState(entity.Status);
             state.MarkAsFinished(id);
         }
+
+        public IzvjestajPromocija GetIzvjestajPromocija()
+        {
+            var izvjestaj = new IzvjestajPromocija();
+
+            var promocijeBicikli = _context.PromocijaBiciklis.ToList();
+            var promocijeDijelovi = _context.PromocijaDijelovis.ToList();
+
+            izvjestaj.UkupnaZarada = promocijeBicikli.Sum(p => p.CijenaPromocije) + promocijeDijelovi.Sum(p => p.CijenaPromocije);
+            izvjestaj.BrojPromocija = promocijeBicikli.Count() + promocijeDijelovi.Count();
+            izvjestaj.BrojAktivnihPromocija = promocijeBicikli.Count(p => p.Status == "aktivan") + promocijeDijelovi.Count(p => p.Status == "aktivan");
+
+            var currentMonth = DateTime.Now.Month;
+            var lastMonth = DateTime.Now.AddMonths(-1).Month;
+
+            izvjestaj.ZbirCijenePromocijaTrenutniMjesec = promocijeBicikli.Where(p => p.DatumPocetka.Month == currentMonth).Sum(p => p.CijenaPromocije) +
+                                                          promocijeDijelovi.Where(p => p.DatumPocetka.Month == currentMonth).Sum(p => p.CijenaPromocije);
+
+            izvjestaj.BrojPromocijaTrenutniMjesec = promocijeBicikli.Count(p => p.DatumPocetka.Month == currentMonth) +
+                                                    promocijeDijelovi.Count(p => p.DatumPocetka.Month == currentMonth);
+
+            izvjestaj.ZbirCijenePromocijaProsliMjesec = promocijeBicikli.Where(p => p.DatumPocetka.Month == lastMonth).Sum(p => p.CijenaPromocije) +
+                                                        promocijeDijelovi.Where(p => p.DatumPocetka.Month == lastMonth).Sum(p => p.CijenaPromocije);
+
+            izvjestaj.BrojPromocijaProsliMjesec = promocijeBicikli.Count(p => p.DatumPocetka.Month == lastMonth) +
+                                                  promocijeDijelovi.Count(p => p.DatumPocetka.Month == lastMonth);
+
+            var groupedPromocije = promocijeBicikli.Concat<object>(promocijeDijelovi)
+                .GroupBy(p => ((dynamic)p).DatumPocetka.Month)
+                .Select(g => new
+                {
+                    Month = g.Key,
+                    TotalZarada = g.Sum(p => (decimal)((dynamic)p).CijenaPromocije)
+                })
+                .OrderByDescending(x => x.TotalZarada)
+                .FirstOrDefault();
+
+
+            if (groupedPromocije != null)
+            {
+                izvjestaj.MjesecSaNajvisePromocija = new DateTime(1, groupedPromocije.Month, 1).ToString("MMMM", new CultureInfo("en-US"));
+                izvjestaj.NajvecaZaradaMjeseca = groupedPromocije.TotalZarada;
+            }
+
+            return izvjestaj;
+        }
+
+
     }
 }

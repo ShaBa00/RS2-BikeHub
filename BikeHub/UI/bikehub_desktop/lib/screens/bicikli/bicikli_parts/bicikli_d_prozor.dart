@@ -76,7 +76,7 @@ class BicikliDProzor extends StatelessWidget {
                                             imageBytes,
                                             fit: BoxFit.cover,
                                           )
-                                        : const Icon(Icons.image_not_supported, size: 50), // Ikona ako slika nije dostupna
+                                        : const Icon(Icons.image_not_supported, size: 50),
                                   ),
                                 ),
                                 Padding(
@@ -96,7 +96,6 @@ class BicikliDProzor extends StatelessWidget {
                         },
                       ),
                     ),
-                    // Paginacija
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

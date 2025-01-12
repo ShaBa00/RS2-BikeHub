@@ -143,17 +143,6 @@ namespace BikeHub.Services
         {
             throw new UserException("Za ovaj entitet nije moguce izvrsiti ovu naredbu");
         }
-        //public override void Aktivacija(int id, bool aktivacija)
-        //{
-        //    var entity = GetById(id);
-        //    if (entity == null)
-        //    {
-        //        throw new Exception("Entity not found.");
-        //    }
-
-        //    var state = _basePrvaGrupaState.CreateState(entity.Status);
-        //    state.Activate(id);
-        //}
 
         public List<GradKorisniciDto> GetGradove()
         {

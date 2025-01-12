@@ -16,8 +16,13 @@ namespace BikeHubBck.Controllers
     {
         private BikeHubDbContext _context;
         private readonly FunctionHelper _functionHelper;
+        private readonly PromocijaBicikliService _promocijaBicikliService;
         public PromocijaBicikliController(IPromocijaBicikliService service, BikeHubDbContext context, FunctionHelper functionHelper) 
-        : base(service, context) { _functionHelper = functionHelper; _context = context; }
+        : base(service, context) { 
+            _functionHelper = functionHelper; 
+            _context = context;
+            _promocijaBicikliService=(PromocijaBicikliService)service;
+        }
         [AllowAnonymous]
         public override PagedResult<BikeHub.Model.PromocijaFM.PromocijaBicikli> GetList([FromQuery] PromocijaBicikliSearchObject searchObject)
         {
@@ -125,6 +130,23 @@ namespace BikeHubBck.Controllers
                 }
             }
             return Unauthorized("Nemate dozvolu za završavanje ove promocije.");
+        }
+
+        [HttpGet("izvjestaj-promocija")]
+        public IActionResult GetIzvjestajPromocija()
+        {
+            var currentUsername = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (currentUsername != null)
+            {
+
+                if (!_functionHelper.IsUserAdmin(currentUsername))
+                {
+                    throw new UserException("Samo admin ima pristup izvještaju");
+                }
+            }
+
+            var result = _promocijaBicikliService.GetIzvjestajPromocija();
+            return Ok(result);
         }
     }
 }

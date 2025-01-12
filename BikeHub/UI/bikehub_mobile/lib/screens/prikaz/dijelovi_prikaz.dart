@@ -7,6 +7,8 @@ import 'package:bikehub_mobile/screens/dodavanje/promocija_zapisa.dart';
 import 'package:bikehub_mobile/screens/glavni_prozor.dart';
 import 'package:bikehub_mobile/screens/nav_bar.dart';
 import 'package:bikehub_mobile/screens/nav_bar_komponente.dart/korisnikovi_proizvodi.dart';
+import 'package:bikehub_mobile/screens/ostalo/confirm_prozor.dart';
+import 'package:bikehub_mobile/screens/ostalo/poruka_helper.dart';
 import 'package:bikehub_mobile/screens/ostalo/prikaz_slika.dart';
 import 'package:bikehub_mobile/screens/prikaz/bicikli_prikaz.dart';
 import 'package:bikehub_mobile/servisi/dijelovi/dijelovi_promocija_service.dart';
@@ -38,18 +40,14 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
 
   final DijeloviService _dijeloviService = DijeloviService();
   final KategorijaServis _kategorijaServis = KategorijaServis();
-  final KategorijaRecommendedService _kategorijaRecommendedService =
-      KategorijaRecommendedService();
-  final NarudbaDijeloviService _narudbaDijeloviService =
-      NarudbaDijeloviService();
+  final KategorijaRecommendedService _kategorijaRecommendedService = KategorijaRecommendedService();
+  final NarudbaDijeloviService _narudbaDijeloviService = NarudbaDijeloviService();
   final NarudbaService _narudbaService = NarudbaService();
   final AdresaServis _adresaServis = AdresaServis();
   final KorisnikServis _korisnikServis = KorisnikServis();
   final DijeloviSlikeService _dijeloviSlikeService = DijeloviSlikeService();
-  final DijeloviPromocijaService _dijeloviPromocijaService =
-      DijeloviPromocijaService();
-  final DijeloviSacuvaniServis _dijeloviSacuvaniServis =
-      DijeloviSacuvaniServis();
+  final DijeloviPromocijaService _dijeloviPromocijaService = DijeloviPromocijaService();
+  final DijeloviSacuvaniServis _dijeloviSacuvaniServis = DijeloviSacuvaniServis();
 
   bool loadingZapisi = true;
   Map<String, dynamic>? zapis;
@@ -64,8 +62,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
 
   _getKategorija() async {
     try {
-      var result =
-          await _kategorijaServis.getKategorijaById(zapis?['kategorijaId']);
+      var result = await _kategorijaServis.getKategorijaById(zapis?['kategorijaId']);
       setState(() {
         kategorija = result;
         loadingZapisi = false;
@@ -86,8 +83,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
 
   _getAdresa() async {
     try {
-      var result =
-          await _adresaServis.getAdresa(korisnikId: zapis?['korisnikId']);
+      var result = await _adresaServis.getAdresa(korisnikId: zapis?['korisnikId']);
       setState(() {
         adresa = result;
       });
@@ -99,8 +95,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
   _getSpaseni() async {
     isLoggedInCache ??= await _korisnikServis.isLoggedIn();
     if (isLoggedInCache == true) {
-      zapisSacuvanog = await _dijeloviSacuvaniServis.isDioSacuvan(
-          korisnikId: korisnikId, dijeloviId: widget.dijeloviId);
+      zapisSacuvanog = await _dijeloviSacuvaniServis.isDioSacuvan(korisnikId: korisnikId, dijeloviId: widget.dijeloviId);
       if (zapisSacuvanog != null && zapisSacuvanog?['status'] != "obrisan") {
         sacuvanZapisi = true;
       }
@@ -114,11 +109,9 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
   List<dynamic> listaRecomendedBicikala = [];
   _getRecomended() async {
     try {
-      await _kategorijaRecommendedService.getRecommendedBiciklis(
-          dijeloviId: widget.dijeloviId);
+      await _kategorijaRecommendedService.getRecommendedBiciklis(dijeloviId: widget.dijeloviId);
       setState(() {
-        listaRecomendedBicikala =
-            _kategorijaRecommendedService.listaRecomendedBicikala;
+        listaRecomendedBicikala = _kategorijaRecommendedService.listaRecomendedBicikala;
       });
     } catch (e) {
       // Handle error if needed
@@ -137,14 +130,12 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
       });
 
       var result = await _dijeloviService.getDijeloviById(widget.dijeloviId);
-      isPromovisan = await _dijeloviPromocijaService.isPromovisan(
-          dijeloviId: widget.dijeloviId);
+      isPromovisan = await _dijeloviPromocijaService.isPromovisan(dijeloviId: widget.dijeloviId);
       setState(() {
         isPromovisan;
         zapis = result;
         listaSlik = (result['slikeDijelovis'] as List<dynamic>?)
-                ?.where(
-                    (item) => item['slika'] != null && item['slika'].isNotEmpty)
+                ?.where((item) => item['slika'] != null && item['slika'].isNotEmpty)
                 .map<String>((item) => item['slika'] as String)
                 .toList() ??
             [];
@@ -209,16 +200,10 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
     if (zapisSacuvanog != null) {
       if (zapisSacuvanog?['status'] != "obrisan") {
         poruka = await _dijeloviSacuvaniServis.promjeniSacuvani(
-            zapisSacuvanog?['spaseniDijeloviId'],
-            zapisSacuvanog?['korisnikId'],
-            zapisSacuvanog?['dijeloviId'],
-            true);
+            zapisSacuvanog?['spaseniDijeloviId'], zapisSacuvanog?['korisnikId'], zapisSacuvanog?['dijeloviId'], true);
       } else {
         poruka = await _dijeloviSacuvaniServis.promjeniSacuvani(
-            zapisSacuvanog?['spaseniDijeloviId'],
-            zapisSacuvanog?['korisnikId'],
-            zapisSacuvanog?['dijeloviId'],
-            false);
+            zapisSacuvanog?['spaseniDijeloviId'], zapisSacuvanog?['korisnikId'], zapisSacuvanog?['dijeloviId'], false);
       }
     } else {
       poruka = await _dijeloviSacuvaniServis.dodajNoviSacuvani(
@@ -246,8 +231,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
       onTap: _dismissKeyboard,
       child: Scaffold(
         appBar: PreferredSize(
-          preferredSize:
-              Size.fromHeight(MediaQuery.of(context).size.height * 0.06),
+          preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.06),
           child: AppBar(
             backgroundColor: Colors.blueAccent,
             iconTheme: IconThemeData(color: Colors.white),
@@ -296,9 +280,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                           ),
                         ),
                         child: Icon(
-                          sacuvanZapisi
-                              ? Icons.bookmark
-                              : Icons.bookmark_border,
+                          sacuvanZapisi ? Icons.bookmark : Icons.bookmark_border,
                           color: Colors.white,
                         ),
                       ),
@@ -364,10 +346,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
     } else if (zapis == null) {
       return Center(child: Text('Greška pri učitavanju podataka.'));
     } else if (zapis!['slikeDijelovis'] != null) {
-      List<Map<String, dynamic>> slikeBiciklis =
-          (zapis!['slikeDijelovis'] as List)
-              .map((item) => item as Map<String, dynamic>)
-              .toList();
+      List<Map<String, dynamic>> slikeBiciklis = (zapis!['slikeDijelovis'] as List).map((item) => item as Map<String, dynamic>).toList();
       return Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height * 0.35,
@@ -721,8 +700,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                               onTap: () => prikaziPopup(context),
                               child: Container(
                                 width: MediaQuery.of(context).size.width * 0.45,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.05,
+                                height: MediaQuery.of(context).size.height * 0.05,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10.0),
                                   border: Border(
@@ -758,8 +736,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                               },
                               child: Container(
                                 width: MediaQuery.of(context).size.width * 0.45,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.05,
+                                height: MediaQuery.of(context).size.height * 0.05,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10.0),
                                   border: Border(
@@ -839,21 +816,14 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        for (int i = 0;
-                            i <
-                                (listaRecomendedBicikala.length > 5
-                                    ? 5
-                                    : listaRecomendedBicikala.length);
-                            i++)
+                        for (int i = 0; i < (listaRecomendedBicikala.length > 5 ? 5 : listaRecomendedBicikala.length); i++)
                           GestureDetector(
                             onTap: () {
-                              int biciklId =
-                                  listaRecomendedBicikala[i]['biciklId'];
+                              int biciklId = listaRecomendedBicikala[i]['biciklId'];
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      BicikliPrikaz(biciklId: biciklId),
+                                  builder: (context) => BicikliPrikaz(biciklId: biciklId),
                                 ),
                               );
                             },
@@ -876,10 +846,8 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.4,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.19,
+                                    width: MediaQuery.of(context).size.width * 0.4,
+                                    height: MediaQuery.of(context).size.height * 0.19,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.only(
                                         topLeft: Radius.circular(30.0),
@@ -887,62 +855,43 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                       ),
                                       color: Colors.transparent,
                                     ),
-                                    child: listaRecomendedBicikala[i]
-                                                    ['slikeBiciklis'] !=
-                                                null &&
-                                            listaRecomendedBicikala[i]
-                                                    ['slikeBiciklis']
-                                                .isNotEmpty
-                                        ? ClipRRect(
-                                            borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(30.0),
-                                              topRight: Radius.circular(30.0),
-                                            ),
-                                            child: Image.memory(
-                                              base64Decode(
-                                                  listaRecomendedBicikala[i]
-                                                          ['slikeBiciklis'][0]
-                                                      ['slika']),
-                                              fit: BoxFit.cover,
-                                            ),
-                                          )
-                                        : Icon(
-                                            Icons.image_not_supported,
-                                            size: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.1,
-                                          ),
+                                    child:
+                                        listaRecomendedBicikala[i]['slikeBiciklis'] != null && listaRecomendedBicikala[i]['slikeBiciklis'].isNotEmpty
+                                            ? ClipRRect(
+                                                borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(30.0),
+                                                  topRight: Radius.circular(30.0),
+                                                ),
+                                                child: Image.memory(
+                                                  base64Decode(listaRecomendedBicikala[i]['slikeBiciklis'][0]['slika']),
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              )
+                                            : Icon(
+                                                Icons.image_not_supported,
+                                                size: MediaQuery.of(context).size.height * 0.1,
+                                              ),
                                   ),
                                   Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.4,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.05,
+                                    width: MediaQuery.of(context).size.width * 0.4,
+                                    height: MediaQuery.of(context).size.height * 0.05,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(30.0),
                                       color: Colors.transparent,
                                     ),
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Flexible(
                                           flex: 1,
                                           child: Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.05,
+                                            height: MediaQuery.of(context).size.height * 0.05,
                                             alignment: Alignment.center,
                                             child: Text(
-                                              listaRecomendedBicikala[i]
-                                                      ?['naziv'] ??
-                                                  'N/A',
+                                              listaRecomendedBicikala[i]?['naziv'] ?? 'N/A',
                                               style: TextStyle(
                                                 fontSize: 16,
-                                                color: const Color.fromARGB(
-                                                    255, 255, 255, 255),
+                                                color: const Color.fromARGB(255, 255, 255, 255),
                                                 overflow: TextOverflow.ellipsis,
                                               ),
                                               maxLines: 1,
@@ -953,20 +902,13 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                         Flexible(
                                           flex: 1,
                                           child: Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.05,
+                                            height: MediaQuery.of(context).size.height * 0.05,
                                             alignment: Alignment.center,
                                             child: Text(
-                                              (listaRecomendedBicikala[i]
-                                                          ?['cijena']
-                                                      ?.toString() ??
-                                                  'N/A'),
+                                              (listaRecomendedBicikala[i]?['cijena']?.toString() ?? 'N/A'),
                                               style: TextStyle(
                                                 fontSize: 16,
-                                                color: const Color.fromARGB(
-                                                    255, 255, 255, 255),
+                                                color: const Color.fromARGB(255, 255, 255, 255),
                                                 overflow: TextOverflow.ellipsis,
                                               ),
                                               maxLines: 1,
@@ -1082,61 +1024,37 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                               child: Column(
                                 children: [
                                   Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.9,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.1,
+                                    width: MediaQuery.of(context).size.width * 0.9,
+                                    height: MediaQuery.of(context).size.height * 0.1,
                                   ),
                                   // Container za prikaz slika
                                   Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.8,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.32,
+                                    width: MediaQuery.of(context).size.width * 0.8,
+                                    height: MediaQuery.of(context).size.height * 0.32,
                                     child: listaSlik.isNotEmpty
                                         ? GestureDetector(
                                             onHorizontalDragEnd: (details) {
-                                              if (details.primaryVelocity !=
-                                                  null) {
-                                                if (details.primaryVelocity! >
-                                                    0) {
+                                              if (details.primaryVelocity != null) {
+                                                if (details.primaryVelocity! > 0) {
                                                   // Swiped Right
                                                   setState(() {
-                                                    currentIndexSlike =
-                                                        (currentIndexSlike -
-                                                                1 +
-                                                                listaSlik
-                                                                    .length) %
-                                                            listaSlik.length;
+                                                    currentIndexSlike = (currentIndexSlike - 1 + listaSlik.length) % listaSlik.length;
                                                   });
-                                                } else if (details
-                                                        .primaryVelocity! <
-                                                    0) {
+                                                } else if (details.primaryVelocity! < 0) {
                                                   // Swiped Left
                                                   setState(() {
-                                                    currentIndexSlike =
-                                                        (currentIndexSlike +
-                                                                1) %
-                                                            listaSlik.length;
+                                                    currentIndexSlike = (currentIndexSlike + 1) % listaSlik.length;
                                                   });
                                                 }
                                               }
                                             },
                                             child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
+                                              borderRadius: BorderRadius.circular(10),
                                               child: Image.memory(
-                                                base64Decode(listaSlik[
-                                                    currentIndexSlike]),
+                                                base64Decode(listaSlik[currentIndexSlike]),
                                                 fit: BoxFit.cover,
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.8,
-                                                height: MediaQuery.of(context)
-                                                        .size
-                                                        .height *
-                                                    0.32,
+                                                width: MediaQuery.of(context).size.width * 0.8,
+                                                height: MediaQuery.of(context).size.height * 0.32,
                                               ),
                                             ),
                                           )
@@ -1147,13 +1065,10 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                   ),
                                   // Container za dugmiće
                                   Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.8,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.1,
+                                    width: MediaQuery.of(context).size.width * 0.8,
+                                    height: MediaQuery.of(context).size.height * 0.1,
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                                       children: [
                                         if (listaSlik.isNotEmpty)
                                           ElevatedButton(
@@ -1161,20 +1076,16 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                               foregroundColor: Colors.lightBlue,
                                               backgroundColor: Colors.white,
                                               shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(30),
+                                                borderRadius: BorderRadius.circular(30),
                                               ),
                                             ),
                                             onPressed: () {
                                               setState(() {
-                                                listaSlik.removeAt(
-                                                    currentIndexSlike);
+                                                listaSlik.removeAt(currentIndexSlike);
                                                 if (listaSlik.isEmpty) {
                                                   currentIndexSlike = 0;
                                                 } else {
-                                                  currentIndexSlike =
-                                                      currentIndexSlike %
-                                                          listaSlik.length;
+                                                  currentIndexSlike = currentIndexSlike % listaSlik.length;
                                                 }
                                               });
                                             },
@@ -1182,9 +1093,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                               fit: BoxFit.scaleDown,
                                               child: Text(
                                                 "Obriši",
-                                                style: TextStyle(
-                                                    color: const Color.fromARGB(
-                                                        255, 244, 3, 3)),
+                                                style: TextStyle(color: const Color.fromARGB(255, 244, 3, 3)),
                                               ),
                                             ),
                                           ),
@@ -1193,13 +1102,11 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                             foregroundColor: Colors.lightBlue,
                                             backgroundColor: Colors.white,
                                             shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(30),
+                                              borderRadius: BorderRadius.circular(30),
                                             ),
                                           ),
                                           onPressed: () async {
-                                            String novaSlika =
-                                                await odaberiSlikuIzGalerije();
+                                            String novaSlika = await odaberiSlikuIzGalerije();
                                             if (novaSlika.isNotEmpty) {
                                               setState(() {
                                                 listaSlik.insert(0, novaSlika);
@@ -1210,8 +1117,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                             fit: BoxFit.scaleDown,
                                             child: Text(
                                               "Dodaj novu",
-                                              style: TextStyle(
-                                                  color: Colors.lightBlue),
+                                              style: TextStyle(color: Colors.lightBlue),
                                             ),
                                           ),
                                         ),
@@ -1220,32 +1126,51 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                   ),
                                   // Container za dugmić dodavanja u bazu
                                   Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.9,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.1,
-                                    child: Center(
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          foregroundColor: Colors.lightBlue,
-                                          backgroundColor: Colors.white,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(30),
+                                    width: MediaQuery.of(context).size.width * 0.9,
+                                    height: MediaQuery.of(context).size.height * 0.2,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            foregroundColor: Colors.lightBlue,
+                                            backgroundColor: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(30),
+                                            ),
+                                          ),
+                                          onPressed: () async {
+                                            sacuvajSlike();
+                                          },
+                                          child: FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Text(
+                                              "Sacuvaj slike",
+                                              style: TextStyle(color: Colors.lightBlue),
+                                            ),
                                           ),
                                         ),
-                                        onPressed: () async {
-                                          sacuvajSlike();
-                                        },
-                                        child: FittedBox(
-                                          fit: BoxFit.scaleDown,
-                                          child: Text(
-                                            "Sacuvaj slike",
-                                            style: TextStyle(
-                                                color: Colors.lightBlue),
+                                        SizedBox(height: 16), // Razmak između dva dugmeta
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            foregroundColor: Colors.white,
+                                            backgroundColor: Colors.red,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(30),
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            obrisiBicikl();
+                                          },
+                                          child: FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Text(
+                                              "Obriši bicikl",
+                                              style: TextStyle(color: Colors.white),
+                                            ),
                                           ),
                                         ),
-                                      ),
+                                      ],
                                     ),
                                   ),
                                 ],
@@ -1257,70 +1182,44 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                               child: Column(
                                 children: [
                                   Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.7,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.66,
+                                    width: MediaQuery.of(context).size.width * 0.7,
+                                    height: MediaQuery.of(context).size.height * 0.66,
                                     child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                                       children: [
                                         Container(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.07,
+                                          height: MediaQuery.of(context).size.height * 0.07,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(10),
                                             border: Border(
-                                              left: BorderSide(
-                                                  color: Colors.white),
-                                              right: BorderSide(
-                                                  color: Colors.white),
-                                              bottom: BorderSide(
-                                                  color: Colors.white),
+                                              left: BorderSide(color: Colors.white),
+                                              right: BorderSide(color: Colors.white),
+                                              bottom: BorderSide(color: Colors.white),
                                             ),
                                           ),
                                           child: Center(
                                             child: Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.65,
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.05,
+                                              width: MediaQuery.of(context).size.width * 0.65,
+                                              height: MediaQuery.of(context).size.height * 0.05,
                                               decoration: BoxDecoration(
                                                 gradient: LinearGradient(
-                                                  colors: [
-                                                    Colors.blue,
-                                                    Colors.purple
-                                                  ],
+                                                  colors: [Colors.blue, Colors.purple],
                                                   begin: Alignment.topLeft,
                                                   end: Alignment.bottomRight,
                                                 ),
-                                                borderRadius:
-                                                    BorderRadius.circular(10.0),
+                                                borderRadius: BorderRadius.circular(10.0),
                                               ),
                                               child: TextField(
                                                 decoration: InputDecoration(
                                                   hintText: "Naziv",
-                                                  hintStyle: TextStyle(
-                                                      color: Colors.white),
+                                                  hintStyle: TextStyle(color: Colors.white),
                                                   border: OutlineInputBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10.0),
+                                                    borderRadius: BorderRadius.circular(10.0),
                                                     borderSide: BorderSide.none,
                                                   ),
-                                                  contentPadding:
-                                                      EdgeInsets.symmetric(
-                                                          horizontal: 12),
+                                                  contentPadding: EdgeInsets.symmetric(horizontal: 12),
                                                 ),
-                                                style: TextStyle(
-                                                    color: Colors.white),
+                                                style: TextStyle(color: Colors.white),
                                                 onChanged: (text) {
                                                   nazivDijelovi = text;
                                                 },
@@ -1329,193 +1228,120 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                           ),
                                         ),
                                         Container(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.07,
+                                          height: MediaQuery.of(context).size.height * 0.07,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(10),
                                             border: Border(
-                                              left: BorderSide(
-                                                  color: Colors.white),
-                                              right: BorderSide(
-                                                  color: Colors.white),
-                                              bottom: BorderSide(
-                                                  color: Colors.white),
+                                              left: BorderSide(color: Colors.white),
+                                              right: BorderSide(color: Colors.white),
+                                              bottom: BorderSide(color: Colors.white),
                                             ),
                                           ),
                                           child: Center(
                                             child: Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.65,
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.05,
+                                              width: MediaQuery.of(context).size.width * 0.65,
+                                              height: MediaQuery.of(context).size.height * 0.05,
                                               decoration: BoxDecoration(
                                                 gradient: LinearGradient(
-                                                  colors: [
-                                                    Colors.blue,
-                                                    Colors.purple
-                                                  ],
+                                                  colors: [Colors.blue, Colors.purple],
                                                   begin: Alignment.topLeft,
                                                   end: Alignment.bottomRight,
                                                 ),
-                                                borderRadius:
-                                                    BorderRadius.circular(10.0),
+                                                borderRadius: BorderRadius.circular(10.0),
                                               ),
                                               child: TextField(
-                                                keyboardType:
-                                                    TextInputType.number,
+                                                keyboardType: TextInputType.number,
                                                 decoration: InputDecoration(
                                                   hintText: "Cijena",
-                                                  hintStyle: TextStyle(
-                                                      color: Colors.white),
+                                                  hintStyle: TextStyle(color: Colors.white),
                                                   border: OutlineInputBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10.0),
+                                                    borderRadius: BorderRadius.circular(10.0),
                                                     borderSide: BorderSide.none,
                                                   ),
-                                                  contentPadding:
-                                                      EdgeInsets.symmetric(
-                                                          horizontal: 12),
+                                                  contentPadding: EdgeInsets.symmetric(horizontal: 12),
                                                 ),
-                                                style: TextStyle(
-                                                    color: Colors.white),
+                                                style: TextStyle(color: Colors.white),
                                                 onChanged: (text) {
-                                                  cijenaDijelovi =
-                                                      int.tryParse(text) ?? 0;
+                                                  cijenaDijelovi = int.tryParse(text) ?? 0;
                                                 },
                                               ),
                                             ),
                                           ),
                                         ),
                                         Container(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.07,
+                                          height: MediaQuery.of(context).size.height * 0.07,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(10),
                                             border: Border(
-                                              left: BorderSide(
-                                                  color: Colors.white),
-                                              right: BorderSide(
-                                                  color: Colors.white),
-                                              bottom: BorderSide(
-                                                  color: Colors.white),
+                                              left: BorderSide(color: Colors.white),
+                                              right: BorderSide(color: Colors.white),
+                                              bottom: BorderSide(color: Colors.white),
                                             ),
                                           ),
                                           child: Center(
                                             child: Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.65,
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.05,
+                                              width: MediaQuery.of(context).size.width * 0.65,
+                                              height: MediaQuery.of(context).size.height * 0.05,
                                               decoration: BoxDecoration(
                                                 gradient: LinearGradient(
-                                                  colors: [
-                                                    Colors.blue,
-                                                    Colors.purple
-                                                  ],
+                                                  colors: [Colors.blue, Colors.purple],
                                                   begin: Alignment.topLeft,
                                                   end: Alignment.bottomRight,
                                                 ),
-                                                borderRadius:
-                                                    BorderRadius.circular(10.0),
+                                                borderRadius: BorderRadius.circular(10.0),
                                               ),
                                               child: TextField(
-                                                keyboardType:
-                                                    TextInputType.number,
+                                                keyboardType: TextInputType.number,
                                                 decoration: InputDecoration(
                                                   hintText: "Kolicina",
-                                                  hintStyle: TextStyle(
-                                                      color: Colors.white),
+                                                  hintStyle: TextStyle(color: Colors.white),
                                                   border: OutlineInputBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10.0),
+                                                    borderRadius: BorderRadius.circular(10.0),
                                                     borderSide: BorderSide.none,
                                                   ),
-                                                  contentPadding:
-                                                      EdgeInsets.symmetric(
-                                                          horizontal: 12),
+                                                  contentPadding: EdgeInsets.symmetric(horizontal: 12),
                                                 ),
-                                                style: TextStyle(
-                                                    color: Colors.white),
+                                                style: TextStyle(color: Colors.white),
                                                 onChanged: (text) {
-                                                  kolicinaDijelovi =
-                                                      int.tryParse(text) ?? 0;
+                                                  kolicinaDijelovi = int.tryParse(text) ?? 0;
                                                 },
                                               ),
                                             ),
                                           ),
                                         ),
                                         Container(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.07,
+                                          height: MediaQuery.of(context).size.height * 0.07,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(10),
                                             border: Border(
-                                              left: BorderSide(
-                                                  color: Colors.white),
-                                              right: BorderSide(
-                                                  color: Colors.white),
-                                              bottom: BorderSide(
-                                                  color: Colors.white),
+                                              left: BorderSide(color: Colors.white),
+                                              right: BorderSide(color: Colors.white),
+                                              bottom: BorderSide(color: Colors.white),
                                             ),
                                           ),
                                           child: Center(
                                             child: Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.65,
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.05,
+                                              width: MediaQuery.of(context).size.width * 0.65,
+                                              height: MediaQuery.of(context).size.height * 0.05,
                                               decoration: BoxDecoration(
                                                 gradient: LinearGradient(
-                                                  colors: [
-                                                    Colors.blue,
-                                                    Colors.purple
-                                                  ],
+                                                  colors: [Colors.blue, Colors.purple],
                                                   begin: Alignment.topLeft,
                                                   end: Alignment.bottomRight,
                                                 ),
-                                                borderRadius:
-                                                    BorderRadius.circular(10.0),
+                                                borderRadius: BorderRadius.circular(10.0),
                                               ),
                                               child: TextField(
                                                 decoration: InputDecoration(
                                                   hintText: "Opis",
-                                                  hintStyle: TextStyle(
-                                                      color: Colors.white),
+                                                  hintStyle: TextStyle(color: Colors.white),
                                                   border: OutlineInputBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10.0),
+                                                    borderRadius: BorderRadius.circular(10.0),
                                                     borderSide: BorderSide.none,
                                                   ),
-                                                  contentPadding:
-                                                      EdgeInsets.symmetric(
-                                                          horizontal: 12),
+                                                  contentPadding: EdgeInsets.symmetric(horizontal: 12),
                                                 ),
-                                                style: TextStyle(
-                                                    color: Colors.white),
+                                                style: TextStyle(color: Colors.white),
                                                 onChanged: (text) {
                                                   opis = text;
                                                 },
@@ -1524,100 +1350,50 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                           ),
                                         ),
                                         Container(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.07,
+                                          height: MediaQuery.of(context).size.height * 0.07,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(10),
                                             border: Border(
-                                              left: BorderSide(
-                                                  color: Colors.white),
-                                              right: BorderSide(
-                                                  color: Colors.white),
-                                              bottom: BorderSide(
-                                                  color: Colors.white),
+                                              left: BorderSide(color: Colors.white),
+                                              right: BorderSide(color: Colors.white),
+                                              bottom: BorderSide(color: Colors.white),
                                             ),
                                           ),
                                           child: Center(
                                             child: Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.65,
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.05,
+                                              width: MediaQuery.of(context).size.width * 0.65,
+                                              height: MediaQuery.of(context).size.height * 0.05,
                                               decoration: BoxDecoration(
                                                 gradient: LinearGradient(
-                                                  colors: [
-                                                    Colors.blue,
-                                                    Colors.purple
-                                                  ],
+                                                  colors: [Colors.blue, Colors.purple],
                                                   begin: Alignment.topLeft,
                                                   end: Alignment.bottomRight,
                                                 ),
-                                                borderRadius:
-                                                    BorderRadius.circular(10.0),
+                                                borderRadius: BorderRadius.circular(10.0),
                                               ),
                                               child: DropdownButton<String>(
                                                 isExpanded: true,
-                                                value: _odabranaKategorijaDijelovi !=
-                                                        null
-                                                    ? _odabranaKategorijaDijelovi![
-                                                            'naziv'] ??
-                                                        'N/A'
-                                                    : null,
+                                                value: _odabranaKategorijaDijelovi != null ? _odabranaKategorijaDijelovi!['naziv'] ?? 'N/A' : null,
                                                 hint: Text(
                                                   'Kategorija',
-                                                  style: TextStyle(
-                                                      color: Colors.white),
+                                                  style: TextStyle(color: Colors.white),
                                                 ),
                                                 onChanged: (String? newValue) {
                                                   setState(() {
-                                                    _odabranaKategorijaDijelovi =
-                                                        _kategorijeDijelovi
-                                                            ?.firstWhere(
-                                                                (kategorija) =>
-                                                                    kategorija[
-                                                                        'naziv'] ==
-                                                                    newValue,
-                                                                orElse: () => {
-                                                                      'naziv':
-                                                                          'N/A'
-                                                                    });
+                                                    _odabranaKategorijaDijelovi = _kategorijeDijelovi
+                                                        ?.firstWhere((kategorija) => kategorija['naziv'] == newValue, orElse: () => {'naziv': 'N/A'});
                                                   });
                                                 },
-                                                items: _kategorijeDijelovi?.map<
-                                                            DropdownMenuItem<
-                                                                String>>(
-                                                        (kategorija) {
-                                                      return DropdownMenuItem<
-                                                          String>(
-                                                        value: kategorija[
-                                                                'naziv'] ??
-                                                            'N/A',
+                                                items: _kategorijeDijelovi?.map<DropdownMenuItem<String>>((kategorija) {
+                                                      return DropdownMenuItem<String>(
+                                                        value: kategorija['naziv'] ?? 'N/A',
                                                         child: Container(
-                                                          width: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .width *
-                                                              0.3,
-                                                          height: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .height *
-                                                              0.04,
+                                                          width: MediaQuery.of(context).size.width * 0.3,
+                                                          height: MediaQuery.of(context).size.height * 0.04,
                                                           child: Center(
                                                             child: Text(
-                                                              kategorija[
-                                                                      'naziv'] ??
-                                                                  'N/A',
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .white),
+                                                              kategorija['naziv'] ?? 'N/A',
+                                                              style: TextStyle(color: Colors.white),
                                                             ),
                                                           ),
                                                         ),
@@ -1626,8 +1402,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                                     [],
                                                 dropdownColor: Colors.blue[700],
                                                 iconEnabledColor: Colors.white,
-                                                style: TextStyle(
-                                                    color: Colors.white),
+                                                style: TextStyle(color: Colors.white),
                                                 underline: Container(),
                                               ),
                                             ),
@@ -1637,18 +1412,15 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                     ),
                                   ),
                                   Container(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.85,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.06,
+                                    width: MediaQuery.of(context).size.width * 0.85,
+                                    height: MediaQuery.of(context).size.height * 0.06,
                                     child: Center(
                                       child: ElevatedButton(
                                         style: ElevatedButton.styleFrom(
                                           foregroundColor: Colors.lightBlue,
                                           backgroundColor: Colors.white,
                                           shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(30),
+                                            borderRadius: BorderRadius.circular(30),
                                           ),
                                         ),
                                         onPressed: () async {
@@ -1658,8 +1430,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                           fit: BoxFit.scaleDown,
                                           child: Text(
                                             "Sacuvaj podatke",
-                                            style: TextStyle(
-                                                color: Colors.lightBlue),
+                                            style: TextStyle(color: Colors.lightBlue),
                                           ),
                                         ),
                                       ),
@@ -1681,12 +1452,9 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                 });
                               },
                               child: Container(
-                                width: currentIndexPopUp == 0
-                                    ? MediaQuery.of(context).size.width * 0.1
-                                    : MediaQuery.of(context).size.width * 0.04,
-                                height: currentIndexPopUp == 0
-                                    ? MediaQuery.of(context).size.height * 0.012
-                                    : MediaQuery.of(context).size.height * 0.01,
+                                width: currentIndexPopUp == 0 ? MediaQuery.of(context).size.width * 0.1 : MediaQuery.of(context).size.width * 0.04,
+                                height:
+                                    currentIndexPopUp == 0 ? MediaQuery.of(context).size.height * 0.012 : MediaQuery.of(context).size.height * 0.01,
                                 margin: EdgeInsets.symmetric(horizontal: 2.0),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
@@ -1701,12 +1469,9 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                 });
                               },
                               child: Container(
-                                width: currentIndexPopUp == 1
-                                    ? MediaQuery.of(context).size.width * 0.1
-                                    : MediaQuery.of(context).size.width * 0.04,
-                                height: currentIndexPopUp == 1
-                                    ? MediaQuery.of(context).size.height * 0.012
-                                    : MediaQuery.of(context).size.height * 0.01,
+                                width: currentIndexPopUp == 1 ? MediaQuery.of(context).size.width * 0.1 : MediaQuery.of(context).size.width * 0.04,
+                                height:
+                                    currentIndexPopUp == 1 ? MediaQuery.of(context).size.height * 0.012 : MediaQuery.of(context).size.height * 0.01,
                                 margin: EdgeInsets.symmetric(horizontal: 2.0),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
@@ -1738,6 +1503,23 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
 
   int odabranaKolicina = 0;
 
+  obrisiBicikl() async {
+    bool? confirmed = await ConfirmProzor.prikaziConfirmProzor(context, "Da li ste sigurni da želite obrisati zapis?");
+    if (confirmed != true) {
+      return;
+    }
+    try {
+      await _dijeloviService.upravljanjeDijelom("obrisan", widget.dijeloviId);
+      PorukaHelper.prikaziPorukuUspjeha(context, "Zapis uspješno obrisan");
+    } catch (e) {
+      PorukaHelper.prikaziPorukuGreske(context, "Greška prilikom brisanja zapisa");
+    }
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const GlavniProzor()),
+    );
+  }
+
   narudbaDijelovi() async {
     if (statusPrijavljenog != "aktivan") {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1763,13 +1545,11 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
       );
       return;
     }
-    final narudbaOdgovor = await _narudbaService.postNarudba(
-        korisnikId: korisnikId, prodavaocId: zapis?['korisnikId']);
+    final narudbaOdgovor = await _narudbaService.postNarudba(korisnikId: korisnikId, prodavaocId: zapis?['korisnikId']);
 
     if (narudbaOdgovor['narudzbaId'] != null) {
       final int narudzbaId = narudbaOdgovor['narudzbaId'];
-      final narudbaDijeloviOdgovor =
-          await _narudbaDijeloviService.postNarudbaDijelovi(
+      final narudbaDijeloviOdgovor = await _narudbaDijeloviService.postNarudbaDijelovi(
         narudzbaId: narudzbaId,
         dijeloviId: widget.dijeloviId,
         kolicina: odabranaKolicina,
@@ -1846,8 +1626,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                             children: [
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.95,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.05,
+                                height: MediaQuery.of(context).size.height * 0.05,
                                 color: Color.fromARGB(0, 13, 255, 0),
                               ),
                               Positioned(
@@ -1877,36 +1656,22 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                             child: Column(
                               children: [
                                 Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.95,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.1,
+                                  width: MediaQuery.of(context).size.width * 0.95,
+                                  height: MediaQuery.of(context).size.height * 0.1,
                                   color: const Color.fromARGB(0, 33, 149, 243),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
                                       Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.35,
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
+                                        width: MediaQuery.of(context).size.width * 0.35,
+                                        height: MediaQuery.of(context).size.height * 0.06,
                                         decoration: BoxDecoration(
                                           border: Border(
-                                            bottom: BorderSide(
-                                                color: Colors.white,
-                                                width: 2.0),
-                                            left: BorderSide(
-                                                color: Colors.white,
-                                                width: 2.0),
-                                            right: BorderSide(
-                                                color: Colors.white,
-                                                width: 2.0),
+                                            bottom: BorderSide(color: Colors.white, width: 2.0),
+                                            left: BorderSide(color: Colors.white, width: 2.0),
+                                            right: BorderSide(color: Colors.white, width: 2.0),
                                           ),
-                                          borderRadius:
-                                              BorderRadius.circular(10.0),
+                                          borderRadius: BorderRadius.circular(10.0),
                                         ),
                                         child: Center(
                                           child: TextField(
@@ -1918,45 +1683,30 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                             decoration: InputDecoration(
                                               hintText: "Upiši količinu",
                                               hintStyle: TextStyle(
-                                                color: Colors.white
-                                                    .withOpacity(0.6),
+                                                color: Colors.white.withOpacity(0.6),
                                               ),
                                               border: InputBorder.none,
-                                              contentPadding:
-                                                  EdgeInsets.symmetric(
-                                                      vertical: 10),
+                                              contentPadding: EdgeInsets.symmetric(vertical: 10),
                                             ),
                                             textAlign: TextAlign.center,
                                             onChanged: (value) {
                                               setState(() {
-                                                odabranaKolicina =
-                                                    int.tryParse(value) ?? 0;
+                                                odabranaKolicina = int.tryParse(value) ?? 0;
                                               });
                                             },
                                           ),
                                         ),
                                       ),
                                       Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.35,
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
+                                        width: MediaQuery.of(context).size.width * 0.35,
+                                        height: MediaQuery.of(context).size.height * 0.06,
                                         decoration: BoxDecoration(
                                           border: Border(
-                                            bottom: BorderSide(
-                                                color: Colors.white,
-                                                width: 2.0),
-                                            left: BorderSide(
-                                                color: Colors.white,
-                                                width: 2.0),
-                                            right: BorderSide(
-                                                color: Colors.white,
-                                                width: 2.0),
+                                            bottom: BorderSide(color: Colors.white, width: 2.0),
+                                            left: BorderSide(color: Colors.white, width: 2.0),
+                                            right: BorderSide(color: Colors.white, width: 2.0),
                                           ),
-                                          borderRadius:
-                                              BorderRadius.circular(10.0),
+                                          borderRadius: BorderRadius.circular(10.0),
                                         ),
                                         child: Center(
                                           child: Text(
@@ -1972,18 +1722,13 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                   ),
                                 ),
                                 Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.35,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.06,
+                                  width: MediaQuery.of(context).size.width * 0.35,
+                                  height: MediaQuery.of(context).size.height * 0.06,
                                   decoration: BoxDecoration(
                                     border: Border(
-                                      bottom: BorderSide(
-                                          color: Colors.white, width: 2.0),
-                                      left: BorderSide(
-                                          color: Colors.white, width: 2.0),
-                                      right: BorderSide(
-                                          color: Colors.white, width: 2.0),
+                                      bottom: BorderSide(color: Colors.white, width: 2.0),
+                                      left: BorderSide(color: Colors.white, width: 2.0),
+                                      right: BorderSide(color: Colors.white, width: 2.0),
                                     ),
                                     borderRadius: BorderRadius.circular(10.0),
                                   ),
@@ -2046,11 +1791,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
   }
 
   sacuvajPodatke() async {
-    if ((nazivDijelovi.isEmpty) &&
-        cijenaDijelovi == 0 &&
-        (opis.isEmpty) &&
-        _odabranaKategorijaDijelovi == null &&
-        kolicinaDijelovi == 0) {
+    if ((nazivDijelovi.isEmpty) && cijenaDijelovi == 0 && (opis.isEmpty) && _odabranaKategorijaDijelovi == null && kolicinaDijelovi == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -2129,8 +1870,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
         for (int i = 0; i < listaSlik.length; i++) {
           if (i < listaIdova.length) {
             // Poziv funkcije putSlike za svaku sliku dok ima id-ova
-            await _dijeloviSlikeService.putSlike(
-                listaSlik[i], widget.dijeloviId, int.parse(listaIdova[i]));
+            await _dijeloviSlikeService.putSlike(listaSlik[i], widget.dijeloviId, int.parse(listaIdova[i]));
           } else {
             // Ako listaIdova ima manje elemenata od listaSlik, preostale slike se dodaju putem postSlike
             break;
@@ -2139,8 +1879,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
 
         // Ako listaSlik ima više elemenata od listaIdova, preostale slike dodaj putem postSlike
         if (listaSlik.length > listaIdova.length) {
-          await _dijeloviSlikeService.postSlike(
-              listaSlik.sublist(listaIdova.length), widget.dijeloviId);
+          await _dijeloviSlikeService.postSlike(listaSlik.sublist(listaIdova.length), widget.dijeloviId);
         } else if (listaIdova.length > listaSlik.length) {
           // Ako listaIdova ima više elemenata od listaSlik, preostale id-ove obriši
           for (int i = listaSlik.length; i < listaIdova.length; i++) {

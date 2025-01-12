@@ -67,59 +67,9 @@ Console.ReadLine();
 
 while (true)
 {
-    await Task.Delay(5000);
+    await Task.Delay(10000);
     Console.WriteLine("Subscriber is running...");
 }
-
-// Zakomentirani kod za pretplatu
-/*
-await bus.PubSub.SubscribeAsync<BikeHub.Model.BicikliFM.Bicikli>("EmailBicikl", async msg =>
-{
-    Console.WriteLine("_------------------------------------Uslo nekom logikom");
-    Console.WriteLine($"Received message: {msg.Naziv}");
-
-    using (var context = new BikeHubDbContext())
-    {
-        var korisnici = await context.Korisniks
-            .Where(k => k.SpaseniBiciklis.Any(sb => sb.BiciklId == msg.BiciklId))
-            .ToListAsync();
-
-        foreach (var korisnik in korisnici)
-        {
-            Console.WriteLine($"Found korisnik: {korisnik.Email}");
-
-            if (IsValidEmail(korisnik.Email))
-            {
-                Console.WriteLine($"Sending email to: {korisnik.Email}");
-                await SendEmailAsync(korisnik.Email, msg.Naziv, (decimal)msg.Cijena, true);
-            }
-        }
-    }
-});
-
-await bus.PubSub.SubscribeAsync<BikeHub.Model.DijeloviFM.Dijelovi>("EmailDijelovi", async msg =>
-{
-    Console.WriteLine($"Received message: {msg.Naziv}");
-
-    using (var context = new BikeHubDbContext())
-    {
-        var korisnici = await context.Korisniks
-            .Where(k => k.SpaseniDijelovis.Any(sb => sb.DijeloviId == msg.DijeloviId))
-            .ToListAsync();
-
-        foreach (var korisnik in korisnici)
-        {
-            Console.WriteLine($"Found korisnik: {korisnik.Email}");
-
-            if (IsValidEmail(korisnik.Email))
-            {
-                Console.WriteLine($"Sending email to: {korisnik.Email}");
-                await SendEmailAsync(korisnik.Email, msg.Naziv, (decimal)msg.Cijena, true);
-            }
-        }
-    }
-});
-*/
 
 bool IsValidEmail(string email)
 {

@@ -7,7 +7,6 @@ namespace BikeHub.Model.SpaseniFM
 {
     public class SpaseniDijeloviSearchObject : BaseSearchObject
     {
-        //public int? SpaseniDijeloviId { get; set; }
 
         public int? DijeloviId { get; set; }
 

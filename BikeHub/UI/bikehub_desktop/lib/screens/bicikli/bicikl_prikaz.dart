@@ -7,6 +7,7 @@ import 'package:bikehub_desktop/services/bicikli/promocija_bicikli_service.dart'
 import 'package:bikehub_desktop/services/bicikli/slike_bicikl_service.dart';
 import 'package:bikehub_desktop/services/bicikli/spaseni_bicikl_service.dart';
 import 'package:bikehub_desktop/services/kategorije/kategorija_service.dart';
+import 'package:bikehub_desktop/screens/ostalo/confirm_prozor.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
@@ -606,6 +607,10 @@ class _BiciklPrikazState extends State<BiciklPrikaz> {
   }
 
   obrisiBicikl() async {
+    bool? confirmed = await ConfirmProzor.prikaziConfirmProzor(context, 'Da li ste sigurni da želite obrisati ovaj bicikl?');
+    if (confirmed != true) {
+      return;
+    }
     var rezultat = await biciklService.deleteBicikl(widget.biciklId);
     if (rezultat != null) {
       PorukaHelper.prikaziPorukuUspjeha(context, "Uspjesno obrisan zapis");

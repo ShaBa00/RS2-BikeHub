@@ -7,6 +7,8 @@ import 'package:bikehub_mobile/screens/dodavanje/promocija_zapisa.dart';
 import 'package:bikehub_mobile/screens/glavni_prozor.dart';
 import 'package:bikehub_mobile/screens/nav_bar.dart';
 import 'package:bikehub_mobile/screens/nav_bar_komponente.dart/korisnikovi_proizvodi.dart';
+import 'package:bikehub_mobile/screens/ostalo/confirm_prozor.dart';
+import 'package:bikehub_mobile/screens/ostalo/poruka_helper.dart';
 import 'package:bikehub_mobile/screens/ostalo/prikaz_slika.dart';
 import 'package:bikehub_mobile/screens/prikaz/dijelovi_prikaz.dart';
 import 'package:bikehub_mobile/servisi/bicikli/bicikl_promocija_service.dart';
@@ -40,12 +42,10 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
   final KategorijaServis _kategorijaServis = KategorijaServis();
   final AdresaServis _adresaServis = AdresaServis();
   final KorisnikServis _korisnikServis = KorisnikServis();
-  final KategorijaRecommendedService _kategorijaRecommendedService =
-      KategorijaRecommendedService();
+  final KategorijaRecommendedService _kategorijaRecommendedService = KategorijaRecommendedService();
   final BiciklSlikeService _biciklSlikeService = BiciklSlikeService();
   final BiciklSacuvaniServis _biciklSacuvaniServis = BiciklSacuvaniServis();
-  final BiciklPromocijaService _biciklPromocijaService =
-      BiciklPromocijaService();
+  final BiciklPromocijaService _biciklPromocijaService = BiciklPromocijaService();
   final NarudbaBiciklService _narudbaBiciklService = NarudbaBiciklService();
   final NarudbaService _narudbaService = NarudbaService();
 
@@ -62,8 +62,7 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
   _getSpaseni() async {
     isLoggedInCache ??= await _korisnikServis.isLoggedIn();
     if (isLoggedInCache == true) {
-      zapisSacuvanog = await _biciklSacuvaniServis.isBiciklSacuvan(
-          korisnikId: korisnikId, biciklId: widget.biciklId);
+      zapisSacuvanog = await _biciklSacuvaniServis.isBiciklSacuvan(korisnikId: korisnikId, biciklId: widget.biciklId);
       if (zapisSacuvanog != null && zapisSacuvanog?['status'] != "obrisan") {
         sacuvanZapisi = true;
       }
@@ -75,8 +74,7 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
 
   _getKategorija() async {
     try {
-      var result =
-          await _kategorijaServis.getKategorijaById(zapis?['kategorijaId']);
+      var result = await _kategorijaServis.getKategorijaById(zapis?['kategorijaId']);
       setState(() {
         kategorija = result;
         loadingZapisi = false;
@@ -97,8 +95,7 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
 
   _getAdresa() async {
     try {
-      var result =
-          await _adresaServis.getAdresa(korisnikId: zapis?['korisnikId']);
+      var result = await _adresaServis.getAdresa(korisnikId: zapis?['korisnikId']);
       setState(() {
         adresa = result;
       });
@@ -110,11 +107,9 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
   List<dynamic> listaRecomendedDijelova = [];
   _getRecomended() async {
     try {
-      await _kategorijaRecommendedService.getRecommendedDijelovis(
-          biciklID: widget.biciklId);
+      await _kategorijaRecommendedService.getRecommendedDijelovis(biciklID: widget.biciklId);
       setState(() {
-        listaRecomendedDijelova =
-            _kategorijaRecommendedService.listaRecomendedDijelova;
+        listaRecomendedDijelova = _kategorijaRecommendedService.listaRecomendedDijelova;
       });
     } catch (e) {
       // Handle error if needed
@@ -133,14 +128,12 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
         statusPrijavljenog = userInfo['status'] ?? 'kreiran';
       });
       var result = await _biciklService.getBiciklById(widget.biciklId);
-      isPromovisan =
-          await _biciklPromocijaService.isPromovisan(biciklId: widget.biciklId);
+      isPromovisan = await _biciklPromocijaService.isPromovisan(biciklId: widget.biciklId);
       setState(() {
         isPromovisan;
         zapis = result;
         listaSlik = (result['slikeBiciklis'] as List<dynamic>?)
-                ?.where(
-                    (item) => item['slika'] != null && item['slika'].isNotEmpty)
+                ?.where((item) => item['slika'] != null && item['slika'].isNotEmpty)
                 .map<String>((item) => item['slika'] as String)
                 .toList() ??
             [];
@@ -206,16 +199,10 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
     if (zapisSacuvanog != null) {
       if (zapisSacuvanog?['status'] != "obrisan") {
         poruka = await _biciklSacuvaniServis.promjeniSacuvani(
-            zapisSacuvanog?['spaseniBicikliId'],
-            zapisSacuvanog?['korisnikId'],
-            zapisSacuvanog?['biciklId'],
-            true);
+            zapisSacuvanog?['spaseniBicikliId'], zapisSacuvanog?['korisnikId'], zapisSacuvanog?['biciklId'], true);
       } else {
         poruka = await _biciklSacuvaniServis.promjeniSacuvani(
-            zapisSacuvanog?['spaseniBicikliId'],
-            zapisSacuvanog?['korisnikId'],
-            zapisSacuvanog?['biciklId'],
-            false);
+            zapisSacuvanog?['spaseniBicikliId'], zapisSacuvanog?['korisnikId'], zapisSacuvanog?['biciklId'], false);
       }
     } else {
       poruka = await _biciklSacuvaniServis.dodajNoviSacuvani(
@@ -244,8 +231,7 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: PreferredSize(
-          preferredSize:
-              Size.fromHeight(MediaQuery.of(context).size.height * 0.06),
+          preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.06),
           child: AppBar(
             backgroundColor: Colors.blueAccent,
             iconTheme: IconThemeData(color: Colors.white),
@@ -294,9 +280,7 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                           ),
                         ),
                         child: Icon(
-                          sacuvanZapisi
-                              ? Icons.bookmark
-                              : Icons.bookmark_border,
+                          sacuvanZapisi ? Icons.bookmark : Icons.bookmark_border,
                           color: Colors.white,
                         ),
                       ),
@@ -367,10 +351,7 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
       return Center(child: Text('Greška pri učitavanju podataka.'));
     } else if (zapis!['slikeBiciklis'] != null) {
       // Pretipkavanje liste
-      List<Map<String, dynamic>> slikeBiciklis =
-          (zapis!['slikeBiciklis'] as List)
-              .map((item) => item as Map<String, dynamic>)
-              .toList();
+      List<Map<String, dynamic>> slikeBiciklis = (zapis!['slikeBiciklis'] as List).map((item) => item as Map<String, dynamic>).toList();
 
       return Container(
         width: MediaQuery.of(context).size.width,
@@ -813,8 +794,7 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                               onTap: () => prikaziPopup(context),
                               child: Container(
                                 width: MediaQuery.of(context).size.width * 0.45,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.05,
+                                height: MediaQuery.of(context).size.height * 0.05,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10.0),
                                   border: Border(
@@ -850,8 +830,7 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                               },
                               child: Container(
                                 width: MediaQuery.of(context).size.width * 0.45,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.05,
+                                height: MediaQuery.of(context).size.height * 0.05,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10.0),
                                   border: Border(
@@ -931,21 +910,14 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        for (int i = 0;
-                            i <
-                                (listaRecomendedDijelova.length > 5
-                                    ? 5
-                                    : listaRecomendedDijelova.length);
-                            i++)
+                        for (int i = 0; i < (listaRecomendedDijelova.length > 5 ? 5 : listaRecomendedDijelova.length); i++)
                           GestureDetector(
                             onTap: () {
-                              int dijeloviId =
-                                  listaRecomendedDijelova[i]['dijeloviId'];
+                              int dijeloviId = listaRecomendedDijelova[i]['dijeloviId'];
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      DijeloviPrikaz(dijeloviId: dijeloviId),
+                                  builder: (context) => DijeloviPrikaz(dijeloviId: dijeloviId),
                                 ),
                               );
                             },
@@ -968,10 +940,8 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.4,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.19,
+                                    width: MediaQuery.of(context).size.width * 0.4,
+                                    height: MediaQuery.of(context).size.height * 0.19,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.only(
                                         topLeft: Radius.circular(30.0),
@@ -979,62 +949,43 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                       ),
                                       color: Colors.transparent,
                                     ),
-                                    child: listaRecomendedDijelova[i]
-                                                    ['slikeDijelovis'] !=
-                                                null &&
-                                            listaRecomendedDijelova[i]
-                                                    ['slikeDijelovis']
-                                                .isNotEmpty
+                                    child: listaRecomendedDijelova[i]['slikeDijelovis'] != null &&
+                                            listaRecomendedDijelova[i]['slikeDijelovis'].isNotEmpty
                                         ? ClipRRect(
                                             borderRadius: BorderRadius.only(
                                               topLeft: Radius.circular(30.0),
                                               topRight: Radius.circular(30.0),
                                             ),
                                             child: Image.memory(
-                                              base64Decode(
-                                                  listaRecomendedDijelova[i]
-                                                          ['slikeDijelovis'][0]
-                                                      ['slika']),
+                                              base64Decode(listaRecomendedDijelova[i]['slikeDijelovis'][0]['slika']),
                                               fit: BoxFit.cover,
                                             ),
                                           )
                                         : Icon(
                                             Icons.image_not_supported,
-                                            size: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.1,
+                                            size: MediaQuery.of(context).size.height * 0.1,
                                           ),
                                   ),
                                   Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.4,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.05,
+                                    width: MediaQuery.of(context).size.width * 0.4,
+                                    height: MediaQuery.of(context).size.height * 0.05,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(30.0),
                                       color: Colors.transparent,
                                     ),
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Flexible(
                                           flex: 1,
                                           child: Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.05,
+                                            height: MediaQuery.of(context).size.height * 0.05,
                                             alignment: Alignment.center,
                                             child: Text(
-                                              listaRecomendedDijelova[i]
-                                                      ?['naziv'] ??
-                                                  'N/A',
+                                              listaRecomendedDijelova[i]?['naziv'] ?? 'N/A',
                                               style: TextStyle(
                                                 fontSize: 16,
-                                                color: const Color.fromARGB(
-                                                    255, 255, 255, 255),
+                                                color: const Color.fromARGB(255, 255, 255, 255),
                                                 overflow: TextOverflow.ellipsis,
                                               ),
                                               maxLines: 1,
@@ -1045,20 +996,13 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                         Flexible(
                                           flex: 1,
                                           child: Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.05,
+                                            height: MediaQuery.of(context).size.height * 0.05,
                                             alignment: Alignment.center,
                                             child: Text(
-                                              (listaRecomendedDijelova[i]
-                                                          ?['cijena']
-                                                      ?.toString() ??
-                                                  'N/A'),
+                                              (listaRecomendedDijelova[i]?['cijena']?.toString() ?? 'N/A'),
                                               style: TextStyle(
                                                 fontSize: 16,
-                                                color: const Color.fromARGB(
-                                                    255, 255, 255, 255),
+                                                color: const Color.fromARGB(255, 255, 255, 255),
                                                 overflow: TextOverflow.ellipsis,
                                               ),
                                               maxLines: 1,
@@ -1092,6 +1036,23 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
 
   int currentIndexPopUp = 0;
   int currentIndexSlike = 0;
+
+  obrisiBicikl() async {
+    bool? confirmed = await ConfirmProzor.prikaziConfirmProzor(context, "Da li ste sigurni da želite obrisati zapis?");
+    if (confirmed != true) {
+      return;
+    }
+    try {
+      await _biciklService.upravljanjeBiciklom("obrisan", widget.biciklId);
+      PorukaHelper.prikaziPorukuUspjeha(context, "Zapis uspješno obrisan");
+    } catch (e) {
+      PorukaHelper.prikaziPorukuGreske(context, "Greška prilikom brisanja zapisa");
+    }
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const GlavniProzor()),
+    );
+  }
 
   void prikaziPopup(BuildContext context) {
     showDialog(
@@ -1174,59 +1135,35 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                               child: Column(
                                 children: [
                                   Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.9,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.1,
+                                    width: MediaQuery.of(context).size.width * 0.9,
+                                    height: MediaQuery.of(context).size.height * 0.1,
                                   ),
                                   // Container za prikaz slika
                                   Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.8,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.32,
+                                    width: MediaQuery.of(context).size.width * 0.8,
+                                    height: MediaQuery.of(context).size.height * 0.32,
                                     child: listaSlik.isNotEmpty
                                         ? GestureDetector(
                                             onHorizontalDragEnd: (details) {
-                                              if (details.primaryVelocity !=
-                                                  null) {
-                                                if (details.primaryVelocity! >
-                                                    0) {
+                                              if (details.primaryVelocity != null) {
+                                                if (details.primaryVelocity! > 0) {
                                                   setState(() {
-                                                    currentIndexSlike =
-                                                        (currentIndexSlike -
-                                                                1 +
-                                                                listaSlik
-                                                                    .length) %
-                                                            listaSlik.length;
+                                                    currentIndexSlike = (currentIndexSlike - 1 + listaSlik.length) % listaSlik.length;
                                                   });
-                                                } else if (details
-                                                        .primaryVelocity! <
-                                                    0) {
+                                                } else if (details.primaryVelocity! < 0) {
                                                   setState(() {
-                                                    currentIndexSlike =
-                                                        (currentIndexSlike +
-                                                                1) %
-                                                            listaSlik.length;
+                                                    currentIndexSlike = (currentIndexSlike + 1) % listaSlik.length;
                                                   });
                                                 }
                                               }
                                             },
                                             child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
+                                              borderRadius: BorderRadius.circular(10),
                                               child: Image.memory(
-                                                base64Decode(listaSlik[
-                                                    currentIndexSlike]),
+                                                base64Decode(listaSlik[currentIndexSlike]),
                                                 fit: BoxFit.cover,
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.8,
-                                                height: MediaQuery.of(context)
-                                                        .size
-                                                        .height *
-                                                    0.32,
+                                                width: MediaQuery.of(context).size.width * 0.8,
+                                                height: MediaQuery.of(context).size.height * 0.32,
                                               ),
                                             ),
                                           )
@@ -1237,13 +1174,10 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                   ),
                                   // Container za dugmiće
                                   Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.8,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.1,
+                                    width: MediaQuery.of(context).size.width * 0.8,
+                                    height: MediaQuery.of(context).size.height * 0.1,
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                                       children: [
                                         if (listaSlik.isNotEmpty)
                                           ElevatedButton(
@@ -1251,20 +1185,16 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                               foregroundColor: Colors.lightBlue,
                                               backgroundColor: Colors.white,
                                               shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(30),
+                                                borderRadius: BorderRadius.circular(30),
                                               ),
                                             ),
                                             onPressed: () {
                                               setState(() {
-                                                listaSlik.removeAt(
-                                                    currentIndexSlike);
+                                                listaSlik.removeAt(currentIndexSlike);
                                                 if (listaSlik.isEmpty) {
                                                   currentIndexSlike = 0;
                                                 } else {
-                                                  currentIndexSlike =
-                                                      currentIndexSlike %
-                                                          listaSlik.length;
+                                                  currentIndexSlike = currentIndexSlike % listaSlik.length;
                                                 }
                                               });
                                             },
@@ -1272,9 +1202,7 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                               fit: BoxFit.scaleDown,
                                               child: Text(
                                                 "Obriši",
-                                                style: TextStyle(
-                                                    color: const Color.fromARGB(
-                                                        255, 244, 3, 3)),
+                                                style: TextStyle(color: const Color.fromARGB(255, 244, 3, 3)),
                                               ),
                                             ),
                                           ),
@@ -1283,13 +1211,11 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                             foregroundColor: Colors.lightBlue,
                                             backgroundColor: Colors.white,
                                             shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(30),
+                                              borderRadius: BorderRadius.circular(30),
                                             ),
                                           ),
                                           onPressed: () async {
-                                            String novaSlika =
-                                                await odaberiSlikuIzGalerije();
+                                            String novaSlika = await odaberiSlikuIzGalerije();
                                             if (novaSlika.isNotEmpty) {
                                               setState(() {
                                                 listaSlik.insert(0, novaSlika);
@@ -1300,8 +1226,7 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                             fit: BoxFit.scaleDown,
                                             child: Text(
                                               "Dodaj novu",
-                                              style: TextStyle(
-                                                  color: Colors.lightBlue),
+                                              style: TextStyle(color: Colors.lightBlue),
                                             ),
                                           ),
                                         ),
@@ -1310,32 +1235,51 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                   ),
                                   // Container za dugmić dodavanja u bazu
                                   Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.9,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.1,
-                                    child: Center(
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          foregroundColor: Colors.lightBlue,
-                                          backgroundColor: Colors.white,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(30),
+                                    width: MediaQuery.of(context).size.width * 0.9,
+                                    height: MediaQuery.of(context).size.height * 0.2,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            foregroundColor: Colors.lightBlue,
+                                            backgroundColor: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(30),
+                                            ),
+                                          ),
+                                          onPressed: () async {
+                                            sacuvajSlike();
+                                          },
+                                          child: FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Text(
+                                              "Sacuvaj slike",
+                                              style: TextStyle(color: Colors.lightBlue),
+                                            ),
                                           ),
                                         ),
-                                        onPressed: () async {
-                                          sacuvajSlike();
-                                        },
-                                        child: FittedBox(
-                                          fit: BoxFit.scaleDown,
-                                          child: Text(
-                                            "Sacuvaj slike",
-                                            style: TextStyle(
-                                                color: Colors.lightBlue),
+                                        SizedBox(height: 16), // Razmak između dva dugmeta
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            foregroundColor: Colors.white,
+                                            backgroundColor: Colors.red,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(30),
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            obrisiBicikl();
+                                          },
+                                          child: FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Text(
+                                              "Obriši bicikl",
+                                              style: TextStyle(color: Colors.white),
+                                            ),
                                           ),
                                         ),
-                                      ),
+                                      ],
                                     ),
                                   ),
                                 ],
@@ -1347,70 +1291,44 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                               child: Column(
                                 children: [
                                   Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.7,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.66,
+                                    width: MediaQuery.of(context).size.width * 0.7,
+                                    height: MediaQuery.of(context).size.height * 0.66,
                                     child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                                       children: [
                                         Container(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.07,
+                                          height: MediaQuery.of(context).size.height * 0.07,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(10),
                                             border: Border(
-                                              left: BorderSide(
-                                                  color: Colors.white),
-                                              right: BorderSide(
-                                                  color: Colors.white),
-                                              bottom: BorderSide(
-                                                  color: Colors.white),
+                                              left: BorderSide(color: Colors.white),
+                                              right: BorderSide(color: Colors.white),
+                                              bottom: BorderSide(color: Colors.white),
                                             ),
                                           ),
                                           child: Center(
                                             child: Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.65,
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.05,
+                                              width: MediaQuery.of(context).size.width * 0.65,
+                                              height: MediaQuery.of(context).size.height * 0.05,
                                               decoration: BoxDecoration(
                                                 gradient: LinearGradient(
-                                                  colors: [
-                                                    Colors.blue,
-                                                    Colors.purple
-                                                  ],
+                                                  colors: [Colors.blue, Colors.purple],
                                                   begin: Alignment.topLeft,
                                                   end: Alignment.bottomRight,
                                                 ),
-                                                borderRadius:
-                                                    BorderRadius.circular(10.0),
+                                                borderRadius: BorderRadius.circular(10.0),
                                               ),
                                               child: TextField(
                                                 decoration: InputDecoration(
                                                   hintText: "Naziv",
-                                                  hintStyle: TextStyle(
-                                                      color: Colors.white),
+                                                  hintStyle: TextStyle(color: Colors.white),
                                                   border: OutlineInputBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10.0),
+                                                    borderRadius: BorderRadius.circular(10.0),
                                                     borderSide: BorderSide.none,
                                                   ),
-                                                  contentPadding:
-                                                      EdgeInsets.symmetric(
-                                                          horizontal: 12),
+                                                  contentPadding: EdgeInsets.symmetric(horizontal: 12),
                                                 ),
-                                                style: TextStyle(
-                                                    color: Colors.white),
+                                                style: TextStyle(color: Colors.white),
                                                 onChanged: (text) {
                                                   nazivBicikl = text;
                                                 },
@@ -1419,165 +1337,96 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                           ),
                                         ),
                                         Container(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.07,
+                                          height: MediaQuery.of(context).size.height * 0.07,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(10),
                                             border: Border(
-                                              left: BorderSide(
-                                                  color: Colors.white),
-                                              right: BorderSide(
-                                                  color: Colors.white),
-                                              bottom: BorderSide(
-                                                  color: Colors.white),
+                                              left: BorderSide(color: Colors.white),
+                                              right: BorderSide(color: Colors.white),
+                                              bottom: BorderSide(color: Colors.white),
                                             ),
                                           ),
                                           child: Center(
                                             child: Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.65,
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.05,
+                                              width: MediaQuery.of(context).size.width * 0.65,
+                                              height: MediaQuery.of(context).size.height * 0.05,
                                               decoration: BoxDecoration(
                                                 gradient: LinearGradient(
-                                                  colors: [
-                                                    Colors.blue,
-                                                    Colors.purple
-                                                  ],
+                                                  colors: [Colors.blue, Colors.purple],
                                                   begin: Alignment.topLeft,
                                                   end: Alignment.bottomRight,
                                                 ),
-                                                borderRadius:
-                                                    BorderRadius.circular(10.0),
+                                                borderRadius: BorderRadius.circular(10.0),
                                               ),
                                               child: TextField(
-                                                keyboardType:
-                                                    TextInputType.number,
+                                                keyboardType: TextInputType.number,
                                                 decoration: InputDecoration(
                                                   hintText: "Cijena",
-                                                  hintStyle: TextStyle(
-                                                      color: Colors.white),
+                                                  hintStyle: TextStyle(color: Colors.white),
                                                   border: OutlineInputBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10.0),
+                                                    borderRadius: BorderRadius.circular(10.0),
                                                     borderSide: BorderSide.none,
                                                   ),
-                                                  contentPadding:
-                                                      EdgeInsets.symmetric(
-                                                          horizontal: 12),
+                                                  contentPadding: EdgeInsets.symmetric(horizontal: 12),
                                                 ),
-                                                style: TextStyle(
-                                                    color: Colors.white),
+                                                style: TextStyle(color: Colors.white),
                                                 onChanged: (text) {
-                                                  cijenaBicikl =
-                                                      int.tryParse(text) ?? 0;
+                                                  cijenaBicikl = int.tryParse(text) ?? 0;
                                                 },
                                               ),
                                             ),
                                           ),
                                         ),
                                         Container(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.07,
+                                          height: MediaQuery.of(context).size.height * 0.07,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(10),
                                             border: Border(
-                                              left: BorderSide(
-                                                  color: Colors.white),
-                                              right: BorderSide(
-                                                  color: Colors.white),
-                                              bottom: BorderSide(
-                                                  color: Colors.white),
+                                              left: BorderSide(color: Colors.white),
+                                              right: BorderSide(color: Colors.white),
+                                              bottom: BorderSide(color: Colors.white),
                                             ),
                                           ),
                                           child: Center(
                                               child: Container(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.65,
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.05,
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 16.0),
+                                            width: MediaQuery.of(context).size.width * 0.65,
+                                            height: MediaQuery.of(context).size.height * 0.05,
+                                            padding: EdgeInsets.symmetric(horizontal: 16.0),
                                             decoration: BoxDecoration(
                                               gradient: LinearGradient(
-                                                colors: [
-                                                  Colors.blue,
-                                                  Colors.purple
-                                                ],
+                                                colors: [Colors.blue, Colors.purple],
                                                 begin: Alignment.topLeft,
                                                 end: Alignment.bottomRight,
                                               ),
-                                              borderRadius:
-                                                  BorderRadius.circular(10.0),
+                                              borderRadius: BorderRadius.circular(10.0),
                                             ),
                                             child: DropdownButtonHideUnderline(
                                               child: DropdownButton<String>(
-                                                value: velicinaRama.isNotEmpty
-                                                    ? velicinaRama
-                                                    : null,
+                                                value: velicinaRama.isNotEmpty ? velicinaRama : null,
                                                 hint: Text(
                                                   "Velicina rama",
-                                                  style: TextStyle(
-                                                      color: Colors.white),
+                                                  style: TextStyle(color: Colors.white),
                                                 ),
-                                                icon: Icon(Icons.arrow_downward,
-                                                    color: Colors.white),
+                                                icon: Icon(Icons.arrow_downward, color: Colors.white),
                                                 iconSize: 24,
                                                 elevation: 16,
-                                                style: TextStyle(
-                                                    color: Colors.white),
+                                                style: TextStyle(color: Colors.white),
                                                 dropdownColor: Colors.purple,
                                                 onChanged: (String? newValue) {
                                                   setState(() {
                                                     velicinaRama = newValue!;
                                                   });
                                                 },
-                                                items: <String>[
-                                                  "",
-                                                  "S",
-                                                  "M",
-                                                  "L",
-                                                  "XL",
-                                                  "XXL"
-                                                ].map<DropdownMenuItem<String>>(
-                                                    (String value) {
-                                                  return DropdownMenuItem<
-                                                      String>(
+                                                items: <String>["", "S", "M", "L", "XL", "XXL"].map<DropdownMenuItem<String>>((String value) {
+                                                  return DropdownMenuItem<String>(
                                                     value: value,
                                                     child: Container(
-                                                      width:
-                                                          MediaQuery.of(context)
-                                                                  .size
-                                                                  .width *
-                                                              0.3,
-                                                      height:
-                                                          MediaQuery.of(context)
-                                                                  .size
-                                                                  .height *
-                                                              0.04,
+                                                      width: MediaQuery.of(context).size.width * 0.3,
+                                                      height: MediaQuery.of(context).size.height * 0.04,
                                                       child: Center(
                                                         child: Text(
-                                                          value.isEmpty
-                                                              ? "Velicina rama"
-                                                              : value,
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.white),
+                                                          value.isEmpty ? "Velicina rama" : value,
+                                                          style: TextStyle(color: Colors.white),
                                                         ),
                                                       ),
                                                     ),
@@ -1588,66 +1437,40 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                           )),
                                         ),
                                         Container(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.07,
+                                          height: MediaQuery.of(context).size.height * 0.07,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(10),
                                             border: Border(
-                                              left: BorderSide(
-                                                  color: Colors.white),
-                                              right: BorderSide(
-                                                  color: Colors.white),
-                                              bottom: BorderSide(
-                                                  color: Colors.white),
+                                              left: BorderSide(color: Colors.white),
+                                              right: BorderSide(color: Colors.white),
+                                              bottom: BorderSide(color: Colors.white),
                                             ),
                                           ),
                                           child: Center(
                                             child: Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.65,
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.05,
+                                              width: MediaQuery.of(context).size.width * 0.65,
+                                              height: MediaQuery.of(context).size.height * 0.05,
                                               decoration: BoxDecoration(
                                                 gradient: LinearGradient(
-                                                  colors: [
-                                                    Colors.blue,
-                                                    Colors.purple
-                                                  ],
+                                                  colors: [Colors.blue, Colors.purple],
                                                   begin: Alignment.topLeft,
                                                   end: Alignment.bottomRight,
                                                 ),
-                                                borderRadius:
-                                                    BorderRadius.circular(10.0),
+                                                borderRadius: BorderRadius.circular(10.0),
                                               ),
-                                              child:
-                                                  DropdownButtonHideUnderline(
+                                              child: DropdownButtonHideUnderline(
                                                 child: DropdownButton<String>(
-                                                  value:
-                                                      velicinaTocka.isNotEmpty
-                                                          ? velicinaTocka
-                                                          : null,
+                                                  value: velicinaTocka.isNotEmpty ? velicinaTocka : null,
                                                   hint: Text(
                                                     "Velicina tocka",
-                                                    style: TextStyle(
-                                                        color: Colors.white),
+                                                    style: TextStyle(color: Colors.white),
                                                   ),
-                                                  icon: Icon(
-                                                      Icons.arrow_downward,
-                                                      color: Colors.white),
+                                                  icon: Icon(Icons.arrow_downward, color: Colors.white),
                                                   iconSize: 24,
                                                   elevation: 16,
-                                                  style: TextStyle(
-                                                      color: Colors.white),
+                                                  style: TextStyle(color: Colors.white),
                                                   dropdownColor: Colors.purple,
-                                                  onChanged:
-                                                      (String? newValue) {
+                                                  onChanged: (String? newValue) {
                                                     setState(() {
                                                       velicinaTocka = newValue!;
                                                     });
@@ -1658,32 +1481,16 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                                     "26",
                                                     "27.5",
                                                     "29",
-                                                  ].map<
-                                                          DropdownMenuItem<
-                                                              String>>(
-                                                      (String value) {
-                                                    return DropdownMenuItem<
-                                                        String>(
+                                                  ].map<DropdownMenuItem<String>>((String value) {
+                                                    return DropdownMenuItem<String>(
                                                       value: value,
                                                       child: Container(
-                                                        width: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .width *
-                                                            0.3,
-                                                        height: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .height *
-                                                            0.04,
+                                                        width: MediaQuery.of(context).size.width * 0.3,
+                                                        height: MediaQuery.of(context).size.height * 0.04,
                                                         child: Center(
                                                           child: Text(
-                                                            value.isEmpty
-                                                                ? "Velicina tocka"
-                                                                : value,
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .white),
+                                                            value.isEmpty ? "Velicina tocka" : value,
+                                                            style: TextStyle(color: Colors.white),
                                                           ),
                                                         ),
                                                       ),
@@ -1695,104 +1502,55 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                           ),
                                         ),
                                         Container(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.07,
+                                          height: MediaQuery.of(context).size.height * 0.07,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(10),
                                             border: Border(
-                                              left: BorderSide(
-                                                  color: Colors.white),
-                                              right: BorderSide(
-                                                  color: Colors.white),
-                                              bottom: BorderSide(
-                                                  color: Colors.white),
+                                              left: BorderSide(color: Colors.white),
+                                              right: BorderSide(color: Colors.white),
+                                              bottom: BorderSide(color: Colors.white),
                                             ),
                                           ),
                                           child: Center(
                                             child: Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.65,
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.05,
+                                              width: MediaQuery.of(context).size.width * 0.65,
+                                              height: MediaQuery.of(context).size.height * 0.05,
                                               decoration: BoxDecoration(
                                                 gradient: LinearGradient(
-                                                  colors: [
-                                                    Colors.blue,
-                                                    Colors.purple
-                                                  ],
+                                                  colors: [Colors.blue, Colors.purple],
                                                   begin: Alignment.topLeft,
                                                   end: Alignment.bottomRight,
                                                 ),
-                                                borderRadius:
-                                                    BorderRadius.circular(10.0),
+                                                borderRadius: BorderRadius.circular(10.0),
                                               ),
-                                              child:
-                                                  DropdownButtonHideUnderline(
+                                              child: DropdownButtonHideUnderline(
                                                 child: DropdownButton<String>(
-                                                  value: brojBrzina != 0
-                                                      ? brojBrzina.toString()
-                                                      : null,
+                                                  value: brojBrzina != 0 ? brojBrzina.toString() : null,
                                                   hint: Text(
                                                     "Broj brzina",
-                                                    style: TextStyle(
-                                                        color: Colors.white),
+                                                    style: TextStyle(color: Colors.white),
                                                   ),
-                                                  icon: Icon(
-                                                      Icons.arrow_downward,
-                                                      color: Colors.white),
+                                                  icon: Icon(Icons.arrow_downward, color: Colors.white),
                                                   iconSize: 24,
                                                   elevation: 16,
-                                                  style: TextStyle(
-                                                      color: Colors.white),
+                                                  style: TextStyle(color: Colors.white),
                                                   dropdownColor: Colors.purple,
-                                                  onChanged:
-                                                      (String? newValue) {
+                                                  onChanged: (String? newValue) {
                                                     setState(() {
-                                                      brojBrzina =
-                                                          int.parse(newValue!);
+                                                      brojBrzina = int.parse(newValue!);
                                                     });
                                                   },
-                                                  items: <String>[
-                                                    "0",
-                                                    "16",
-                                                    "18",
-                                                    "21",
-                                                    "24",
-                                                    "27",
-                                                    "31"
-                                                  ].map<
-                                                          DropdownMenuItem<
-                                                              String>>(
-                                                      (String value) {
-                                                    return DropdownMenuItem<
-                                                        String>(
+                                                  items:
+                                                      <String>["0", "16", "18", "21", "24", "27", "31"].map<DropdownMenuItem<String>>((String value) {
+                                                    return DropdownMenuItem<String>(
                                                       value: value,
                                                       child: Container(
-                                                        width: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .width *
-                                                            0.3,
-                                                        height: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .height *
-                                                            0.04,
+                                                        width: MediaQuery.of(context).size.width * 0.3,
+                                                        height: MediaQuery.of(context).size.height * 0.04,
                                                         child: Center(
                                                           child: Text(
-                                                            value.isEmpty
-                                                                ? "Broj brzina"
-                                                                : value,
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .white),
+                                                            value.isEmpty ? "Broj brzina" : value,
+                                                            style: TextStyle(color: Colors.white),
                                                           ),
                                                         ),
                                                       ),
@@ -1804,166 +1562,91 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                           ),
                                         ),
                                         Container(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.07,
+                                          height: MediaQuery.of(context).size.height * 0.07,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(10),
                                             border: Border(
-                                              left: BorderSide(
-                                                  color: Colors.white),
-                                              right: BorderSide(
-                                                  color: Colors.white),
-                                              bottom: BorderSide(
-                                                  color: Colors.white),
+                                              left: BorderSide(color: Colors.white),
+                                              right: BorderSide(color: Colors.white),
+                                              bottom: BorderSide(color: Colors.white),
                                             ),
                                           ),
                                           child: Center(
                                             child: Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.65,
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.05,
+                                              width: MediaQuery.of(context).size.width * 0.65,
+                                              height: MediaQuery.of(context).size.height * 0.05,
                                               decoration: BoxDecoration(
                                                 gradient: LinearGradient(
-                                                  colors: [
-                                                    Colors.blue,
-                                                    Colors.purple
-                                                  ],
+                                                  colors: [Colors.blue, Colors.purple],
                                                   begin: Alignment.topLeft,
                                                   end: Alignment.bottomRight,
                                                 ),
-                                                borderRadius:
-                                                    BorderRadius.circular(10.0),
+                                                borderRadius: BorderRadius.circular(10.0),
                                               ),
                                               child: TextField(
-                                                keyboardType:
-                                                    TextInputType.number,
+                                                keyboardType: TextInputType.number,
                                                 decoration: InputDecoration(
                                                   hintText: "Kolicina",
-                                                  hintStyle: TextStyle(
-                                                      color: Colors.white),
+                                                  hintStyle: TextStyle(color: Colors.white),
                                                   border: OutlineInputBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10.0),
+                                                    borderRadius: BorderRadius.circular(10.0),
                                                     borderSide: BorderSide.none,
                                                   ),
-                                                  contentPadding:
-                                                      EdgeInsets.symmetric(
-                                                          horizontal: 12),
+                                                  contentPadding: EdgeInsets.symmetric(horizontal: 12),
                                                 ),
-                                                style: TextStyle(
-                                                    color: Colors.white),
+                                                style: TextStyle(color: Colors.white),
                                                 onChanged: (text) {
-                                                  kolicinaBicikla =
-                                                      int.tryParse(text) ?? 0;
+                                                  kolicinaBicikla = int.tryParse(text) ?? 0;
                                                 },
                                               ),
                                             ),
                                           ),
                                         ),
                                         Container(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.07,
+                                          height: MediaQuery.of(context).size.height * 0.07,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(10),
                                             border: Border(
-                                              left: BorderSide(
-                                                  color: Colors.white),
-                                              right: BorderSide(
-                                                  color: Colors.white),
-                                              bottom: BorderSide(
-                                                  color: Colors.white),
+                                              left: BorderSide(color: Colors.white),
+                                              right: BorderSide(color: Colors.white),
+                                              bottom: BorderSide(color: Colors.white),
                                             ),
                                           ),
                                           child: Center(
                                             child: Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.65,
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.05,
+                                              width: MediaQuery.of(context).size.width * 0.65,
+                                              height: MediaQuery.of(context).size.height * 0.05,
                                               decoration: BoxDecoration(
                                                 gradient: LinearGradient(
-                                                  colors: [
-                                                    Colors.blue,
-                                                    Colors.purple
-                                                  ],
+                                                  colors: [Colors.blue, Colors.purple],
                                                   begin: Alignment.topLeft,
                                                   end: Alignment.bottomRight,
                                                 ),
-                                                borderRadius:
-                                                    BorderRadius.circular(10.0),
+                                                borderRadius: BorderRadius.circular(10.0),
                                               ),
                                               child: DropdownButton<String>(
                                                 isExpanded: true,
-                                                value: _odabranaKategorijaBicikl !=
-                                                        null
-                                                    ? _odabranaKategorijaBicikl![
-                                                            'naziv'] ??
-                                                        'N/A'
-                                                    : null,
+                                                value: _odabranaKategorijaBicikl != null ? _odabranaKategorijaBicikl!['naziv'] ?? 'N/A' : null,
                                                 hint: Text(
                                                   'Kategorija',
-                                                  style: TextStyle(
-                                                      color: Colors.white),
+                                                  style: TextStyle(color: Colors.white),
                                                 ),
                                                 onChanged: (String? newValue) {
                                                   setState(() {
-                                                    _odabranaKategorijaBicikl =
-                                                        _kategorijeBicikl
-                                                            ?.firstWhere(
-                                                                (kategorija) =>
-                                                                    kategorija[
-                                                                        'naziv'] ==
-                                                                    newValue,
-                                                                orElse: () => {
-                                                                      'naziv':
-                                                                          'N/A'
-                                                                    });
+                                                    _odabranaKategorijaBicikl = _kategorijeBicikl
+                                                        ?.firstWhere((kategorija) => kategorija['naziv'] == newValue, orElse: () => {'naziv': 'N/A'});
                                                   });
                                                 },
-                                                items: _kategorijeBicikl?.map<
-                                                            DropdownMenuItem<
-                                                                String>>(
-                                                        (kategorija) {
-                                                      return DropdownMenuItem<
-                                                          String>(
-                                                        value: kategorija[
-                                                                'naziv'] ??
-                                                            'N/A',
+                                                items: _kategorijeBicikl?.map<DropdownMenuItem<String>>((kategorija) {
+                                                      return DropdownMenuItem<String>(
+                                                        value: kategorija['naziv'] ?? 'N/A',
                                                         child: Container(
-                                                          width: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .width *
-                                                              0.3,
-                                                          height: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .height *
-                                                              0.04,
+                                                          width: MediaQuery.of(context).size.width * 0.3,
+                                                          height: MediaQuery.of(context).size.height * 0.04,
                                                           child: Center(
                                                             child: Text(
-                                                              kategorija[
-                                                                      'naziv'] ??
-                                                                  'N/A',
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .white),
+                                                              kategorija['naziv'] ?? 'N/A',
+                                                              style: TextStyle(color: Colors.white),
                                                             ),
                                                           ),
                                                         ),
@@ -1972,8 +1655,7 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                                     [],
                                                 dropdownColor: Colors.blue[700],
                                                 iconEnabledColor: Colors.white,
-                                                style: TextStyle(
-                                                    color: Colors.white),
+                                                style: TextStyle(color: Colors.white),
                                                 underline: Container(),
                                               ),
                                             ),
@@ -1983,18 +1665,15 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                     ),
                                   ),
                                   Container(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.85,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.06,
+                                    width: MediaQuery.of(context).size.width * 0.85,
+                                    height: MediaQuery.of(context).size.height * 0.06,
                                     child: Center(
                                       child: ElevatedButton(
                                         style: ElevatedButton.styleFrom(
                                           foregroundColor: Colors.lightBlue,
                                           backgroundColor: Colors.white,
                                           shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(30),
+                                            borderRadius: BorderRadius.circular(30),
                                           ),
                                         ),
                                         onPressed: () async {
@@ -2004,8 +1683,7 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                           fit: BoxFit.scaleDown,
                                           child: Text(
                                             "Sacuvaj podatke",
-                                            style: TextStyle(
-                                                color: Colors.lightBlue),
+                                            style: TextStyle(color: Colors.lightBlue),
                                           ),
                                         ),
                                       ),
@@ -2027,12 +1705,9 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                 });
                               },
                               child: Container(
-                                width: currentIndexPopUp == 0
-                                    ? MediaQuery.of(context).size.width * 0.1
-                                    : MediaQuery.of(context).size.width * 0.04,
-                                height: currentIndexPopUp == 0
-                                    ? MediaQuery.of(context).size.height * 0.012
-                                    : MediaQuery.of(context).size.height * 0.01,
+                                width: currentIndexPopUp == 0 ? MediaQuery.of(context).size.width * 0.1 : MediaQuery.of(context).size.width * 0.04,
+                                height:
+                                    currentIndexPopUp == 0 ? MediaQuery.of(context).size.height * 0.012 : MediaQuery.of(context).size.height * 0.01,
                                 margin: EdgeInsets.symmetric(horizontal: 2.0),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
@@ -2047,12 +1722,9 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                 });
                               },
                               child: Container(
-                                width: currentIndexPopUp == 1
-                                    ? MediaQuery.of(context).size.width * 0.1
-                                    : MediaQuery.of(context).size.width * 0.04,
-                                height: currentIndexPopUp == 1
-                                    ? MediaQuery.of(context).size.height * 0.012
-                                    : MediaQuery.of(context).size.height * 0.01,
+                                width: currentIndexPopUp == 1 ? MediaQuery.of(context).size.width * 0.1 : MediaQuery.of(context).size.width * 0.04,
+                                height:
+                                    currentIndexPopUp == 1 ? MediaQuery.of(context).size.height * 0.012 : MediaQuery.of(context).size.height * 0.01,
                                 margin: EdgeInsets.symmetric(horizontal: 2.0),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
@@ -2090,13 +1762,16 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
     if (statusPrijavljenog != "aktivan") {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height * 0.05),
           content: Text(
-            'Samo verifikovani korisnici mogu naruciti',
+            'Samo verifikovani korisnici mogu naručiti',
             style: TextStyle(color: Colors.white),
           ),
           backgroundColor: Color.fromARGB(255, 219, 244, 31),
         ),
       );
+
       return;
     }
 
@@ -2114,16 +1789,14 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
     }
 
     // Prvo pozovi postNarudba
-    final narudbaOdgovor = await _narudbaService.postNarudba(
-        korisnikId: korisnikId, prodavaocId: zapis?['korisnikId']);
+    final narudbaOdgovor = await _narudbaService.postNarudba(korisnikId: korisnikId, prodavaocId: zapis?['korisnikId']);
 
     if (narudbaOdgovor['narudzbaId'] != null) {
       // Uzmi narudzbaId iz odgovora
       final int narudzbaId = narudbaOdgovor['narudzbaId'];
 
       // Zatim pozovi postNarudbaBicikl s potrebnim podacima
-      final narudbaBiciklOdgovor =
-          await _narudbaBiciklService.postNarudbaBicikl(
+      final narudbaBiciklOdgovor = await _narudbaBiciklService.postNarudbaBicikl(
         narudzbaId: narudzbaId,
         biciklId: widget.biciklId,
         kolicina: odabranaKolicina,
@@ -2202,8 +1875,7 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                             children: [
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.95,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.05,
+                                height: MediaQuery.of(context).size.height * 0.05,
                                 color: Color.fromARGB(0, 13, 255, 0),
                               ),
                               Positioned(
@@ -2233,36 +1905,22 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                             child: Column(
                               children: [
                                 Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.95,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.1,
+                                  width: MediaQuery.of(context).size.width * 0.95,
+                                  height: MediaQuery.of(context).size.height * 0.1,
                                   color: const Color.fromARGB(0, 33, 149, 243),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
                                       Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.35,
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
+                                        width: MediaQuery.of(context).size.width * 0.35,
+                                        height: MediaQuery.of(context).size.height * 0.06,
                                         decoration: BoxDecoration(
                                           border: Border(
-                                            bottom: BorderSide(
-                                                color: Colors.white,
-                                                width: 2.0),
-                                            left: BorderSide(
-                                                color: Colors.white,
-                                                width: 2.0),
-                                            right: BorderSide(
-                                                color: Colors.white,
-                                                width: 2.0),
+                                            bottom: BorderSide(color: Colors.white, width: 2.0),
+                                            left: BorderSide(color: Colors.white, width: 2.0),
+                                            right: BorderSide(color: Colors.white, width: 2.0),
                                           ),
-                                          borderRadius:
-                                              BorderRadius.circular(10.0),
+                                          borderRadius: BorderRadius.circular(10.0),
                                         ),
                                         child: Center(
                                           child: TextField(
@@ -2275,46 +1933,30 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                             decoration: InputDecoration(
                                               hintText: "Upiši količinu",
                                               hintStyle: TextStyle(
-                                                color: Colors.white
-                                                    .withOpacity(0.6),
+                                                color: Colors.white.withOpacity(0.6),
                                               ),
                                               border: InputBorder.none,
-                                              contentPadding: EdgeInsets.symmetric(
-                                                  vertical:
-                                                      10), // Postavljanje paddinga
+                                              contentPadding: EdgeInsets.symmetric(vertical: 10), // Postavljanje paddinga
                                             ),
-                                            textAlign: TextAlign
-                                                .center, // Centriranje unosa korisnika
+                                            textAlign: TextAlign.center, // Centriranje unosa korisnika
                                             onChanged: (value) {
                                               setState(() {
-                                                odabranaKolicina =
-                                                    int.tryParse(value) ?? 0;
+                                                odabranaKolicina = int.tryParse(value) ?? 0;
                                               });
                                             },
                                           ),
                                         ),
                                       ),
                                       Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.35,
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
+                                        width: MediaQuery.of(context).size.width * 0.35,
+                                        height: MediaQuery.of(context).size.height * 0.06,
                                         decoration: BoxDecoration(
                                           border: Border(
-                                            bottom: BorderSide(
-                                                color: Colors.white,
-                                                width: 2.0),
-                                            left: BorderSide(
-                                                color: Colors.white,
-                                                width: 2.0),
-                                            right: BorderSide(
-                                                color: Colors.white,
-                                                width: 2.0),
+                                            bottom: BorderSide(color: Colors.white, width: 2.0),
+                                            left: BorderSide(color: Colors.white, width: 2.0),
+                                            right: BorderSide(color: Colors.white, width: 2.0),
                                           ),
-                                          borderRadius:
-                                              BorderRadius.circular(10.0),
+                                          borderRadius: BorderRadius.circular(10.0),
                                         ),
                                         child: Center(
                                           child: Text(
@@ -2330,18 +1972,13 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                   ),
                                 ),
                                 Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.35,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.06,
+                                  width: MediaQuery.of(context).size.width * 0.35,
+                                  height: MediaQuery.of(context).size.height * 0.06,
                                   decoration: BoxDecoration(
                                     border: Border(
-                                      bottom: BorderSide(
-                                          color: Colors.white, width: 2.0),
-                                      left: BorderSide(
-                                          color: Colors.white, width: 2.0),
-                                      right: BorderSide(
-                                          color: Colors.white, width: 2.0),
+                                      bottom: BorderSide(color: Colors.white, width: 2.0),
+                                      left: BorderSide(color: Colors.white, width: 2.0),
+                                      right: BorderSide(color: Colors.white, width: 2.0),
                                     ),
                                     borderRadius: BorderRadius.circular(10.0),
                                   ),
@@ -2489,19 +2126,16 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
       if (listaIdova.isNotEmpty) {
         for (int i = 0; i < listaSlik.length; i++) {
           if (i < listaIdova.length) {
-            await _biciklSlikeService.putSlikeBicikl(
-                listaSlik[i], widget.biciklId, int.parse(listaIdova[i]));
+            await _biciklSlikeService.putSlikeBicikl(listaSlik[i], widget.biciklId, int.parse(listaIdova[i]));
           } else {
             break;
           }
         }
         if (listaSlik.length > listaIdova.length) {
-          await _biciklSlikeService.postSlikeBicikli(
-              listaSlik.sublist(listaIdova.length), widget.biciklId);
+          await _biciklSlikeService.postSlikeBicikli(listaSlik.sublist(listaIdova.length), widget.biciklId);
         } else if (listaIdova.length > listaSlik.length) {
           for (int i = listaSlik.length; i < listaIdova.length; i++) {
-            await _biciklSlikeService
-                .obrisiSlikuBicikl(int.parse(listaIdova[i]));
+            await _biciklSlikeService.obrisiSlikuBicikl(int.parse(listaIdova[i]));
           }
         }
       } else {

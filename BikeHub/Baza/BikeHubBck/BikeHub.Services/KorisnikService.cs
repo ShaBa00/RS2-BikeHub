@@ -80,9 +80,9 @@ namespace BikeHub.Services
         {
             var result = Context.Set<Database.Korisnik>()
                 .Include(b => b.KorisnikInfos)
-                .Include(b => b.Bicikls)//.Where(b=>b.Status== "aktivan")
-                .Include(b => b.Dijelovis)//.Where(b => b.Status == "aktivan")
-                .Include(b => b.Servisers)//.Where(b => b.Status == "aktivan")
+                .Include(b => b.Bicikls)
+                .Include(b => b.Dijelovis)
+                .Include(b => b.Servisers)
                 .Include(b => b.RezervacijaServisas)
                 .FirstOrDefault(b => b.KorisnikId == id);
 
@@ -99,7 +99,7 @@ namespace BikeHub.Services
             int brojRezervacija = result.RezervacijaServisas.Where(b=>b.KorisnikId==id).ToList().Count;
 
             var serviserStatus = result.Servisers.FirstOrDefault(s => s.KorisnikId == id);
-            // Provjera da li je korisnik serviser
+            
             string jeServiser = serviserStatus?.Status ?? null;
             var mappedKorisnik = Mapper.Map<Model.KorisnikFM.Korisnik>(result);
             mappedKorisnik.BrojRezervacija = brojRezervacija;
@@ -308,13 +308,10 @@ namespace BikeHub.Services
                 var state = _basePrvaGrupaState.CreateState("kreiran");
                 var noviRequest = Mapper.Map<KorisniciInsertRHS>(entity);
                 state.Insert(noviRequest);
-
-                // Vraća uspješnu poruku
                 return new OkObjectResult(new { message = "Novi admin je uspješno dodan." });
             }
             catch (UserException ex)
             {
-                // Vraća grešku s porukom korisnika
                 return new BadRequestObjectResult(new
                 {
                     errors = new
@@ -325,7 +322,6 @@ namespace BikeHub.Services
             }
             catch (Exception ex)
             {
-                // Vraća neočekivanu grešku
                 return new ObjectResult(new
                 {
                     errors = new

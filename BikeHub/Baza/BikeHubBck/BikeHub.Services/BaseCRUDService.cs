@@ -99,6 +99,5 @@ namespace BikeHub.Services
 
             Context.SaveChanges();
         }
-        //public virtual void BeforeSoftDelete(TModel request, TDbEntity r) { }
     }
 }

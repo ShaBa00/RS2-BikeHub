@@ -511,6 +511,16 @@ class _SignUpProzorState extends State<SignUpProzor> with SingleTickerProviderSt
     );
   }
 
+  bool isValidEmail(String email) {
+    final regex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    return regex.hasMatch(email);
+  }
+
+  bool isValidImePrezime(String imePrezime) {
+    final regex = RegExp(r'^[a-zA-Z]+( [a-zA-Z]+)+$');
+    return regex.hasMatch(imePrezime);
+  }
+
   signUp() async {
     if (username.isEmpty) {
       PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati Username");
@@ -547,6 +557,13 @@ class _SignUpProzorState extends State<SignUpProzor> with SingleTickerProviderSt
       });
       return;
     }
+    if (!isValidEmail(email)) {
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Email je u pogresnom formatu");
+      setState(() {
+        currentCardIndex = 0;
+      });
+      return;
+    }
     bool korisnikU = await korisnikService.ceckKorisnikUsername(username: username);
     if (korisnikU) {
       PorukaHelper.prikaziPorukuUpozorenja(context, "Username je zauzet");
@@ -565,6 +582,13 @@ class _SignUpProzorState extends State<SignUpProzor> with SingleTickerProviderSt
     }
     if (imePrezime.isEmpty) {
       PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati ime i prezime");
+      setState(() {
+        currentCardIndex = 1;
+      });
+      return;
+    }
+    if (!isValidImePrezime(imePrezime)) {
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Ime Prezime je u pogresnom formatu");
       setState(() {
         currentCardIndex = 1;
       });

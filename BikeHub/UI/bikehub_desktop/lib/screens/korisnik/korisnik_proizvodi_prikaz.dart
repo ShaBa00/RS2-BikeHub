@@ -1,5 +1,6 @@
 import 'package:bikehub_desktop/screens/bicikli/bicikl_prikaz.dart';
 import 'package:bikehub_desktop/screens/dijelovi/dijelovi_prikaz.dart';
+import 'package:bikehub_desktop/screens/ostalo/confirm_prozor.dart';
 import 'package:bikehub_desktop/services/bicikli/bicikl_service.dart';
 import 'package:bikehub_desktop/services/dijelovi/dijelovi_service.dart';
 import 'package:bikehub_desktop/services/korisnik/korisnik_service.dart';
@@ -250,6 +251,10 @@ class _KorisnikProizvodiPrikazState extends State<KorisnikProizvodiPrikaz> {
   }
 
   void _removeBicikl(int biciklId) async {
+    bool? confirmed = await ConfirmProzor.prikaziConfirmProzor(context, 'Da li ste sigurni da želite obrisati ovaj bicikl?');
+    if (confirmed != true) {
+      return;
+    }
     await BiciklService().removeBicikl(biciklId);
     setState(() {
       _proizvodi = _fetchProizvodi();
@@ -257,6 +262,10 @@ class _KorisnikProizvodiPrikazState extends State<KorisnikProizvodiPrikaz> {
   }
 
   void _removeDio(int dijeloviId) async {
+    bool? confirmed = await ConfirmProzor.prikaziConfirmProzor(context, 'Da li ste sigurni da želite obrisati ovaj dio?');
+    if (confirmed != true) {
+      return;
+    }
     await DijeloviService().removeDijelovi(dijeloviId);
     setState(() {
       _proizvodi = _fetchProizvodi();

@@ -106,4 +106,22 @@ class PromocijaBicikliService {
       throw e;
     }
   }
+
+  Future<Map<String, dynamic>> getIzvjestajPromocije() async {
+    try {
+      await _addAuthorizationHeader();
+
+      final response = await _dio.get('${HelperService.baseUrl}/PromocijaBicikli/izvjestaj-promocija');
+
+      if (response.statusCode == 200) {
+        return response.data;
+      } else {
+        throw Exception("Failed to load Izvjestaj Promocija");
+      }
+    } catch (e) {
+      logger.e('Greška: $e');
+      // ignore: use_rethrow_when_possible
+      throw e;
+    }
+  }
 }

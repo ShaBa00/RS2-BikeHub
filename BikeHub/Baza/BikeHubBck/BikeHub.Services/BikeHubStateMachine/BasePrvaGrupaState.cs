@@ -48,10 +48,6 @@ namespace BikeHub.Services.BikeHubStateMachine
         {
             throw new UserException("Method not allowed");
         }
-        //public virtual List<string> AllowedActions(TDbEntity entity)
-        //{
-        //    throw new Exception("Metoda nije dozvoljena");
-        //}
         public BasePrvaGrupaState<TModel, TDbEntity , TInsert, TUpdate> CreateState(string stateName)
         {
             switch (stateName)

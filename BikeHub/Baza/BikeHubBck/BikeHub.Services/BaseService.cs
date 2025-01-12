@@ -22,9 +22,9 @@ namespace BikeHub.Services
 
         public PagedResult<TModel> GetPaged(TSearch search)
         {
-            List<TModel> result = new List<TModel>(); //Genericka Lista, tako da, koji kod Model da dobijemo napravit cemu listu za nejeg
+            List<TModel> result = new List<TModel>(); 
             
-            var quary = Context.Set<TDbEntity>().AsQueryable(); // Genericki quary koji pravimo na odnosu clase TDbEntity koja nam je potrebna
+            var quary = Context.Set<TDbEntity>().AsQueryable(); 
 
             quary = AddFilter(search, quary);
 
@@ -43,10 +43,6 @@ namespace BikeHub.Services
             pagedResult.Count = count;
             return pagedResult;
         }
-
-        // Funkcija AddFilter je upravo ona funkcija u kojoj cemo kreirati kod koji nije zajednicki za sve modele,
-        // ali da ne bi napravili neku gresku osigurat cemo se da on po defoltu ne radi nista tako sto ce vracati,
-        // onaj query koji je dobio 
         public virtual IQueryable<TDbEntity> AddFilter(TSearch search, IQueryable<TDbEntity> query)
         {
             return query;

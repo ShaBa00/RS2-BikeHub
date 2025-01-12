@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:bikehub_desktop/screens/bicikli/bicikl_prikaz.dart';
+import 'package:bikehub_desktop/screens/ostalo/confirm_prozor.dart';
 import 'package:bikehub_desktop/screens/ostalo/poruka_helper.dart';
 import 'package:bikehub_desktop/screens/pocetni_prozor.dart';
 import 'package:bikehub_desktop/services/dijelovi/dijelovi_service.dart';
@@ -595,6 +596,10 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
   }
 
   obrisiDio() async {
+    bool? confirmed = await ConfirmProzor.prikaziConfirmProzor(context, 'Da li ste sigurni da želite obrisati ovaj dio?');
+    if (confirmed != true) {
+      return;
+    }
     var rezultat = await dijeloviService.deleteDijelovi(widget.dioId);
     if (rezultat != null) {
       PorukaHelper.prikaziPorukuUspjeha(context, "Uspjesno obrisan zapis");

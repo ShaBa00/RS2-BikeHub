@@ -1,6 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api, prefer_const_constructors, prefer_const_literals_to_create_immutables, unused_field, prefer_final_fields, unused_element, no_leading_underscores_for_local_identifiers, avoid_print, unnecessary_const, use_build_context_synchronously, sort_child_properties_last
 
 import 'package:bikehub_mobile/screens/administracija/image_carousel.dart';
+import 'package:bikehub_mobile/screens/ostalo/confirm_prozor.dart';
 import 'package:bikehub_mobile/screens/ostalo/poruka_helper.dart';
 import 'package:bikehub_mobile/servisi/bicikli/bicikl_service.dart';
 import 'package:bikehub_mobile/servisi/dijelovi/dijelovi_service.dart';
@@ -16,8 +17,7 @@ class AdministracijaPage extends StatefulWidget {
   _AdministracijaPageState createState() => _AdministracijaPageState();
 }
 
-class _AdministracijaPageState extends State<AdministracijaPage>
-    with SingleTickerProviderStateMixin {
+class _AdministracijaPageState extends State<AdministracijaPage> with SingleTickerProviderStateMixin {
   String activeTitle = 'home';
   bool _isLoading = true;
   String _username = "";
@@ -79,8 +79,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
     _fetchPodatci();
     _controller = AnimationController(
       duration: const Duration(milliseconds: 300),
-      reverseDuration:
-          const Duration(milliseconds: 300), // Dodana reverseDuration
+      reverseDuration: const Duration(milliseconds: 300), // Dodana reverseDuration
       vsync: this,
     );
     _offsetAnimation = Tween<Offset>(
@@ -146,9 +145,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
         setState(() {
           _currentPageKorisnik = 0;
           _selectedStatus = status;
-          _prikazaniKorisnici = _listaKorisnika
-              .where((korisnik) => korisnik['status'] == _status)
-              .toList();
+          _prikazaniKorisnici = _listaKorisnika.where((korisnik) => korisnik['status'] == _status).toList();
           _brojPrikazanihKorisnika = _prikazaniKorisnici.length;
         });
         break;
@@ -156,9 +153,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
         setState(() {
           _currentPageServiseri = 0;
           _selectedStatusServiseri = status;
-          _prikazaniServiseri = _listaServisera
-              .where((serviser) => serviser['status'] == _status)
-              .toList();
+          _prikazaniServiseri = _listaServisera.where((serviser) => serviser['status'] == _status).toList();
           _brojPrikazanihServiseri = _prikazaniServiseri.length;
         });
         break;
@@ -166,9 +161,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
         setState(() {
           _currentPageBicikli = 0;
           _selectedStatusBicikli = status;
-          _prikazaniBicikli = _listaBicikala
-              .where((bicikl) => bicikl['status'] == _status)
-              .toList();
+          _prikazaniBicikli = _listaBicikala.where((bicikl) => bicikl['status'] == _status).toList();
           _brojPrikazanihBicikli = _prikazaniBicikli.length;
         });
         break;
@@ -176,9 +169,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
         setState(() {
           _currentPageDijelovi = 0;
           _selectedStatusDijelovi = status;
-          _prikazaniDijelovi = _listaDijelova
-              .where((dijelovi) => dijelovi['status'] == _status)
-              .toList();
+          _prikazaniDijelovi = _listaDijelova.where((dijelovi) => dijelovi['status'] == _status).toList();
           _brojPrikazanihDijelovi = _prikazaniDijelovi.length;
         });
         break;
@@ -326,14 +317,12 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                 Container(
                   height: MediaQuery.of(context).size.height * 0.1,
                   width: MediaQuery.of(context).size.width * 0.5,
-                  color: const Color.fromARGB(
-                      0, 33, 149, 243), // Bilo koja pozadina za prvi dio
+                  color: const Color.fromARGB(0, 33, 149, 243), // Bilo koja pozadina za prvi dio
                   child: Center(
                     child: Text(
                       _username,
                       style: TextStyle(
-                        color: Color.fromARGB(
-                            255, 255, 255, 255), // Plava boja teksta
+                        color: Color.fromARGB(255, 255, 255, 255), // Plava boja teksta
                         fontSize: 18.0,
                       ),
                     ),
@@ -342,8 +331,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                 Container(
                   height: MediaQuery.of(context).size.height * 0.1,
                   width: MediaQuery.of(context).size.width * 0.5,
-                  color: const Color.fromARGB(
-                      0, 76, 175, 79), // Bilo koja pozadina za drugi dio
+                  color: const Color.fromARGB(0, 76, 175, 79), // Bilo koja pozadina za drugi dio
                   child: Center(
                     child: ElevatedButton(
                       onPressed: () {
@@ -366,9 +354,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
               ],
             ),
           ),
-          showNewContainer
-              ? adminNewContainer(context)
-              : adminListContainer(context),
+          showNewContainer ? adminNewContainer(context) : adminListContainer(context),
         ],
       ),
     );
@@ -379,19 +365,14 @@ class _AdministracijaPageState extends State<AdministracijaPage>
     int endIndex = startIndex + _pageSizeAdministrator;
     List currentAdmini = _listaAdministratora.sublist(
       startIndex,
-      endIndex > _listaAdministratora.length
-          ? _listaAdministratora.length
-          : endIndex,
+      endIndex > _listaAdministratora.length ? _listaAdministratora.length : endIndex,
     );
     return Container(
       height: MediaQuery.of(context).size.height * 0.657,
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            Color.fromARGB(255, 205, 238, 239),
-            Color.fromARGB(255, 165, 196, 210)
-          ],
+          colors: [Color.fromARGB(255, 205, 238, 239), Color.fromARGB(255, 165, 196, 210)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -405,8 +386,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
           Container(
             height: MediaQuery.of(context).size.height * 0.59,
             width: MediaQuery.of(context).size.width,
-            color:
-                const Color.fromARGB(0, 244, 67, 54), // Pozadina prvog dijela
+            color: const Color.fromARGB(0, 244, 67, 54), // Pozadina prvog dijela
             child: ListView.builder(
               itemCount: currentAdmini.length,
               itemBuilder: (context, index) {
@@ -421,8 +401,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                     print('Kliknut red broj $index');
                   },
                   child: Padding(
-                    padding: EdgeInsets.only(
-                        top: index == 0 ? 25.0 : 8.0, bottom: 8.0),
+                    padding: EdgeInsets.only(top: index == 0 ? 25.0 : 8.0, bottom: 8.0),
                     child: Align(
                       alignment: Alignment.center,
                       child: Container(
@@ -438,8 +417,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                             Container(
                               height: MediaQuery.of(context).size.height * 0.05,
                               width: MediaQuery.of(context).size.width * 0.15,
-                              color: const Color.fromARGB(
-                                  0, 244, 67, 54), // Promijeni boju po želji
+                              color: const Color.fromARGB(0, 244, 67, 54), // Promijeni boju po želji
                               child: Center(
                                 child: Icon(
                                   Icons.person,
@@ -450,8 +428,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                             Container(
                               height: MediaQuery.of(context).size.height * 0.05,
                               width: MediaQuery.of(context).size.width * 0.65,
-                              color: const Color.fromARGB(
-                                  0, 76, 175, 79), // Promijeni boju po želji
+                              color: const Color.fromARGB(0, 76, 175, 79), // Promijeni boju po želji
                               child: Center(
                                 child: Text(
                                   korisnik['username'],
@@ -465,11 +442,9 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                             Container(
                               height: MediaQuery.of(context).size.height * 0.05,
                               width: MediaQuery.of(context).size.width * 0.15,
-                              color: const Color.fromARGB(
-                                  0, 33, 149, 243), // Promijeni boju po želji
+                              color: const Color.fromARGB(0, 33, 149, 243), // Promijeni boju po želji
                               child: Center(
-                                child: _buildInfoButton(
-                                    korisnik['korisnikId'], "korisniciP"),
+                                child: _buildInfoButton(korisnik['korisnikId'], "korisniciP"),
                               ),
                             ),
                           ],
@@ -484,8 +459,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
           Container(
             height: MediaQuery.of(context).size.height * 0.06,
             width: MediaQuery.of(context).size.width,
-            color:
-                const Color.fromARGB(0, 76, 175, 79), // Pozadina drugog dijela
+            color: const Color.fromARGB(0, 76, 175, 79), // Pozadina drugog dijela
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -529,10 +503,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            Color.fromARGB(255, 251, 251, 251),
-            Color.fromARGB(255, 128, 255, 253)
-          ],
+          colors: [Color.fromARGB(255, 251, 251, 251), Color.fromARGB(255, 128, 255, 253)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -547,15 +518,11 @@ class _AdministracijaPageState extends State<AdministracijaPage>
           width: MediaQuery.of(context).size.width * 0.9,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                Color.fromARGB(255, 110, 255, 253),
-                Color.fromARGB(255, 255, 255, 255)
-              ],
+              colors: [Color.fromARGB(255, 110, 255, 253), Color.fromARGB(255, 255, 255, 255)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius:
-                BorderRadius.all(Radius.circular(10.0)), // Zaobljene ivice
+            borderRadius: BorderRadius.all(Radius.circular(10.0)), // Zaobljene ivice
           ),
           child: Column(
             children: [
@@ -595,8 +562,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
               Container(
                 height: MediaQuery.of(context).size.height * 0.06,
                 width: MediaQuery.of(context).size.width * 0.9,
-                color:
-                    const Color.fromARGB(0, 96, 125, 139), // Bilo koja pozadina
+                color: const Color.fromARGB(0, 96, 125, 139), // Bilo koja pozadina
                 child: Center(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -612,13 +578,11 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                           style: TextStyle(
                             fontWeight: FontWeight.bold, // Boldiraj tekst
                             fontSize: 18.0, // Povećaj font teksta
-                            color: Color.fromARGB(
-                                255, 255, 255, 255), // Plava boja teksta
+                            color: Color.fromARGB(255, 255, 255, 255), // Plava boja teksta
                           ),
                         ),
                         style: TextButton.styleFrom(
-                          backgroundColor: Color.fromARGB(
-                              255, 87, 202, 255), // Bijela boja dugmeta
+                          backgroundColor: Color.fromARGB(255, 87, 202, 255), // Bijela boja dugmeta
                         ),
                       ),
                       SizedBox(width: 10), // Razmak između dugmadi
@@ -631,13 +595,11 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                           style: TextStyle(
                             fontWeight: FontWeight.bold, // Boldiraj tekst
                             fontSize: 18.0, // Povećaj font teksta
-                            color: Color.fromARGB(
-                                255, 255, 255, 255), // Plava boja teksta
+                            color: Color.fromARGB(255, 255, 255, 255), // Plava boja teksta
                           ),
                         ),
                         style: TextButton.styleFrom(
-                          backgroundColor: Color.fromARGB(
-                              255, 87, 202, 255), // Bijela boja dugmeta
+                          backgroundColor: Color.fromARGB(255, 87, 202, 255), // Bijela boja dugmeta
                         ),
                       ),
                     ],
@@ -688,9 +650,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
             obscureText: isPassword,
             decoration: InputDecoration(
               border: InputBorder.none,
-              hintText: title == "Lozinka" || title == "Potvrda lozinke"
-                  ? "Unesite $title"
-                  : null,
+              hintText: title == "Lozinka" || title == "Potvrda lozinke" ? "Unesite $title" : null,
               hintStyle: TextStyle(color: Colors.grey[500], fontSize: 12),
             ),
             style: const TextStyle(fontSize: 14),
@@ -703,23 +663,19 @@ class _AdministracijaPageState extends State<AdministracijaPage>
 
   void dodajAdministratora() async {
     if (_usernameController.text.isEmpty) {
-      PorukaHelper.prikaziPorukuUpozorenja(
-          context, "Potrebno je dodati username");
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati username");
       return;
     }
     if (_lozinkaController.text.isEmpty) {
-      PorukaHelper.prikaziPorukuUpozorenja(
-          context, "Potrebno je dodati lozinku");
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati lozinku");
       return;
     }
     if (_lozinkaPotvrdaController.text.isEmpty) {
-      PorukaHelper.prikaziPorukuUpozorenja(
-          context, "Potrebno je dodati potvrdenu lozinku");
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati potvrdenu lozinku");
       return;
     }
     if (_lozinkaController.text != _lozinkaPotvrdaController.text) {
-      PorukaHelper.prikaziPorukuUpozorenja(
-          context, "Lozinka i potvrdena lozinka moraju biti iste");
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Lozinka i potvrdena lozinka moraju biti iste");
       return;
     }
     if (_emailController.text.isEmpty) {
@@ -747,10 +703,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
           showNewContainer = false;
         });
       } else {
-        PorukaHelper.prikaziPorukuUpozorenja(
-            context,
-            responseMessage ??
-                "Došlo je do greške prilikom dodavanja administratora");
+        PorukaHelper.prikaziPorukuUpozorenja(context, responseMessage ?? "Došlo je do greške prilikom dodavanja administratora");
       }
     } catch (e) {
       PorukaHelper.prikaziPorukuUpozorenja(context, "Došlo je do greške: $e");
@@ -762,9 +715,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
     int endIndex = startIndex + _pageSizeKorisnik;
     List currentKorisnik = _prikazaniKorisnici.sublist(
       startIndex,
-      endIndex > _prikazaniKorisnici.length
-          ? _prikazaniKorisnici.length
-          : endIndex,
+      endIndex > _prikazaniKorisnici.length ? _prikazaniKorisnici.length : endIndex,
     );
     return Container(
       height: MediaQuery.of(context).size.height * 0.757,
@@ -781,17 +732,11 @@ class _AdministracijaPageState extends State<AdministracijaPage>
               children: [
                 Text(
                   _selectedStatus, // Pretpostavljam da je ovo String varijabla
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 255, 255, 255)),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 255, 255, 255)),
                 ),
                 Text(
                   'Korisnici',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 255, 255, 255)),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 255, 255, 255)),
                 ),
                 _buildButton("Postavi status", 1),
               ],
@@ -821,8 +766,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                     Container(
                       height: MediaQuery.of(context).size.height * 0.617,
                       width: MediaQuery.of(context).size.width,
-                      color: const Color.fromARGB(
-                          0, 244, 67, 54), // Pozadina prvog dijela
+                      color: const Color.fromARGB(0, 244, 67, 54), // Pozadina prvog dijela
                       child: ListView.builder(
                         itemCount: currentKorisnik.length,
                         itemBuilder: (context, index) {
@@ -837,15 +781,12 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                               print('Kliknut red broj $index');
                             },
                             child: Padding(
-                              padding: EdgeInsets.only(
-                                  top: index == 0 ? 25.0 : 8.0, bottom: 8.0),
+                              padding: EdgeInsets.only(top: index == 0 ? 25.0 : 8.0, bottom: 8.0),
                               child: Align(
                                 alignment: Alignment.center,
                                 child: Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.95,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.05,
+                                  width: MediaQuery.of(context).size.width * 0.95,
+                                  height: MediaQuery.of(context).size.height * 0.05,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(20.0),
@@ -854,14 +795,9 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.05,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.15,
-                                        color: const Color.fromARGB(0, 244, 67,
-                                            54), // Promijeni boju po želji
+                                        height: MediaQuery.of(context).size.height * 0.05,
+                                        width: MediaQuery.of(context).size.width * 0.15,
+                                        color: const Color.fromARGB(0, 244, 67, 54), // Promijeni boju po želji
                                         child: Center(
                                           child: Icon(
                                             Icons.person,
@@ -870,14 +806,9 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                         ),
                                       ),
                                       Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.05,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.65,
-                                        color: const Color.fromARGB(0, 76, 175,
-                                            79), // Promijeni boju po želji
+                                        height: MediaQuery.of(context).size.height * 0.05,
+                                        width: MediaQuery.of(context).size.width * 0.65,
+                                        color: const Color.fromARGB(0, 76, 175, 79), // Promijeni boju po želji
                                         child: Center(
                                           child: Text(
                                             korisnik['username'],
@@ -889,18 +820,11 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                         ),
                                       ),
                                       Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.05,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.15,
-                                        color: const Color.fromARGB(0, 33, 149,
-                                            243), // Promijeni boju po želji
+                                        height: MediaQuery.of(context).size.height * 0.05,
+                                        width: MediaQuery.of(context).size.width * 0.15,
+                                        color: const Color.fromARGB(0, 33, 149, 243), // Promijeni boju po želji
                                         child: Center(
-                                          child: _buildInfoButton(
-                                              korisnik['korisnikId'],
-                                              "korisniciP"),
+                                          child: _buildInfoButton(korisnik['korisnikId'], "korisniciP"),
                                         ),
                                       ),
                                     ],
@@ -915,8 +839,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                     Container(
                       height: MediaQuery.of(context).size.height * 0.06,
                       width: MediaQuery.of(context).size.width,
-                      color: const Color.fromARGB(
-                          0, 76, 175, 79), // Pozadina drugog dijela
+                      color: const Color.fromARGB(0, 76, 175, 79), // Pozadina drugog dijela
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -1008,9 +931,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
     int endIndex = startIndex + _pageSizeServiseri;
     List currentServiseri = _prikazaniServiseri.sublist(
       startIndex,
-      endIndex > _prikazaniServiseri.length
-          ? _prikazaniServiseri.length
-          : endIndex,
+      endIndex > _prikazaniServiseri.length ? _prikazaniServiseri.length : endIndex,
     );
     return Container(
       height: MediaQuery.of(context).size.height * 0.757,
@@ -1027,17 +948,11 @@ class _AdministracijaPageState extends State<AdministracijaPage>
               children: [
                 Text(
                   _selectedStatusServiseri, // Pretpostavljam da je ovo String varijabla
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 255, 255, 255)),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 255, 255, 255)),
                 ),
                 Text(
                   'Serviseri',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 255, 255, 255)),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 255, 255, 255)),
                 ),
                 _buildButton("Postavi status", 2),
               ],
@@ -1067,8 +982,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                     Container(
                       height: MediaQuery.of(context).size.height * 0.617,
                       width: MediaQuery.of(context).size.width,
-                      color: const Color.fromARGB(
-                          0, 244, 67, 54), // Pozadina prvog dijela
+                      color: const Color.fromARGB(0, 244, 67, 54), // Pozadina prvog dijela
                       child: ListView.builder(
                         itemCount: currentServiseri.length,
                         itemBuilder: (context, index) {
@@ -1083,15 +997,12 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                               print('Kliknut red broj $index');
                             },
                             child: Padding(
-                              padding: EdgeInsets.only(
-                                  top: index == 0 ? 25.0 : 8.0, bottom: 8.0),
+                              padding: EdgeInsets.only(top: index == 0 ? 25.0 : 8.0, bottom: 8.0),
                               child: Align(
                                 alignment: Alignment.center,
                                 child: Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.95,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.05,
+                                  width: MediaQuery.of(context).size.width * 0.95,
+                                  height: MediaQuery.of(context).size.height * 0.05,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(20.0),
@@ -1100,14 +1011,9 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.05,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.15,
-                                        color: const Color.fromARGB(0, 244, 67,
-                                            54), // Promijeni boju po želji
+                                        height: MediaQuery.of(context).size.height * 0.05,
+                                        width: MediaQuery.of(context).size.width * 0.15,
+                                        color: const Color.fromARGB(0, 244, 67, 54), // Promijeni boju po želji
                                         child: Center(
                                           child: Icon(
                                             Icons.person,
@@ -1116,14 +1022,9 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                         ),
                                       ),
                                       Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.05,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.65,
-                                        color: const Color.fromARGB(0, 76, 175,
-                                            79), // Promijeni boju po želji
+                                        height: MediaQuery.of(context).size.height * 0.05,
+                                        width: MediaQuery.of(context).size.width * 0.65,
+                                        color: const Color.fromARGB(0, 76, 175, 79), // Promijeni boju po želji
                                         child: Center(
                                           child: Text(
                                             serviser['username'],
@@ -1135,18 +1036,11 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                         ),
                                       ),
                                       Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.05,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.15,
-                                        color: const Color.fromARGB(0, 33, 149,
-                                            243), // Promijeni boju po želji
+                                        height: MediaQuery.of(context).size.height * 0.05,
+                                        width: MediaQuery.of(context).size.width * 0.15,
+                                        color: const Color.fromARGB(0, 33, 149, 243), // Promijeni boju po želji
                                         child: Center(
-                                          child: _buildInfoButton(
-                                              serviser['serviserId'],
-                                              "serviseriP"),
+                                          child: _buildInfoButton(serviser['serviserId'], "serviseriP"),
                                         ),
                                       ),
                                     ],
@@ -1161,8 +1055,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                     Container(
                       height: MediaQuery.of(context).size.height * 0.06,
                       width: MediaQuery.of(context).size.width,
-                      color: const Color.fromARGB(
-                          0, 76, 175, 79), // Pozadina drugog dijela
+                      color: const Color.fromARGB(0, 76, 175, 79), // Pozadina drugog dijela
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -1274,8 +1167,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
             child: Container(
               height: MediaQuery.of(context).size.height * 0.17,
               width: MediaQuery.of(context).size.width * 0.8,
-              margin:
-                  EdgeInsets.only(bottom: 10.0), // Odvoji kontejnere vertikalno
+              margin: EdgeInsets.only(bottom: 10.0), // Odvoji kontejnere vertikalno
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [
@@ -1293,8 +1185,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                     height: MediaQuery.of(context).size.height * 0.085,
                     width: MediaQuery.of(context).size.width * 0.8,
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(
-                          0, 33, 149, 243), // Promijenite boju po potrebi
+                      color: const Color.fromARGB(0, 33, 149, 243), // Promijenite boju po potrebi
                     ),
                     child: Center(
                       child: Container(
@@ -1302,8 +1193,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                         width: MediaQuery.of(context).size.width * 0.5,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius:
-                              BorderRadius.circular(15.0), // Zaobljene ivice
+                          borderRadius: BorderRadius.circular(15.0), // Zaobljene ivice
                         ),
                         child: Center(
                           child: Text(
@@ -1318,8 +1208,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                     height: MediaQuery.of(context).size.height * 0.085,
                     width: MediaQuery.of(context).size.width * 0.8,
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(
-                          0, 76, 175, 79), // Promijenite boju po potrebi
+                      color: const Color.fromARGB(0, 76, 175, 79), // Promijenite boju po potrebi
                     ),
                     child: Center(
                       child: Row(
@@ -1350,8 +1239,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
             child: Container(
               height: MediaQuery.of(context).size.height * 0.17,
               width: MediaQuery.of(context).size.width * 0.8,
-              margin:
-                  EdgeInsets.only(bottom: 10.0), // Odvoji kontejnere vertikalno
+              margin: EdgeInsets.only(bottom: 10.0), // Odvoji kontejnere vertikalno
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [
@@ -1369,8 +1257,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                     height: MediaQuery.of(context).size.height * 0.085,
                     width: MediaQuery.of(context).size.width * 0.8,
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(
-                          0, 33, 149, 243), // Promijenite boju po potrebi
+                      color: const Color.fromARGB(0, 33, 149, 243), // Promijenite boju po potrebi
                     ),
                     child: Center(
                       child: Container(
@@ -1378,8 +1265,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                         width: MediaQuery.of(context).size.width * 0.5,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius:
-                              BorderRadius.circular(15.0), // Zaobljene ivice
+                          borderRadius: BorderRadius.circular(15.0), // Zaobljene ivice
                         ),
                         child: Center(
                           child: Text(
@@ -1394,8 +1280,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                     height: MediaQuery.of(context).size.height * 0.085,
                     width: MediaQuery.of(context).size.width * 0.8,
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(
-                          0, 76, 175, 79), // Promijenite boju po potrebi
+                      color: const Color.fromARGB(0, 76, 175, 79), // Promijenite boju po potrebi
                     ),
                     child: Center(
                       child: Row(
@@ -1426,8 +1311,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
             child: Container(
               height: MediaQuery.of(context).size.height * 0.17,
               width: MediaQuery.of(context).size.width * 0.8,
-              margin:
-                  EdgeInsets.only(bottom: 10.0), // Odvoji kontejnere vertikalno
+              margin: EdgeInsets.only(bottom: 10.0), // Odvoji kontejnere vertikalno
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [
@@ -1445,8 +1329,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                     height: MediaQuery.of(context).size.height * 0.085,
                     width: MediaQuery.of(context).size.width * 0.8,
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(
-                          0, 33, 149, 243), // Promijenite boju po potrebi
+                      color: const Color.fromARGB(0, 33, 149, 243), // Promijenite boju po potrebi
                     ),
                     child: Center(
                       child: Container(
@@ -1454,8 +1337,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                         width: MediaQuery.of(context).size.width * 0.5,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius:
-                              BorderRadius.circular(15.0), // Zaobljene ivice
+                          borderRadius: BorderRadius.circular(15.0), // Zaobljene ivice
                         ),
                         child: Center(
                           child: Text(
@@ -1470,8 +1352,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                     height: MediaQuery.of(context).size.height * 0.085,
                     width: MediaQuery.of(context).size.width * 0.8,
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(
-                          0, 76, 175, 79), // Promijenite boju po potrebi
+                      color: const Color.fromARGB(0, 76, 175, 79), // Promijenite boju po potrebi
                     ),
                     child: Center(
                       child: Row(
@@ -1502,8 +1383,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
             child: Container(
               height: MediaQuery.of(context).size.height * 0.17,
               width: MediaQuery.of(context).size.width * 0.8,
-              margin:
-                  EdgeInsets.only(bottom: 10.0), // Odvoji kontejnere vertikalno
+              margin: EdgeInsets.only(bottom: 10.0), // Odvoji kontejnere vertikalno
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [
@@ -1521,8 +1401,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                     height: MediaQuery.of(context).size.height * 0.085,
                     width: MediaQuery.of(context).size.width * 0.8,
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(
-                          0, 33, 149, 243), // Promijenite boju po potrebi
+                      color: const Color.fromARGB(0, 33, 149, 243), // Promijenite boju po potrebi
                     ),
                     child: Center(
                       child: Container(
@@ -1530,8 +1409,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                         width: MediaQuery.of(context).size.width * 0.5,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius:
-                              BorderRadius.circular(15.0), // Zaobljene ivice
+                          borderRadius: BorderRadius.circular(15.0), // Zaobljene ivice
                         ),
                         child: Center(
                           child: Text(
@@ -1546,8 +1424,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                     height: MediaQuery.of(context).size.height * 0.085,
                     width: MediaQuery.of(context).size.width * 0.8,
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(
-                          0, 76, 175, 79), // Promijenite boju po potrebi
+                      color: const Color.fromARGB(0, 76, 175, 79), // Promijenite boju po potrebi
                     ),
                     child: Center(
                       child: Row(
@@ -1597,17 +1474,11 @@ class _AdministracijaPageState extends State<AdministracijaPage>
               children: [
                 Text(
                   _selectedStatusBicikli, // Pretpostavljam da je ovo String varijabla
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 255, 255, 255)),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 255, 255, 255)),
                 ),
                 Text(
                   'Bicikli',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 255, 255, 255)),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 255, 255, 255)),
                 ),
                 _buildButton("Postavi status", 3),
               ],
@@ -1637,8 +1508,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                     Container(
                       height: MediaQuery.of(context).size.height * 0.617,
                       width: MediaQuery.of(context).size.width,
-                      color: const Color.fromARGB(
-                          0, 244, 67, 54), // Pozadina prvog dijela
+                      color: const Color.fromARGB(0, 244, 67, 54), // Pozadina prvog dijela
                       child: ListView.builder(
                         itemCount: currentBicikli.length,
                         itemBuilder: (context, index) {
@@ -1653,15 +1523,12 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                               print('Kliknut red broj $index');
                             },
                             child: Padding(
-                              padding: EdgeInsets.only(
-                                  top: index == 0 ? 25.0 : 8.0, bottom: 8.0),
+                              padding: EdgeInsets.only(top: index == 0 ? 25.0 : 8.0, bottom: 8.0),
                               child: Align(
                                 alignment: Alignment.center,
                                 child: Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.95,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.05,
+                                  width: MediaQuery.of(context).size.width * 0.95,
+                                  height: MediaQuery.of(context).size.height * 0.05,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(20.0),
@@ -1670,14 +1537,9 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.05,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.15,
-                                        color: const Color.fromARGB(0, 244, 67,
-                                            54), // Promijeni boju po želji
+                                        height: MediaQuery.of(context).size.height * 0.05,
+                                        width: MediaQuery.of(context).size.width * 0.15,
+                                        color: const Color.fromARGB(0, 244, 67, 54), // Promijeni boju po želji
                                         child: Center(
                                           child: Icon(
                                             Icons.person,
@@ -1686,14 +1548,9 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                         ),
                                       ),
                                       Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.05,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.65,
-                                        color: const Color.fromARGB(0, 76, 175,
-                                            79), // Promijeni boju po želji
+                                        height: MediaQuery.of(context).size.height * 0.05,
+                                        width: MediaQuery.of(context).size.width * 0.65,
+                                        color: const Color.fromARGB(0, 76, 175, 79), // Promijeni boju po želji
                                         child: Center(
                                           child: Text(
                                             bicikl['naziv'],
@@ -1705,17 +1562,11 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                         ),
                                       ),
                                       Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.05,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.15,
-                                        color: const Color.fromARGB(0, 33, 149,
-                                            243), // Promijeni boju po želji
+                                        height: MediaQuery.of(context).size.height * 0.05,
+                                        width: MediaQuery.of(context).size.width * 0.15,
+                                        color: const Color.fromARGB(0, 33, 149, 243), // Promijeni boju po želji
                                         child: Center(
-                                          child: _buildInfoButton(
-                                              bicikl['biciklId'], "bicikliP"),
+                                          child: _buildInfoButton(bicikl['biciklId'], "bicikliP"),
                                         ),
                                       ),
                                     ],
@@ -1730,8 +1581,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                     Container(
                       height: MediaQuery.of(context).size.height * 0.06,
                       width: MediaQuery.of(context).size.width,
-                      color: const Color.fromARGB(
-                          0, 76, 175, 79), // Pozadina drugog dijela
+                      color: const Color.fromARGB(0, 76, 175, 79), // Pozadina drugog dijela
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -1823,9 +1673,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
     int endIndex = startIndex + _pageSizeBicikli;
     List currentDijelovi = _prikazaniDijelovi.sublist(
       startIndex,
-      endIndex > _prikazaniDijelovi.length
-          ? _prikazaniDijelovi.length
-          : endIndex,
+      endIndex > _prikazaniDijelovi.length ? _prikazaniDijelovi.length : endIndex,
     );
     return Container(
       height: MediaQuery.of(context).size.height * 0.757,
@@ -1842,17 +1690,11 @@ class _AdministracijaPageState extends State<AdministracijaPage>
               children: [
                 Text(
                   _selectedStatusDijelovi, // Pretpostavljam da je ovo String varijabla
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 255, 255, 255)),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 255, 255, 255)),
                 ),
                 Text(
                   'Dijelovi',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 255, 255, 255)),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 255, 255, 255)),
                 ),
                 _buildButton("Postavi status", 4),
               ],
@@ -1882,8 +1724,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                     Container(
                       height: MediaQuery.of(context).size.height * 0.617,
                       width: MediaQuery.of(context).size.width,
-                      color: const Color.fromARGB(
-                          0, 244, 67, 54), // Pozadina prvog dijela
+                      color: const Color.fromARGB(0, 244, 67, 54), // Pozadina prvog dijela
                       child: ListView.builder(
                         itemCount: currentDijelovi.length,
                         itemBuilder: (context, index) {
@@ -1898,15 +1739,12 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                               print('Kliknut red broj $index');
                             },
                             child: Padding(
-                              padding: EdgeInsets.only(
-                                  top: index == 0 ? 25.0 : 8.0, bottom: 8.0),
+                              padding: EdgeInsets.only(top: index == 0 ? 25.0 : 8.0, bottom: 8.0),
                               child: Align(
                                 alignment: Alignment.center,
                                 child: Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.95,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.05,
+                                  width: MediaQuery.of(context).size.width * 0.95,
+                                  height: MediaQuery.of(context).size.height * 0.05,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(20.0),
@@ -1915,14 +1753,9 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.05,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.15,
-                                        color: const Color.fromARGB(0, 244, 67,
-                                            54), // Promijeni boju po želji
+                                        height: MediaQuery.of(context).size.height * 0.05,
+                                        width: MediaQuery.of(context).size.width * 0.15,
+                                        color: const Color.fromARGB(0, 244, 67, 54), // Promijeni boju po želji
                                         child: Center(
                                           child: Icon(
                                             Icons.person,
@@ -1931,14 +1764,9 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                         ),
                                       ),
                                       Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.05,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.65,
-                                        color: const Color.fromARGB(0, 76, 175,
-                                            79), // Promijeni boju po želji
+                                        height: MediaQuery.of(context).size.height * 0.05,
+                                        width: MediaQuery.of(context).size.width * 0.65,
+                                        color: const Color.fromARGB(0, 76, 175, 79), // Promijeni boju po želji
                                         child: Center(
                                           child: Text(
                                             dijelovi['naziv'],
@@ -1950,18 +1778,11 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                         ),
                                       ),
                                       Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.05,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.15,
-                                        color: const Color.fromARGB(0, 33, 149,
-                                            243), // Promijeni boju po želji
+                                        height: MediaQuery.of(context).size.height * 0.05,
+                                        width: MediaQuery.of(context).size.width * 0.15,
+                                        color: const Color.fromARGB(0, 33, 149, 243), // Promijeni boju po želji
                                         child: Center(
-                                          child: _buildInfoButton(
-                                              dijelovi['dijeloviId'],
-                                              "dijeloviP"),
+                                          child: _buildInfoButton(dijelovi['dijeloviId'], "dijeloviP"),
                                         ),
                                       ),
                                     ],
@@ -1976,8 +1797,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                     Container(
                       height: MediaQuery.of(context).size.height * 0.06,
                       width: MediaQuery.of(context).size.width,
-                      color: const Color.fromARGB(
-                          0, 76, 175, 79), // Pozadina drugog dijela
+                      color: const Color.fromARGB(0, 76, 175, 79), // Pozadina drugog dijela
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -2084,8 +1904,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
         break;
       case "Serviser":
         try {
-          zapis = await _serviserService.getServiseriDTOById(
-              serviserId: _odabraniId);
+          zapis = await _serviserService.getServiseriDTOById(serviserId: _odabraniId);
           ucitanZapis = true;
         } catch (e) {
           ucitanZapis = false;
@@ -2126,8 +1945,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
           return Center(
             child: CircularProgressIndicator(),
           );
-        } else if (snapshot.connectionState == ConnectionState.done &&
-            ucitanZapis) {
+        } else if (snapshot.connectionState == ConnectionState.done && ucitanZapis) {
           return Container(
             height: MediaQuery.of(context).size.height * 0.757,
             width: MediaQuery.of(context).size.width,
@@ -2137,8 +1955,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                 Container(
                   height: MediaQuery.of(context).size.height * 0.08,
                   width: MediaQuery.of(context).size.width,
-                  color: const Color.fromARGB(
-                      0, 244, 67, 54), // Bilo koja pozadina
+                  color: const Color.fromARGB(0, 244, 67, 54), // Bilo koja pozadina
                   child: Center(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -2185,10 +2002,8 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                     children: [
                       SizedBox(height: 25),
                       Container(
-                        width: MediaQuery.of(context).size.width *
-                            0.95, // 95% širine ekrana
-                        height: MediaQuery.of(context).size.height *
-                            0.28, // 28% visine ekrana
+                        width: MediaQuery.of(context).size.width * 0.95, // 95% širine ekrana
+                        height: MediaQuery.of(context).size.height * 0.28, // 28% visine ekrana
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
                             colors: [
@@ -2198,32 +2013,25 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
-                          borderRadius:
-                              BorderRadius.circular(25.0), // Zaobljene ivice
+                          borderRadius: BorderRadius.circular(25.0), // Zaobljene ivice
                         ),
                         child: Column(
-                          mainAxisAlignment:
-                              MainAxisAlignment.center, // Centriranje djece
+                          mainAxisAlignment: MainAxisAlignment.center, // Centriranje djece
                           children: [
                             // imePrezime, Status,
                             Container(
-                              width: MediaQuery.of(context).size.width *
-                                  0.90, // 90% širine ekrana
-                              height: MediaQuery.of(context).size.height *
-                                  0.06, // 6% visine ekrana
+                              width: MediaQuery.of(context).size.width * 0.90, // 90% širine ekrana
+                              height: MediaQuery.of(context).size.height * 0.06, // 6% visine ekrana
                               decoration: BoxDecoration(
                                 color: Colors.white, // Bijela boja pozadine
-                                borderRadius: BorderRadius.circular(
-                                    12.0), // Zaobljene ivice
+                                borderRadius: BorderRadius.circular(12.0), // Zaobljene ivice
                               ),
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   // Prvi dio: Ime i prezime korisnika
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 7.0),
+                                    padding: const EdgeInsets.symmetric(horizontal: 7.0),
                                     child: Row(
                                       children: [
                                         const Icon(
@@ -2268,23 +2076,18 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                             SizedBox(height: 8),
                             //email broj
                             Container(
-                              width: MediaQuery.of(context).size.width *
-                                  0.90, // 90% širine ekrana
-                              height: MediaQuery.of(context).size.height *
-                                  0.06, // 6% visine ekrana
+                              width: MediaQuery.of(context).size.width * 0.90, // 90% širine ekrana
+                              height: MediaQuery.of(context).size.height * 0.06, // 6% visine ekrana
                               decoration: BoxDecoration(
                                 color: Colors.white, // Bijela boja pozadine
-                                borderRadius: BorderRadius.circular(
-                                    12.0), // Zaobljene ivice
+                                borderRadius: BorderRadius.circular(12.0), // Zaobljene ivice
                               ),
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   // Prvi dio: Email korisnika
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 7.0),
+                                    padding: const EdgeInsets.symmetric(horizontal: 7.0),
                                     child: Row(
                                       children: [
                                         const Icon(
@@ -2292,9 +2095,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                           size: 20,
                                           color: Colors.black,
                                         ),
-                                        const SizedBox(
-                                            width:
-                                                8), // Razmak između ikone i teksta
+                                        const SizedBox(width: 8), // Razmak između ikone i teksta
                                         Text(
                                           zapis?['email'] ?? 'N/A',
                                           style: const TextStyle(
@@ -2307,8 +2108,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                   ),
                                   // Drugi dio: Telefon korisnika
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 7.0),
+                                    padding: const EdgeInsets.symmetric(horizontal: 7.0),
                                     child: Row(
                                       children: [
                                         const Icon(
@@ -2316,9 +2116,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                           size: 20,
                                           color: Colors.black,
                                         ),
-                                        const SizedBox(
-                                            width:
-                                                8), // Razmak između ikone i teksta
+                                        const SizedBox(width: 8), // Razmak između ikone i teksta
                                         Text(
                                           getTelefon(zapis!),
                                           style: const TextStyle(
@@ -2335,18 +2133,14 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                             SizedBox(height: 8), // Razmak između redova
                             //Grad, ulica
                             Container(
-                              width: MediaQuery.of(context).size.width *
-                                  0.90, // 90% širine ekrana
-                              height: MediaQuery.of(context).size.height *
-                                  0.06, // 6% visine ekrana
+                              width: MediaQuery.of(context).size.width * 0.90, // 90% širine ekrana
+                              height: MediaQuery.of(context).size.height * 0.06, // 6% visine ekrana
                               decoration: BoxDecoration(
                                 color: Colors.white, // Bijela boja pozadine
-                                borderRadius: BorderRadius.circular(
-                                    12.0), // Zaobljene ivice
+                                borderRadius: BorderRadius.circular(12.0), // Zaobljene ivice
                               ),
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0),
+                                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                                 child: Row(
                                   children: [
                                     const Icon(
@@ -2354,9 +2148,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                       size: 20,
                                       color: Colors.black,
                                     ),
-                                    const SizedBox(
-                                        width:
-                                            8), // Razmak između ikone i teksta
+                                    const SizedBox(width: 8), // Razmak između ikone i teksta
                                     Text(
                                       adresa != null
                                           ? '${adresa?['grad'] ?? 'N/A'}, ${adresa?['ulica'] ?? 'N/A'}, ${adresa?['postanskiBroj'] ?? 'N/A'}'
@@ -2377,8 +2169,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                       Container(
                         height: MediaQuery.of(context).size.height * 0.26,
                         width: MediaQuery.of(context).size.width * 0.95,
-                        color: const Color.fromARGB(
-                            0, 76, 175, 79), // Druga pozadina
+                        color: const Color.fromARGB(0, 76, 175, 79), // Druga pozadina
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -2394,27 +2185,20 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
                                 ),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10.0)),
+                                borderRadius: BorderRadius.all(Radius.circular(10.0)),
                               ),
                               child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
                                 children: [
                                   Container(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.045,
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.4,
+                                    height: MediaQuery.of(context).size.height * 0.045,
+                                    width: MediaQuery.of(context).size.width * 0.4,
                                     decoration: BoxDecoration(
-                                      color: const Color.fromARGB(
-                                          255, 255, 255, 255),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10.0)),
+                                      color: const Color.fromARGB(255, 255, 255, 255),
+                                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
                                     ),
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                       children: [
                                         const Text(
                                           'Narudžbe',
@@ -2424,15 +2208,8 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                           ),
                                         ),
                                         Text(
-                                          zapis != null &&
-                                                  zapis?['korisnikInfos'] !=
-                                                      null &&
-                                                  zapis?['korisnikInfos']
-                                                      .isNotEmpty
-                                              ? (zapis?['korisnikInfos'][0]
-                                                          ['brojNarudbi']
-                                                      ?.toString() ??
-                                                  'N/A')
+                                          zapis != null && zapis?['korisnikInfos'] != null && zapis?['korisnikInfos'].isNotEmpty
+                                              ? (zapis?['korisnikInfos'][0]['brojNarudbi']?.toString() ?? 'N/A')
                                               : 'N/A',
                                           style: const TextStyle(
                                             fontSize: 16,
@@ -2443,19 +2220,14 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                     ),
                                   ),
                                   Container(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.045,
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.4,
+                                    height: MediaQuery.of(context).size.height * 0.045,
+                                    width: MediaQuery.of(context).size.width * 0.4,
                                     decoration: BoxDecoration(
-                                      color: const Color.fromARGB(
-                                          255, 255, 255, 255),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10.0)),
+                                      color: const Color.fromARGB(255, 255, 255, 255),
+                                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
                                     ),
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                       children: [
                                         const Text(
                                           'Servisi',
@@ -2465,15 +2237,8 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                           ),
                                         ),
                                         Text(
-                                          zapis != null &&
-                                                  zapis?['korisnikInfos'] !=
-                                                      null &&
-                                                  zapis?['korisnikInfos']
-                                                      .isNotEmpty
-                                              ? (zapis?['korisnikInfos'][0]
-                                                          ['brojServisa']
-                                                      ?.toString() ??
-                                                  'N/A')
+                                          zapis != null && zapis?['korisnikInfos'] != null && zapis?['korisnikInfos'].isNotEmpty
+                                              ? (zapis?['korisnikInfos'][0]['brojServisa']?.toString() ?? 'N/A')
                                               : 'N/A',
                                           style: const TextStyle(
                                             fontSize: 16,
@@ -2484,19 +2249,14 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                     ),
                                   ),
                                   Container(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.045,
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.4,
+                                    height: MediaQuery.of(context).size.height * 0.045,
+                                    width: MediaQuery.of(context).size.width * 0.4,
                                     decoration: BoxDecoration(
-                                      color: const Color.fromARGB(
-                                          255, 255, 255, 255),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10.0)),
+                                      color: const Color.fromARGB(255, 255, 255, 255),
+                                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
                                     ),
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                       children: [
                                         const Text(
                                           'Proizvodi',
@@ -2506,8 +2266,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                           ),
                                         ),
                                         Text(
-                                          zapis?['brojProizvoda']?.toString() ??
-                                              'N/A',
+                                          zapis?['brojProizvoda']?.toString() ?? 'N/A',
                                           style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
@@ -2517,19 +2276,14 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                     ),
                                   ),
                                   Container(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.045,
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.4,
+                                    height: MediaQuery.of(context).size.height * 0.045,
+                                    width: MediaQuery.of(context).size.width * 0.4,
                                     decoration: BoxDecoration(
-                                      color: const Color.fromARGB(
-                                          255, 255, 255, 255),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10.0)),
+                                      color: const Color.fromARGB(255, 255, 255, 255),
+                                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
                                     ),
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                       children: [
                                         const Text(
                                           'Kolicina',
@@ -2539,9 +2293,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                           ),
                                         ),
                                         Text(
-                                          zapis?['ukupnaKolicina']
-                                                  ?.toString() ??
-                                              'N/A',
+                                          zapis?['ukupnaKolicina']?.toString() ?? 'N/A',
                                           style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
@@ -2565,31 +2317,23 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
                                 ),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10.0)),
+                                borderRadius: BorderRadius.all(Radius.circular(10.0)),
                               ),
                               child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
                                 children: [
                                   Container(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.045,
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.4,
+                                    height: MediaQuery.of(context).size.height * 0.045,
+                                    width: MediaQuery.of(context).size.width * 0.4,
                                     decoration: BoxDecoration(
                                       color: Color.fromARGB(255, 255, 255, 255),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10.0)),
+                                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
                                     ),
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          zapis?['isAdmin'] == true
-                                              ? 'Admin'
-                                              : 'Nije admin',
+                                          zapis?['isAdmin'] == true ? 'Admin' : 'Nije admin',
                                           style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
@@ -2599,24 +2343,17 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                     ),
                                   ),
                                   Container(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.045,
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.4,
+                                    height: MediaQuery.of(context).size.height * 0.045,
+                                    width: MediaQuery.of(context).size.width * 0.4,
                                     decoration: BoxDecoration(
-                                      color: const Color.fromARGB(
-                                          255, 255, 255, 255),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10.0)),
+                                      color: const Color.fromARGB(255, 255, 255, 255),
+                                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
                                     ),
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          zapis?['jeServiser'] == null
-                                              ? 'nije Serviser'
-                                              : 'Serviser',
+                                          zapis?['jeServiser'] == null ? 'nije Serviser' : 'Serviser',
                                           style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
@@ -2645,14 +2382,12 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
-                          borderRadius: BorderRadius.all(
-                              Radius.circular(10.0)), // Zaobljene ivice
+                          borderRadius: BorderRadius.all(Radius.circular(10.0)), // Zaobljene ivice
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            if (zapis?['status'] == 'kreiran' ||
-                                zapis?['status'] == 'izmijenjen') ...[
+                            if (zapis?['status'] == 'kreiran' || zapis?['status'] == 'izmijenjen') ...[
                               _buildISetStatusButton('Aktiviraj', 'Korisnik'),
                               _buildISetStatusButton('Vrati', 'Korisnik'),
                               _buildISetStatusButton('Obrisi', 'Korisnik'),
@@ -2692,7 +2427,12 @@ class _AdministracijaPageState extends State<AdministracijaPage>
         status = "vracen";
         break;
       case "Obrisi":
+        bool? confirmed = await ConfirmProzor.prikaziConfirmProzor(context, "Da li ste sigurni da želite obrisati zapis?");
+        if (confirmed != true) {
+          return;
+        }
         status = "obrisan";
+
         break;
       default:
         break;
@@ -2702,11 +2442,9 @@ class _AdministracijaPageState extends State<AdministracijaPage>
       case "Korisnik":
         try {
           await _korisnikService.upravljanjeKorisnikom(status, _odabraniId);
-          PorukaHelper.prikaziPorukuUspjeha(
-              context, "Status uspješno ažuriran");
+          PorukaHelper.prikaziPorukuUspjeha(context, "Status uspješno ažuriran");
         } catch (e) {
-          PorukaHelper.prikaziPorukuGreske(
-              context, "Greška prilikom ažuriranja statusa");
+          PorukaHelper.prikaziPorukuGreske(context, "Greška prilikom ažuriranja statusa");
         }
         await _korisnikService.getKorisniks(status: '');
         setState(() {
@@ -2719,11 +2457,9 @@ class _AdministracijaPageState extends State<AdministracijaPage>
       case "Serviser":
         try {
           await _serviserService.upravljanjeServiserom(status, _odabraniId);
-          PorukaHelper.prikaziPorukuUspjeha(
-              context, "Status uspješno ažuriran");
+          PorukaHelper.prikaziPorukuUspjeha(context, "Status uspješno ažuriran");
         } catch (e) {
-          PorukaHelper.prikaziPorukuGreske(
-              context, "Greška prilikom ažuriranja statusa");
+          PorukaHelper.prikaziPorukuGreske(context, "Greška prilikom ažuriranja statusa");
         }
         await _serviserService.getServiseriDTO(
           status: '',
@@ -2740,11 +2476,9 @@ class _AdministracijaPageState extends State<AdministracijaPage>
       case "Bicikl":
         try {
           await _biciklService.upravljanjeBiciklom(status, _odabraniId);
-          PorukaHelper.prikaziPorukuUspjeha(
-              context, "Status uspješno ažuriran");
+          PorukaHelper.prikaziPorukuUspjeha(context, "Status uspješno ažuriran");
         } catch (e) {
-          PorukaHelper.prikaziPorukuGreske(
-              context, "Greška prilikom ažuriranja statusa");
+          PorukaHelper.prikaziPorukuGreske(context, "Greška prilikom ažuriranja statusa");
         }
 
         await _biciklService.getBiciklis(status: '');
@@ -2758,11 +2492,9 @@ class _AdministracijaPageState extends State<AdministracijaPage>
       case "Dijelovi":
         try {
           await _dijeloviService.upravljanjeDijelom(status, _odabraniId);
-          PorukaHelper.prikaziPorukuUspjeha(
-              context, "Status uspješno ažuriran");
+          PorukaHelper.prikaziPorukuUspjeha(context, "Status uspješno ažuriran");
         } catch (e) {
-          PorukaHelper.prikaziPorukuGreske(
-              context, "Greška prilikom ažuriranja statusa");
+          PorukaHelper.prikaziPorukuGreske(context, "Greška prilikom ažuriranja statusa");
         }
 
         await _dijeloviService.getDijelovis(status: '');
@@ -2806,8 +2538,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
   }
 
   String getTelefon(Map<String, dynamic> korisnik) {
-    if (korisnik['korisnikInfos'] != null &&
-        korisnik['korisnikInfos'].isNotEmpty) {
+    if (korisnik['korisnikInfos'] != null && korisnik['korisnikInfos'].isNotEmpty) {
       String telefon = korisnik['korisnikInfos'][0]['telefon'] ?? 'N/A';
       return telefon.isNotEmpty ? telefon : 'N/A';
     }
@@ -2815,8 +2546,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
   }
 
   String getImePrezime(Map<String, dynamic> korisnik) {
-    if (korisnik['korisnikInfos'] != null &&
-        korisnik['korisnikInfos'].isNotEmpty) {
+    if (korisnik['korisnikInfos'] != null && korisnik['korisnikInfos'].isNotEmpty) {
       String imePrezime = korisnik['korisnikInfos'][0]['imePrezime'] ?? 'N/A';
       return imePrezime.isNotEmpty ? imePrezime : 'N/A';
     }
@@ -2831,8 +2561,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
           return Center(
             child: CircularProgressIndicator(),
           );
-        } else if (snapshot.connectionState == ConnectionState.done &&
-            ucitanZapis) {
+        } else if (snapshot.connectionState == ConnectionState.done && ucitanZapis) {
           return Container(
             height: MediaQuery.of(context).size.height * 0.757,
             width: MediaQuery.of(context).size.width,
@@ -2842,8 +2571,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                 Container(
                   height: MediaQuery.of(context).size.height * 0.08,
                   width: MediaQuery.of(context).size.width,
-                  color: const Color.fromARGB(
-                      0, 244, 67, 54), // Bilo koja pozadina
+                  color: const Color.fromARGB(0, 244, 67, 54), // Bilo koja pozadina
                   child: Center(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -2892,8 +2620,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                       Container(
                         height: MediaQuery.of(context).size.height * 0.5,
                         width: MediaQuery.of(context).size.width * 0.95,
-                        color: const Color.fromARGB(
-                            0, 33, 149, 243), // Prva pozadina
+                        color: const Color.fromARGB(0, 33, 149, 243), // Prva pozadina
                         child: Center(
                           child: Container(
                             width: MediaQuery.of(context).size.width * 0.95,
@@ -2913,10 +2640,8 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.9,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.06,
+                                  width: MediaQuery.of(context).size.width * 0.9,
+                                  height: MediaQuery.of(context).size.height * 0.06,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(20.0),
@@ -2924,40 +2649,28 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                   child: Row(
                                     children: [
                                       Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.45,
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
-                                        color: const Color.fromARGB(
-                                            0, 244, 67, 54), // Prva pozadina
+                                        width: MediaQuery.of(context).size.width * 0.45,
+                                        height: MediaQuery.of(context).size.height * 0.06,
+                                        color: const Color.fromARGB(0, 244, 67, 54), // Prva pozadina
                                         child: Center(
                                           child: Text(
                                             "Cijena: ${zapis?['cijena'] ?? 'N/A'}",
                                             style: TextStyle(
-                                              color: const Color.fromARGB(
-                                                  255, 0, 0, 0),
+                                              color: const Color.fromARGB(255, 0, 0, 0),
                                               fontSize: 17.0,
                                             ),
                                           ),
                                         ),
                                       ),
                                       Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.45,
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
-                                        color: const Color.fromARGB(
-                                            0, 33, 149, 243), // Druga pozadina
+                                        width: MediaQuery.of(context).size.width * 0.45,
+                                        height: MediaQuery.of(context).size.height * 0.06,
+                                        color: const Color.fromARGB(0, 33, 149, 243), // Druga pozadina
                                         child: Center(
                                           child: Text(
                                             "Ocjena: ${zapis?['ukupnaOcjena'] ?? 'N/A'}",
                                             style: TextStyle(
-                                              color: const Color.fromARGB(
-                                                  255, 0, 0, 0),
+                                              color: const Color.fromARGB(255, 0, 0, 0),
                                               fontSize: 17.0,
                                             ),
                                           ),
@@ -2967,10 +2680,8 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                   ),
                                 ),
                                 Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.9,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.06,
+                                  width: MediaQuery.of(context).size.width * 0.9,
+                                  height: MediaQuery.of(context).size.height * 0.06,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(20.0),
@@ -2978,49 +2689,35 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                   child: Row(
                                     children: [
                                       Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.45,
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
-                                        color: const Color.fromARGB(
-                                            0, 244, 67, 54), // Prva pozadina
+                                        width: MediaQuery.of(context).size.width * 0.45,
+                                        height: MediaQuery.of(context).size.height * 0.06,
+                                        color: const Color.fromARGB(0, 244, 67, 54), // Prva pozadina
                                         child: Center(
                                           child: Text(
                                             "Broj Servisa: ${zapis?['brojServisa'] ?? 'N/A'}",
                                             style: TextStyle(
-                                              color: const Color.fromARGB(
-                                                  255, 0, 0, 0),
+                                              color: const Color.fromARGB(255, 0, 0, 0),
                                               fontSize: 17.0,
                                             ),
                                           ),
                                         ),
                                       ),
                                       Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.45,
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
-                                        color: const Color.fromARGB(
-                                            0, 33, 149, 243), // Druga pozadina
+                                        width: MediaQuery.of(context).size.width * 0.45,
+                                        height: MediaQuery.of(context).size.height * 0.06,
+                                        color: const Color.fromARGB(0, 33, 149, 243), // Druga pozadina
                                         child: Center(
                                           child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
                                               Icon(
                                                 Icons.location_on,
-                                                color: const Color.fromARGB(
-                                                    255, 0, 0, 0),
+                                                color: const Color.fromARGB(255, 0, 0, 0),
                                               ),
                                               Text(
                                                 "${zapis?['grad'] ?? 'N/A'}",
                                                 style: TextStyle(
-                                                  color: const Color.fromARGB(
-                                                      255, 0, 0, 0),
+                                                  color: const Color.fromARGB(255, 0, 0, 0),
                                                   fontSize: 17.0,
                                                 ),
                                               ),
@@ -3032,32 +2729,27 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                   ),
                                 ),
                                 Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.9,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.06,
+                                  width: MediaQuery.of(context).size.width * 0.9,
+                                  height: MediaQuery.of(context).size.height * 0.06,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(20.0),
                                   ),
                                   child: Center(
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(
                                           "Status",
                                           style: TextStyle(
-                                            color: const Color.fromARGB(
-                                                255, 0, 0, 0),
+                                            color: const Color.fromARGB(255, 0, 0, 0),
                                             fontSize: 18.0,
                                           ),
                                         ),
                                         Text(
                                           ": ${zapis?['status'] ?? 'N/A'}",
                                           style: TextStyle(
-                                            color: const Color.fromARGB(
-                                                255, 0, 0, 0),
+                                            color: const Color.fromARGB(255, 0, 0, 0),
                                             fontSize: 18.0,
                                           ),
                                         ),
@@ -3082,14 +2774,12 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
-                          borderRadius: BorderRadius.all(
-                              Radius.circular(10.0)), // Zaobljene ivice
+                          borderRadius: BorderRadius.all(Radius.circular(10.0)), // Zaobljene ivice
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            if (zapis?['status'] == 'kreiran' ||
-                                zapis?['status'] == 'izmijenjen') ...[
+                            if (zapis?['status'] == 'kreiran' || zapis?['status'] == 'izmijenjen') ...[
                               _buildISetStatusButton('Aktiviraj', 'Serviser'),
                               _buildISetStatusButton('Vrati', 'Serviser'),
                               _buildISetStatusButton('Obrisi', 'Serviser'),
@@ -3126,8 +2816,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
           return Center(
             child: CircularProgressIndicator(),
           );
-        } else if (snapshot.connectionState == ConnectionState.done &&
-            ucitanZapis) {
+        } else if (snapshot.connectionState == ConnectionState.done && ucitanZapis) {
           return Container(
             height: MediaQuery.of(context).size.height * 0.757,
             width: MediaQuery.of(context).size.width,
@@ -3137,8 +2826,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                 Container(
                   height: MediaQuery.of(context).size.height * 0.08,
                   width: MediaQuery.of(context).size.width,
-                  color: const Color.fromARGB(
-                      0, 244, 67, 54), // Bilo koja pozadina
+                  color: const Color.fromARGB(0, 244, 67, 54), // Bilo koja pozadina
                   child: Center(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -3188,8 +2876,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                       Container(
                         height: MediaQuery.of(context).size.height * 0.35,
                         width: MediaQuery.of(context).size.width * 0.95,
-                        color: const Color.fromARGB(
-                            0, 244, 67, 54), // Prva pozadina
+                        color: const Color.fromARGB(0, 244, 67, 54), // Prva pozadina
                         child: Center(
                           child: Container(
                             height: MediaQuery.of(context).size.height * 0.3,
@@ -3203,19 +2890,15 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
-                              borderRadius: BorderRadius.circular(
-                                  20.0), // Zaobljene ivice
+                              borderRadius: BorderRadius.circular(20.0), // Zaobljene ivice
                             ),
                             child: Row(
                               children: [
                                 //slika
                                 Container(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.3,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.65,
-                                  color: const Color.fromARGB(
-                                      0, 255, 153, 0), // Prva pozadina
+                                  height: MediaQuery.of(context).size.height * 0.3,
+                                  width: MediaQuery.of(context).size.width * 0.65,
+                                  color: const Color.fromARGB(0, 255, 153, 0), // Prva pozadina
                                   child: ImageCarousel(
                                     slikeBiciklis: zapis?['slikeBiciklis'],
                                     initialIndex: 0, // Početni indeks slike
@@ -3224,13 +2907,10 @@ class _AdministracijaPageState extends State<AdministracijaPage>
 
                                 //status
                                 Container(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.3,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.3,
+                                  height: MediaQuery.of(context).size.height * 0.3,
+                                  width: MediaQuery.of(context).size.width * 0.3,
                                   decoration: BoxDecoration(
-                                    color:
-                                        const Color.fromARGB(255, 39, 142, 176),
+                                    color: const Color.fromARGB(255, 39, 142, 176),
                                     borderRadius: BorderRadius.only(
                                       topRight: Radius.circular(10.0),
                                       bottomRight: Radius.circular(10.0),
@@ -3238,20 +2918,14 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                   ),
                                   child: Center(
                                     child: Container(
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.1,
-                                      width: MediaQuery.of(context).size.width *
-                                          0.25,
+                                      height: MediaQuery.of(context).size.height * 0.1,
+                                      width: MediaQuery.of(context).size.width * 0.25,
                                       decoration: BoxDecoration(
-                                        color: Colors
-                                            .white, // Bijela boja pozadine
-                                        borderRadius: BorderRadius.circular(
-                                            10.0), // Zaobljene ivice
+                                        color: Colors.white, // Bijela boja pozadine
+                                        borderRadius: BorderRadius.circular(10.0), // Zaobljene ivice
                                       ),
                                       child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Text(
                                             "Status:",
@@ -3265,8 +2939,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                             style: TextStyle(
                                               color: Colors.black,
                                               fontSize: 15.0,
-                                              fontWeight: FontWeight
-                                                  .bold, // Boldiran font za drugi dio
+                                              fontWeight: FontWeight.bold, // Boldiran font za drugi dio
                                             ),
                                           ),
                                         ],
@@ -3282,8 +2955,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                       Container(
                         height: MediaQuery.of(context).size.height * 0.25,
                         width: MediaQuery.of(context).size.width * 0.95,
-                        color: const Color.fromARGB(
-                            0, 33, 149, 243), // Druga pozadina
+                        color: const Color.fromARGB(0, 33, 149, 243), // Druga pozadina
                         child: Center(
                           child: Container(
                             height: MediaQuery.of(context).size.height * 0.23,
@@ -3297,31 +2969,23 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
-                              borderRadius: BorderRadius.circular(
-                                  20.0), // Zaobljene ivice
+                              borderRadius: BorderRadius.circular(20.0), // Zaobljene ivice
                             ),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 Container(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.06,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.9,
+                                  height: MediaQuery.of(context).size.height * 0.06,
+                                  width: MediaQuery.of(context).size.width * 0.9,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(
-                                        20.0), // Zaobljene ivice
+                                    borderRadius: BorderRadius.circular(20.0), // Zaobljene ivice
                                   ),
                                   child: Row(
                                     children: [
                                       Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.45,
+                                        height: MediaQuery.of(context).size.height * 0.06,
+                                        width: MediaQuery.of(context).size.width * 0.45,
                                         color: Colors.transparent,
                                         child: Center(
                                           child: Text(
@@ -3334,12 +2998,8 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                         ),
                                       ),
                                       Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.45,
+                                        height: MediaQuery.of(context).size.height * 0.06,
+                                        width: MediaQuery.of(context).size.width * 0.45,
                                         color: Colors.transparent,
                                         child: Center(
                                           child: Text(
@@ -3355,24 +3015,17 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                   ),
                                 ),
                                 Container(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.06,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.9,
+                                  height: MediaQuery.of(context).size.height * 0.06,
+                                  width: MediaQuery.of(context).size.width * 0.9,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(
-                                        20.0), // Zaobljene ivice
+                                    borderRadius: BorderRadius.circular(20.0), // Zaobljene ivice
                                   ),
                                   child: Row(
                                     children: [
                                       Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.45,
+                                        height: MediaQuery.of(context).size.height * 0.06,
+                                        width: MediaQuery.of(context).size.width * 0.45,
                                         color: Colors.transparent,
                                         child: Center(
                                           child: Text(
@@ -3385,12 +3038,8 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                         ),
                                       ),
                                       Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.45,
+                                        height: MediaQuery.of(context).size.height * 0.06,
+                                        width: MediaQuery.of(context).size.width * 0.45,
                                         color: Colors.transparent,
                                         child: Center(
                                           child: Text(
@@ -3406,24 +3055,17 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                   ),
                                 ),
                                 Container(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.06,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.9,
+                                  height: MediaQuery.of(context).size.height * 0.06,
+                                  width: MediaQuery.of(context).size.width * 0.9,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(
-                                        20.0), // Zaobljene ivice
+                                    borderRadius: BorderRadius.circular(20.0), // Zaobljene ivice
                                   ),
                                   child: Row(
                                     children: [
                                       Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.45,
+                                        height: MediaQuery.of(context).size.height * 0.06,
+                                        width: MediaQuery.of(context).size.width * 0.45,
                                         color: Colors.transparent,
                                         child: Center(
                                           child: Text(
@@ -3436,12 +3078,8 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                         ),
                                       ),
                                       Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.45,
+                                        height: MediaQuery.of(context).size.height * 0.06,
+                                        width: MediaQuery.of(context).size.width * 0.45,
                                         color: Colors.transparent,
                                         child: Center(
                                           child: Text(
@@ -3473,14 +3111,12 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
-                          borderRadius: BorderRadius.all(
-                              Radius.circular(10.0)), // Zaobljene ivice
+                          borderRadius: BorderRadius.all(Radius.circular(10.0)), // Zaobljene ivice
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            if (zapis?['status'] == 'kreiran' ||
-                                zapis?['status'] == 'izmijenjen') ...[
+                            if (zapis?['status'] == 'kreiran' || zapis?['status'] == 'izmijenjen') ...[
                               _buildISetStatusButton('Aktiviraj', 'Bicikl'),
                               _buildISetStatusButton('Vrati', 'Bicikl'),
                               _buildISetStatusButton('Obrisi', 'Bicikl'),
@@ -3517,8 +3153,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
           return Center(
             child: CircularProgressIndicator(),
           );
-        } else if (snapshot.connectionState == ConnectionState.done &&
-            ucitanZapis) {
+        } else if (snapshot.connectionState == ConnectionState.done && ucitanZapis) {
           return Container(
             height: MediaQuery.of(context).size.height * 0.757,
             width: MediaQuery.of(context).size.width,
@@ -3528,8 +3163,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                 Container(
                   height: MediaQuery.of(context).size.height * 0.08,
                   width: MediaQuery.of(context).size.width,
-                  color: const Color.fromARGB(
-                      0, 244, 67, 54), // Bilo koja pozadina
+                  color: const Color.fromARGB(0, 244, 67, 54), // Bilo koja pozadina
                   child: Center(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -3579,8 +3213,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                       Container(
                         height: MediaQuery.of(context).size.height * 0.35,
                         width: MediaQuery.of(context).size.width * 0.95,
-                        color: const Color.fromARGB(
-                            0, 244, 67, 54), // Prva pozadina
+                        color: const Color.fromARGB(0, 244, 67, 54), // Prva pozadina
                         child: Center(
                           child: Container(
                             height: MediaQuery.of(context).size.height * 0.3,
@@ -3594,19 +3227,15 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
-                              borderRadius: BorderRadius.circular(
-                                  20.0), // Zaobljene ivice
+                              borderRadius: BorderRadius.circular(20.0), // Zaobljene ivice
                             ),
                             child: Row(
                               children: [
                                 //slika
                                 Container(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.3,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.65,
-                                  color: const Color.fromARGB(
-                                      0, 255, 153, 0), // Prva pozadina
+                                  height: MediaQuery.of(context).size.height * 0.3,
+                                  width: MediaQuery.of(context).size.width * 0.65,
+                                  color: const Color.fromARGB(0, 255, 153, 0), // Prva pozadina
                                   child: ImageCarousel(
                                     slikeBiciklis: zapis?['slikeDijelovis'],
                                     initialIndex: 0, // Početni indeks slike
@@ -3615,13 +3244,10 @@ class _AdministracijaPageState extends State<AdministracijaPage>
 
                                 //status
                                 Container(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.3,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.3,
+                                  height: MediaQuery.of(context).size.height * 0.3,
+                                  width: MediaQuery.of(context).size.width * 0.3,
                                   decoration: BoxDecoration(
-                                    color:
-                                        const Color.fromARGB(255, 39, 142, 176),
+                                    color: const Color.fromARGB(255, 39, 142, 176),
                                     borderRadius: BorderRadius.only(
                                       topRight: Radius.circular(10.0),
                                       bottomRight: Radius.circular(10.0),
@@ -3629,20 +3255,14 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                   ),
                                   child: Center(
                                     child: Container(
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.1,
-                                      width: MediaQuery.of(context).size.width *
-                                          0.25,
+                                      height: MediaQuery.of(context).size.height * 0.1,
+                                      width: MediaQuery.of(context).size.width * 0.25,
                                       decoration: BoxDecoration(
-                                        color: Colors
-                                            .white, // Bijela boja pozadine
-                                        borderRadius: BorderRadius.circular(
-                                            10.0), // Zaobljene ivice
+                                        color: Colors.white, // Bijela boja pozadine
+                                        borderRadius: BorderRadius.circular(10.0), // Zaobljene ivice
                                       ),
                                       child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Text(
                                             "Status:",
@@ -3656,8 +3276,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                             style: TextStyle(
                                               color: Colors.black,
                                               fontSize: 15.0,
-                                              fontWeight: FontWeight
-                                                  .bold, // Boldiran font za drugi dio
+                                              fontWeight: FontWeight.bold, // Boldiran font za drugi dio
                                             ),
                                           ),
                                         ],
@@ -3673,8 +3292,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                       Container(
                         height: MediaQuery.of(context).size.height * 0.25,
                         width: MediaQuery.of(context).size.width * 0.95,
-                        color: const Color.fromARGB(
-                            0, 33, 149, 243), // Druga pozadina
+                        color: const Color.fromARGB(0, 33, 149, 243), // Druga pozadina
                         child: Center(
                           child: Container(
                             height: MediaQuery.of(context).size.height * 0.23,
@@ -3688,31 +3306,23 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
-                              borderRadius: BorderRadius.circular(
-                                  20.0), // Zaobljene ivice
+                              borderRadius: BorderRadius.circular(20.0), // Zaobljene ivice
                             ),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 Container(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.06,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.9,
+                                  height: MediaQuery.of(context).size.height * 0.06,
+                                  width: MediaQuery.of(context).size.width * 0.9,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(
-                                        20.0), // Zaobljene ivice
+                                    borderRadius: BorderRadius.circular(20.0), // Zaobljene ivice
                                   ),
                                   child: Row(
                                     children: [
                                       Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.45,
+                                        height: MediaQuery.of(context).size.height * 0.06,
+                                        width: MediaQuery.of(context).size.width * 0.45,
                                         color: Colors.transparent,
                                         child: Center(
                                           child: Text(
@@ -3725,12 +3335,8 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                         ),
                                       ),
                                       Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.45,
+                                        height: MediaQuery.of(context).size.height * 0.06,
+                                        width: MediaQuery.of(context).size.width * 0.45,
                                         color: Colors.transparent,
                                         child: Center(
                                           child: Text(
@@ -3746,24 +3352,17 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                   ),
                                 ),
                                 Container(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.06,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.9,
+                                  height: MediaQuery.of(context).size.height * 0.06,
+                                  width: MediaQuery.of(context).size.width * 0.9,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(
-                                        20.0), // Zaobljene ivice
+                                    borderRadius: BorderRadius.circular(20.0), // Zaobljene ivice
                                   ),
                                   child: Row(
                                     children: [
                                       Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.45,
+                                        height: MediaQuery.of(context).size.height * 0.06,
+                                        width: MediaQuery.of(context).size.width * 0.45,
                                         color: Colors.transparent,
                                         child: Center(
                                           child: Text(
@@ -3776,36 +3375,25 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                                         ),
                                       ),
                                       Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.45,
+                                        height: MediaQuery.of(context).size.height * 0.06,
+                                        width: MediaQuery.of(context).size.width * 0.45,
                                         color: Colors.transparent,
                                       ),
                                     ],
                                   ),
                                 ),
                                 Container(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.06,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.9,
+                                  height: MediaQuery.of(context).size.height * 0.06,
+                                  width: MediaQuery.of(context).size.width * 0.9,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(
-                                        20.0), // Zaobljene ivice
+                                    borderRadius: BorderRadius.circular(20.0), // Zaobljene ivice
                                   ),
                                   child: Row(
                                     children: [
                                       Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.9,
+                                        height: MediaQuery.of(context).size.height * 0.06,
+                                        width: MediaQuery.of(context).size.width * 0.9,
                                         color: Colors.transparent,
                                         child: Center(
                                           child: SingleChildScrollView(
@@ -3840,14 +3428,12 @@ class _AdministracijaPageState extends State<AdministracijaPage>
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
-                          borderRadius: BorderRadius.all(
-                              Radius.circular(10.0)), // Zaobljene ivice
+                          borderRadius: BorderRadius.all(Radius.circular(10.0)), // Zaobljene ivice
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            if (zapis?['status'] == 'kreiran' ||
-                                zapis?['status'] == 'izmijenjen') ...[
+                            if (zapis?['status'] == 'kreiran' || zapis?['status'] == 'izmijenjen') ...[
                               _buildISetStatusButton('Aktiviraj', 'Dijelovi'),
                               _buildISetStatusButton('Vrati', 'Dijelovi'),
                               _buildISetStatusButton('Obrisi', 'Dijelovi'),
@@ -3889,8 +3475,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
         height: MediaQuery.of(context).size.height * 0.05,
         width: MediaQuery.of(context).size.height * 0.05, // Da bude krug
         decoration: BoxDecoration(
-          color:
-              const Color.fromARGB(0, 68, 137, 255), // Promijeni boju po želji
+          color: const Color.fromARGB(0, 68, 137, 255), // Promijeni boju po želji
           shape: BoxShape.circle,
         ),
         child: Center(
@@ -4080,8 +3665,7 @@ class _AdministracijaPageState extends State<AdministracijaPage>
 
   Widget navBarButton(BuildContext context, String title, IconData icon) {
     return IconButton(
-      icon:
-          Icon(icon, color: activeTitle == title ? Colors.blue : Colors.black),
+      icon: Icon(icon, color: activeTitle == title ? Colors.blue : Colors.black),
       iconSize: 35.0, // Povećanje veličine ikone
       padding: const EdgeInsets.all(16.0), // Povećanje širine dugmića
       onPressed: () {

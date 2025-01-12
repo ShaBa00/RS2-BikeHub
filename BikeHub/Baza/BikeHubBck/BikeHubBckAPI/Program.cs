@@ -1,4 +1,4 @@
-using BikeHub.Services;
+﻿using BikeHub.Services;
 using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
 using Mapster;
@@ -149,18 +149,31 @@ using (var scope = app.Services.CreateScope())
     {
         //dbContext.Database.EnsureCreated();
         dbContext.Database.Migrate();
-       DataSeeder.Seed(dbContext);
+        DataSeeder.Seed(dbContext);
     }
     else
     {
-        var pendingMigrations = dbContext.Database.GetPendingMigrations();
-        if (pendingMigrations.Any())
+        // Provjera postojanja bilo koje tabele u bazi podataka
+        var anyTableExists = dbContext.Database.ExecuteSqlRaw("SELECT 1 FROM INFORMATION_SCHEMA.TABLES") == 1;
+
+        // Ako bilo koja tabela postoji, preskoči migraciju
+        if (anyTableExists)
         {
-            dbContext.Database.Migrate();
-            Console.WriteLine("Database migrated successfully.");
+            Console.WriteLine("Database already contains tables. Migration not needed.");
+        }
+        else
+        {
+            var pendingMigrations = dbContext.Database.GetPendingMigrations();
+            if (pendingMigrations.Any())
+            {
+                dbContext.Database.Migrate();
+                Console.WriteLine("Database migrated successfully.");
+            }
         }
     }
 }
+
+
 
 
 if (app.Environment.IsDevelopment())

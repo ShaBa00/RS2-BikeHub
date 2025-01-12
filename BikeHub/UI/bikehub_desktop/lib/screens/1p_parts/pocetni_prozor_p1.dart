@@ -44,7 +44,7 @@ class _PocetniProzorP1State extends State<PocetniProzorP1> {
     isLoggedIn = await korisnikService.isLoggedIn();
     if (isLoggedIn) {
       var korisnik = await korisnikService.getUserInfo();
-      korisnikId = int.parse(korisnik['korisnikId'] as String); // Pretvara String u int
+      korisnikId = int.parse(korisnik['korisnikId'] as String);
     } else {
       isLoggedIn = false;
     }
@@ -278,7 +278,6 @@ class _PocetniProzorP1State extends State<PocetniProzorP1> {
       height: MediaQuery.of(context).size.height * 0.035,
       child: ElevatedButton(
         onPressed: () {
-          // Navigacija na osnovu oznake dugmeta
           if (label == 'Bicikl') {
             Navigator.push(
               context,

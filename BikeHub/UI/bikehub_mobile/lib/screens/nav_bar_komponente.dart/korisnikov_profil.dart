@@ -5,6 +5,7 @@ import 'package:bikehub_mobile/screens/glavni_prozor.dart';
 import 'package:bikehub_mobile/screens/narudbe_zahtjev.dart';
 import 'package:bikehub_mobile/screens/nav_bar.dart';
 import 'package:bikehub_mobile/screens/nav_bar_komponente.dart/korisnikove_rezervacije.dart';
+import 'package:bikehub_mobile/screens/ostalo/confirm_prozor.dart';
 import 'package:bikehub_mobile/screens/ostalo/poruka_helper.dart';
 import 'package:bikehub_mobile/screens/prijava/log_in.dart';
 import 'package:bikehub_mobile/screens/servis/korisnikov_servis.dart';
@@ -91,10 +92,8 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Container(
-              width:
-                  MediaQuery.of(context).size.width * 0.95, // 95% širine ekrana
-              height:
-                  MediaQuery.of(context).size.height * 0.07, // 7% visine ekrana
+              width: MediaQuery.of(context).size.width * 0.95, // 95% širine ekrana
+              height: MediaQuery.of(context).size.height * 0.07, // 7% visine ekrana
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(25.0),
@@ -103,23 +102,18 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                 children: [
                   // dD
                   Container(
-                    width: MediaQuery.of(context).size.width *
-                        0.40, // 40% širine ekrana
-                    height: MediaQuery.of(context).size.height *
-                        0.07, // 7% visine ekrana
-                    color: const Color.fromARGB(
-                        0, 244, 67, 54), // Zamijenite s bojom po želji
+                    width: MediaQuery.of(context).size.width * 0.40, // 40% širine ekrana
+                    height: MediaQuery.of(context).size.height * 0.07, // 7% visine ekrana
+                    color: const Color.fromARGB(0, 244, 67, 54), // Zamijenite s bojom po želji
                     child: Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.arrow_back,
-                              color: Colors.black), // Ikone crne boje
+                          icon: const Icon(Icons.arrow_back, color: Colors.black), // Ikone crne boje
                           iconSize: 24.0, // Veličina ikone
                           onPressed: () {
                             Navigator.pushReplacement(
                               context,
-                              MaterialPageRoute(
-                                  builder: (context) => const GlavniProzor()),
+                              MaterialPageRoute(builder: (context) => const GlavniProzor()),
                             );
                           },
                         ),
@@ -132,16 +126,11 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                   ),
                   // lD
                   Container(
-                    width: MediaQuery.of(context).size.width *
-                        0.55, // 55% širine ekrana
-                    height: MediaQuery.of(context).size.height *
-                        0.07, // 7% visine ekrana
-                    color: Color.fromARGB(
-                        0, 255, 6, 6), // Zamijenite s bojom po želji
+                    width: MediaQuery.of(context).size.width * 0.55, // 55% širine ekrana
+                    height: MediaQuery.of(context).size.height * 0.07, // 7% visine ekrana
+                    color: Color.fromARGB(0, 255, 6, 6), // Zamijenite s bojom po želji
                     child: Center(
-                      child: activeTitleP == 'home'
-                          ? _buildButton('Uredi profil')
-                          : _buildButton('Nazad'),
+                      child: activeTitleP == 'home' ? _buildButton('Uredi profil') : _buildButton('Nazad'),
                     ),
                   )
                 ],
@@ -191,9 +180,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
           } else if (snapshot.hasError) {
             return Center(
               child: Text(
-                  snapshot.error.toString().contains('Server is not available')
-                      ? 'Server nije dostupan'
-                      : 'Problem prilikom učitavanja podataka'),
+                  snapshot.error.toString().contains('Server is not available') ? 'Server nije dostupan' : 'Problem prilikom učitavanja podataka'),
             );
           } else if (snapshot.data == null) {
             return Center(
@@ -232,9 +219,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
         ),
       ),
       style: TextButton.styleFrom(
-        backgroundColor: title == izmjeneNad
-            ? Color.fromARGB(255, 87, 202, 255)
-            : Color.fromARGB(255, 255, 255, 255),
+        backgroundColor: title == izmjeneNad ? Color.fromARGB(255, 87, 202, 255) : Color.fromARGB(255, 255, 255, 255),
       ),
     );
   }
@@ -263,10 +248,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
         width: MediaQuery.of(context).size.width * 0.9,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(255, 110, 255, 253),
-              Color.fromARGB(255, 255, 255, 255)
-            ],
+            colors: [Color.fromARGB(255, 110, 255, 253), Color.fromARGB(255, 255, 255, 255)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -284,8 +266,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
             Container(
               height: MediaQuery.of(context).size.height * 0.39,
               width: MediaQuery.of(context).size.width * 0.9,
-              color: Color.fromARGB(
-                  0, 244, 67, 54), // Bilo koja pozadina za prvi dio
+              color: Color.fromARGB(0, 244, 67, 54), // Bilo koja pozadina za prvi dio
               child: Center(
                 child: Column(
                   children: [
@@ -321,10 +302,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
         width: MediaQuery.of(context).size.width * 0.9,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(255, 110, 255, 253),
-              Color.fromARGB(255, 255, 255, 255)
-            ],
+            colors: [Color.fromARGB(255, 110, 255, 253), Color.fromARGB(255, 255, 255, 255)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -342,8 +320,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
             Container(
               height: MediaQuery.of(context).size.height * 0.39,
               width: MediaQuery.of(context).size.width * 0.9,
-              color: Color.fromARGB(
-                  0, 244, 67, 54), // Bilo koja pozadina za prvi dio
+              color: Color.fromARGB(0, 244, 67, 54), // Bilo koja pozadina za prvi dio
               child: Center(
                 child: Column(
                   children: [
@@ -379,10 +356,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
         width: MediaQuery.of(context).size.width * 0.9,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(255, 110, 255, 253),
-              Color.fromARGB(255, 255, 255, 255)
-            ],
+            colors: [Color.fromARGB(255, 110, 255, 253), Color.fromARGB(255, 255, 255, 255)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -395,8 +369,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
             Container(
               height: MediaQuery.of(context).size.height * 0.43,
               width: MediaQuery.of(context).size.width * 0.9,
-              color: Color.fromARGB(
-                  0, 244, 67, 54), // Bilo koja pozadina za prvi dio
+              color: Color.fromARGB(0, 244, 67, 54), // Bilo koja pozadina za prvi dio
               child: Center(
                 child: Column(
                   children: [
@@ -449,13 +422,9 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
   void posaljiIzmjene(String objekt) {
     switch (objekt) {
       case "Lozinku":
-        _korisnikService
-            .izmjeniLozinkuKorisnika(staraLozinka.text, lozinka.text,
-                lozinkaPotvrda.text, korisnik?['korisnikId'])
-            .then((result) {
+        _korisnikService.izmjeniLozinkuKorisnika(staraLozinka.text, lozinka.text, lozinkaPotvrda.text, korisnik?['korisnikId']).then((result) {
           if (result == "Lozinka uspješno izmjenjena") {
-            PorukaHelper.prikaziPorukuUspjeha(context,
-                "Zbog uspjesne promjene lozinke potrebo je logirati se");
+            PorukaHelper.prikaziPorukuUspjeha(context, "Zbog uspjesne promjene lozinke potrebo je logirati se");
             _korisnikService.logout();
             lozinka.clear();
             lozinkaPotvrda.clear();
@@ -473,10 +442,8 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
         break;
       case "Adresu":
         final Future<String?> adresaResult = adresa == null || adresa!.isEmpty
-            ? _adresaService.postAdresa(
-                korisnikId, grad.text, postanskiBroj.text, ulica.text)
-            : _adresaService.promjeniAdresu(
-                grad.text, postanskiBroj.text, ulica.text, adresa?['adresaId']);
+            ? _adresaService.postAdresa(korisnikId, grad.text, postanskiBroj.text, ulica.text)
+            : _adresaService.promjeniAdresu(grad.text, postanskiBroj.text, ulica.text, adresa?['adresaId']);
 
         adresaResult.then((result) {
           if (result == "Adresa uspješno izmjenjena") {
@@ -497,23 +464,15 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
         break;
 
       case "Osnovne":
-        if (username.text.isEmpty &&
-            email.text.isEmpty &&
-            imePrezime.text.isEmpty &&
-            telefon.text.isEmpty) {
-          PorukaHelper.prikaziPorukuUpozorenja(
-              context, "Potrebno je izmjenuti barem jedan zapis");
+        if (username.text.isEmpty && email.text.isEmpty && imePrezime.text.isEmpty && telefon.text.isEmpty) {
+          PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je izmjenuti barem jedan zapis");
         } else {
           if (imePrezime.text.isNotEmpty || telefon.text.isNotEmpty) {
-            if (korisnik?['korisnikInfos'] == null ||
-                korisnik?['korisnikInfos']!.isEmpty) {
+            if (korisnik?['korisnikInfos'] == null || korisnik?['korisnikInfos']!.isEmpty) {
               if (imePrezime.text.isEmpty || telefon.text.isEmpty) {
-                PorukaHelper.prikaziPorukuUpozorenja(
-                    context, "Potrebno je dodati obe vrijednosti");
+                PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati obe vrijednosti");
               }
-              _korisnikInfoServis
-                  .postKorisnikInfo(korisnikId, imePrezime.text, telefon.text)
-                  .then((result) {
+              _korisnikInfoServis.postKorisnikInfo(korisnikId, imePrezime.text, telefon.text).then((result) {
                 if (result == "Korisnik Info uspješno izmjenjena") {
                   imePrezime.clear();
                   telefon.clear();
@@ -531,10 +490,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
               });
               break;
             }
-            _korisnikInfoServis
-                .promjeniKorisnikInfo(imePrezime.text, telefon.text,
-                    korisnik?['korisnikInfos'][0]['korisnikInfoId'])
-                .then((result) {
+            _korisnikInfoServis.promjeniKorisnikInfo(imePrezime.text, telefon.text, korisnik?['korisnikInfos'][0]['korisnikInfoId']).then((result) {
               if (result == "Korisnik Info uspješno izmjenjena") {
                 imePrezime.clear();
                 telefon.clear();
@@ -552,14 +508,10 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
             });
           }
           if (username.text.isNotEmpty || email.text.isNotEmpty) {
-            _korisnikService
-                .izmjeniKorisnika(
-                    email.text, username.text, korisnik?['korisnikId'])
-                .then((result) {
+            _korisnikService.izmjeniKorisnika(email.text, username.text, korisnik?['korisnikId']).then((result) {
               if (result == "Korisnik uspješno izmjenjen") {
                 if (username.text.isNotEmpty) {
-                  PorukaHelper.prikaziPorukuUspjeha(context,
-                      "Zbog uspjesne promjene username-a potrebo je logirati se");
+                  PorukaHelper.prikaziPorukuUspjeha(context, "Zbog uspjesne promjene username-a potrebo je logirati se");
                   _korisnikService.logout();
                   email.clear();
                   username.clear();
@@ -600,8 +552,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
   final TextEditingController postanskiBroj = TextEditingController();
   final TextEditingController ulica = TextEditingController();
 
-  Widget createInputField(
-      String title, bool isLozinka, TextEditingController controller) {
+  Widget createInputField(String title, bool isLozinka, TextEditingController controller) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: GestureDetector(
@@ -620,8 +571,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
             ),
             SizedBox(height: 8.0),
             Container(
-              width: MediaQuery.of(context).size.width *
-                  0.8, // Smanjena širina inputa
+              width: MediaQuery.of(context).size.width * 0.8, // Smanjena širina inputa
               child: TextField(
                 controller: controller,
                 obscureText: isLozinka,
@@ -655,10 +605,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
           height: MediaQuery.of(context).size.height * 0.73,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                Color.fromARGB(255, 251, 251, 251),
-                Color.fromARGB(255, 128, 255, 253)
-              ],
+              colors: [Color.fromARGB(255, 251, 251, 251), Color.fromARGB(255, 128, 255, 253)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -674,8 +621,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                 //dio za prikaz dugmica
                 width: double.infinity,
                 height: MediaQuery.of(context).size.height * 0.07,
-                color:
-                    const Color.fromARGB(0, 76, 175, 79), // Bilo koja pozadina
+                color: const Color.fromARGB(0, 76, 175, 79), // Bilo koja pozadina
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -703,8 +649,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
         children: [
           Container(
             width: double.infinity,
-            height:
-                MediaQuery.of(context).size.height * 0.17, // 20% visine ekrana
+            height: MediaQuery.of(context).size.height * 0.17, // 20% visine ekrana
             color: Color.fromARGB(0, 244, 67, 54), // Prva pozadina
             child: Column(
               children: [
@@ -717,8 +662,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                       Container(
                         width: double.infinity,
                         height: MediaQuery.of(context).size.height * 0.09,
-                        color: Color.fromARGB(
-                            0, 33, 149, 243), // Pozadina za prvi podkontenjer
+                        color: Color.fromARGB(0, 33, 149, 243), // Pozadina za prvi podkontenjer
                         child: Center(
                           child: Container(
                             width: 80, // Širina kruga
@@ -745,27 +689,40 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                       Container(
                         width: double.infinity,
                         height: MediaQuery.of(context).size.height * 0.03,
-                        color: Color.fromARGB(
-                            0, 255, 68, 58), // Pozadina za drugi podkontenjer
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 18.0),
-                            child: InkWell(
-                              onTap: () {
-                                _korisnikService.logout();
-                                setState(() {
-                                  _initialize();
-                                  activeTitleP = "home";
-                                });
-                              },
-                              child: Icon(
-                                Icons.logout,
-                                color: Color.fromARGB(255, 0, 0, 0),
-                                size: 30,
+                        color: Color.fromARGB(0, 255, 68, 58), // Pozadina za drugi podkontenjer
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 18.0),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.white, backgroundColor: Colors.red, // Boja teksta dugmeta
+                                ),
+                                onPressed: () {
+                                  obrisiProfil();
+                                },
+                                child: Text('Obriši'),
                               ),
                             ),
-                          ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 18.0),
+                              child: InkWell(
+                                onTap: () {
+                                  _korisnikService.logout();
+                                  setState(() {
+                                    _initialize();
+                                    activeTitleP = "home";
+                                  });
+                                },
+                                child: Icon(
+                                  Icons.logout,
+                                  color: Color.fromARGB(255, 0, 0, 0),
+                                  size: 30,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -774,10 +731,8 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                 // username
                 Container(
                   width: double.infinity,
-                  height: MediaQuery.of(context).size.height *
-                      0.04, // 12% visine ekrana
-                  color: Color.fromARGB(
-                      0, 76, 175, 79), // Pozadina za drugi podkontenjer
+                  height: MediaQuery.of(context).size.height * 0.04, // 12% visine ekrana
+                  color: Color.fromARGB(0, 76, 175, 79), // Pozadina za drugi podkontenjer
                   child: Center(
                     child: Text(
                       korisnik['username'] ?? 'N/A', // Prikaz korisničkog imena
@@ -795,16 +750,13 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
           // imePrezime, Status, email, broj, grad, ulica
           Container(
             width: double.infinity,
-            height:
-                MediaQuery.of(context).size.height * 0.30, // 28% visine ekrana
+            height: MediaQuery.of(context).size.height * 0.30, // 28% visine ekrana
             color: Color.fromARGB(0, 76, 175, 79), // Druga pozadina
             child: Center(
               // Dodano za centriranje unutarnjeg kontenjera
               child: Container(
-                width: MediaQuery.of(context).size.width *
-                    0.95, // 95% širine ekrana
-                height: MediaQuery.of(context).size.height *
-                    0.28, // 28% visine ekrana
+                width: MediaQuery.of(context).size.width * 0.95, // 95% širine ekrana
+                height: MediaQuery.of(context).size.height * 0.28, // 28% visine ekrana
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [
@@ -817,27 +769,22 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                   borderRadius: BorderRadius.circular(25.0), // Zaobljene ivice
                 ),
                 child: Column(
-                  mainAxisAlignment:
-                      MainAxisAlignment.center, // Centriranje djece
+                  mainAxisAlignment: MainAxisAlignment.center, // Centriranje djece
                   children: [
                     // imePrezime, Status,
                     Container(
-                      width: MediaQuery.of(context).size.width *
-                          0.90, // 90% širine ekrana
-                      height: MediaQuery.of(context).size.height *
-                          0.06, // 6% visine ekrana
+                      width: MediaQuery.of(context).size.width * 0.90, // 90% širine ekrana
+                      height: MediaQuery.of(context).size.height * 0.06, // 6% visine ekrana
                       decoration: BoxDecoration(
                         color: Colors.white, // Bijela boja pozadine
-                        borderRadius:
-                            BorderRadius.circular(12.0), // Zaobljene ivice
+                        borderRadius: BorderRadius.circular(12.0), // Zaobljene ivice
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           // Prvi dio: Ime i prezime korisnika
                           Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 7.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 7.0),
                             child: Row(
                               children: [
                                 const Icon(
@@ -845,8 +792,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                                   size: 20,
                                   color: Colors.black,
                                 ),
-                                const SizedBox(
-                                    width: 8), // Razmak između ikone i teksta
+                                const SizedBox(width: 8), // Razmak između ikone i teksta
                                 Text(
                                   getImePrezime(korisnik),
                                   style: const TextStyle(
@@ -879,22 +825,18 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                     SizedBox(height: 8), // Razmak između redova
                     //email broj
                     Container(
-                      width: MediaQuery.of(context).size.width *
-                          0.90, // 90% širine ekrana
-                      height: MediaQuery.of(context).size.height *
-                          0.06, // 6% visine ekrana
+                      width: MediaQuery.of(context).size.width * 0.90, // 90% širine ekrana
+                      height: MediaQuery.of(context).size.height * 0.06, // 6% visine ekrana
                       decoration: BoxDecoration(
                         color: Colors.white, // Bijela boja pozadine
-                        borderRadius:
-                            BorderRadius.circular(12.0), // Zaobljene ivice
+                        borderRadius: BorderRadius.circular(12.0), // Zaobljene ivice
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           // Prvi dio: Email korisnika
                           Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 7.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 7.0),
                             child: Row(
                               children: [
                                 const Icon(
@@ -902,8 +844,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                                   size: 20,
                                   color: Colors.black,
                                 ),
-                                const SizedBox(
-                                    width: 8), // Razmak između ikone i teksta
+                                const SizedBox(width: 8), // Razmak između ikone i teksta
                                 Text(
                                   korisnik['email'] ?? 'N/A',
                                   style: const TextStyle(
@@ -916,8 +857,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                           ),
                           // Drugi dio: Telefon korisnika
                           Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 7.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 7.0),
                             child: Row(
                               children: [
                                 const Icon(
@@ -925,8 +865,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                                   size: 20,
                                   color: Colors.black,
                                 ),
-                                const SizedBox(
-                                    width: 8), // Razmak između ikone i teksta
+                                const SizedBox(width: 8), // Razmak između ikone i teksta
                                 Text(
                                   getTelefon(korisnik),
                                   style: const TextStyle(
@@ -943,14 +882,11 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                     SizedBox(height: 8), // Razmak između redova
                     //Grad, ulica
                     Container(
-                      width: MediaQuery.of(context).size.width *
-                          0.90, // 90% širine ekrana
-                      height: MediaQuery.of(context).size.height *
-                          0.06, // 6% visine ekrana
+                      width: MediaQuery.of(context).size.width * 0.90, // 90% širine ekrana
+                      height: MediaQuery.of(context).size.height * 0.06, // 6% visine ekrana
                       decoration: BoxDecoration(
                         color: Colors.white, // Bijela boja pozadine
-                        borderRadius:
-                            BorderRadius.circular(12.0), // Zaobljene ivice
+                        borderRadius: BorderRadius.circular(12.0), // Zaobljene ivice
                       ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -961,8 +897,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                               size: 20,
                               color: Colors.black,
                             ),
-                            const SizedBox(
-                                width: 8), // Razmak između ikone i teksta
+                            const SizedBox(width: 8), // Razmak između ikone i teksta
                             Text(
                               adresa != null
                                   ? '${adresa?['grad'] ?? 'N/A'}, ${adresa?['ulica'] ?? 'N/A'}, ${adresa?['postanskiBroj'] ?? 'N/A'}'
@@ -984,8 +919,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
           //broj proizvoda, serviser
           Container(
             width: double.infinity,
-            height:
-                MediaQuery.of(context).size.height * 0.23, // 23% visine ekrana
+            height: MediaQuery.of(context).size.height * 0.23, // 23% visine ekrana
             color: const Color.fromARGB(0, 255, 235, 59), // Treća pozadina
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -1007,16 +941,14 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      borderRadius:
-                          BorderRadius.circular(10.0), // Zaobljene ivice
+                      borderRadius: BorderRadius.circular(10.0), // Zaobljene ivice
                     ),
                     child: Column(
                       children: [
                         Container(
                           width: MediaQuery.of(context).size.width * 0.43,
                           height: MediaQuery.of(context).size.height * 0.095,
-                          color: const Color.fromARGB(
-                              0, 244, 67, 54), // Boja pozadine za prvi dio
+                          color: const Color.fromARGB(0, 244, 67, 54), // Boja pozadine za prvi dio
                           child: Center(
                             child: _buildButton("Narudžbe"),
                           ),
@@ -1024,8 +956,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                         Container(
                           width: MediaQuery.of(context).size.width * 0.43,
                           height: MediaQuery.of(context).size.height * 0.095,
-                          color: const Color.fromARGB(
-                              0, 33, 149, 243), // Boja pozadine za drugi dio
+                          color: const Color.fromARGB(0, 33, 149, 243), // Boja pozadine za drugi dio
                           child: Center(
                             child: _buildButton("Rezervacije"),
                           ),
@@ -1048,8 +979,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
-                    borderRadius:
-                        BorderRadius.circular(10.0), // Zaobljene ivice
+                    borderRadius: BorderRadius.circular(10.0), // Zaobljene ivice
                   ),
                   child: korisnik['isAdmin']
                       ? Column(
@@ -1057,10 +987,8 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                           children: [
                             Container(
                               width: MediaQuery.of(context).size.width * 0.43,
-                              height:
-                                  MediaQuery.of(context).size.height * 0.095,
-                              color: const Color.fromARGB(
-                                  0, 244, 67, 54), // Prva boja
+                              height: MediaQuery.of(context).size.height * 0.095,
+                              color: const Color.fromARGB(0, 244, 67, 54), // Prva boja
                               //serviser
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -1069,19 +997,16 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                                     Text(
                                       'Zahtjev za licencu\nservisera je poslan',
                                       style: TextStyle(
-                                        color: Colors
-                                            .white, // Bijela boja za tekst
+                                        color: Colors.white, // Bijela boja za tekst
                                         fontSize: 15,
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
-                                  ] else if (korisnik['jeServiser'] ==
-                                      null) ...[
+                                  ] else if (korisnik['jeServiser'] == null) ...[
                                     Text(
                                       'Postani serviser',
                                       style: TextStyle(
-                                        color: Colors
-                                            .white, // Bijela boja za tekst
+                                        color: Colors.white, // Bijela boja za tekst
                                         fontSize: 14,
                                       ),
                                     ),
@@ -1090,8 +1015,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                                     Text(
                                       'Vaš servis',
                                       style: TextStyle(
-                                        color: Colors
-                                            .white, // Bijela boja za tekst
+                                        color: Colors.white, // Bijela boja za tekst
                                         fontSize: 14,
                                       ),
                                     ),
@@ -1103,10 +1027,8 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                             //admin
                             Container(
                               width: MediaQuery.of(context).size.width * 0.43,
-                              height:
-                                  MediaQuery.of(context).size.height * 0.095,
-                              color: const Color.fromARGB(
-                                  0, 76, 175, 79), // Druga boja
+                              height: MediaQuery.of(context).size.height * 0.095,
+                              color: const Color.fromARGB(0, 76, 175, 79), // Druga boja
                               child: Center(
                                 child: _buildButton('Admin'),
                               ),
@@ -1116,8 +1038,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                       : Container(
                           width: MediaQuery.of(context).size.width * 0.43,
                           height: MediaQuery.of(context).size.height * 0.095,
-                          color:
-                              const Color.fromARGB(0, 244, 67, 54), // Prva boja
+                          color: const Color.fromARGB(0, 244, 67, 54), // Prva boja
                           //serviser
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -1162,9 +1083,29 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
     );
   }
 
+  obrisiProfil() async {
+    if (korisnik?['status'] == "obrisan") {
+      PorukaHelper.prikaziPorukuUpozorenja(context, "Profil je obrisan");
+      return;
+    }
+    bool? confirmed = await ConfirmProzor.prikaziConfirmProzor(context, "Da li ste sigurni da želite obrisati profil?");
+    if (confirmed != true) {
+      return;
+    }
+    try {
+      await _korisnikService.upravljanjeKorisnikom("obrisan", korisnikId);
+      PorukaHelper.prikaziPorukuUspjeha(context, "Profil uspješno obrisan");
+    } catch (e) {
+      PorukaHelper.prikaziPorukuGreske(context, "Greška prilikom brisanja korisnika");
+    }
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const GlavniProzor()),
+    );
+  }
+
   String getImePrezime(Map<String, dynamic> korisnik) {
-    if (korisnik['korisnikInfos'] != null &&
-        korisnik['korisnikInfos'].isNotEmpty) {
+    if (korisnik['korisnikInfos'] != null && korisnik['korisnikInfos'].isNotEmpty) {
       String imePrezime = korisnik['korisnikInfos'][0]['imePrezime'] ?? 'N/A';
       return imePrezime.isNotEmpty ? imePrezime : 'N/A';
     }
@@ -1176,8 +1117,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
   }
 
   String getTelefon(Map<String, dynamic> korisnik) {
-    if (korisnik['korisnikInfos'] != null &&
-        korisnik['korisnikInfos'].isNotEmpty) {
+    if (korisnik['korisnikInfos'] != null && korisnik['korisnikInfos'].isNotEmpty) {
       String telefon = korisnik['korisnikInfos'][0]['telefon'] ?? 'N/A';
       return telefon.isNotEmpty ? telefon : 'N/A';
     }
@@ -1260,8 +1200,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
         break;
       case 'Posalji':
         if (cijenaNovog <= 0) {
-          PorukaHelper.prikaziPorukuUpozorenja(
-              context, 'Cijena mora biti veca od 0.');
+          PorukaHelper.prikaziPorukuUpozorenja(context, 'Cijena mora biti veca od 0.');
 
           Navigator.of(context).pop();
           break;
@@ -1275,8 +1214,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
   }
 
   Future<void> slanjeZahtjeva(BuildContext context) async {
-    String? result =
-        await _serviserService.postServiser(korisnikId, cijenaNovog);
+    String? result = await _serviserService.postServiser(korisnikId, cijenaNovog);
 
     bool uspjesnoDodano = result == "Zahtjev uspješno poslan";
 
@@ -1385,8 +1323,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                                     border: InputBorder.none,
                                   ),
                                   onChanged: (value) {
-                                    if (value.isNotEmpty &&
-                                        int.tryParse(value) != null) {
+                                    if (value.isNotEmpty && int.tryParse(value) != null) {
                                       cijenaNovog = int.parse(value);
                                     }
                                   },
@@ -1403,8 +1340,7 @@ class _KorisnikovProfilState extends State<KorisnikovProfil> {
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height * 0.10,
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(
-                        0, 255, 235, 59), // Promijeni pozadinu po želji
+                    color: const Color.fromARGB(0, 255, 235, 59), // Promijeni pozadinu po želji
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(20.0),
                       bottomRight: Radius.circular(20.0),

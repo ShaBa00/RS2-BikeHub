@@ -310,7 +310,7 @@ namespace BikeHub.Services
         public List<object> GetPromotedItems()
         {
             var promotedBicikli = _context.Bicikls
-                .Where(b => b.PromocijaBiciklis.Any(pb => pb.Status == "aktivan"))
+                .Where(b => b.Status == "aktivan" && b.PromocijaBiciklis.Any(pb => pb.Status == "aktivan"))
                 .Select(b => new
                 {
                     b.BiciklId,
@@ -326,7 +326,7 @@ namespace BikeHub.Services
                 }).ToList();
 
             var promotedDijelovi = _context.Dijelovis
-                .Where(d => d.PromocijaDijelovis.Any(pd => pd.Status != "zavrseno" && pd.Status != "obrisan" && pd.Status != "vracen"))
+                .Where(d => d.Status == "aktivan" && d.PromocijaDijelovis.Any(pd => pd.Status != "zavrseno" && pd.Status != "obrisan" && pd.Status != "vracen"))
                 .Select(d => new
                 {
                     d.DijeloviId,
@@ -340,7 +340,6 @@ namespace BikeHub.Services
                         s.Slika
                     }).ToList()
                 }).ToList();
-
 
             if (!promotedBicikli.Any() && !promotedDijelovi.Any())
             {
@@ -385,6 +384,7 @@ namespace BikeHub.Services
 
             return promotedBicikli.Cast<object>().Concat(promotedDijelovi.Cast<object>()).ToList();
         }
+
 
 
 

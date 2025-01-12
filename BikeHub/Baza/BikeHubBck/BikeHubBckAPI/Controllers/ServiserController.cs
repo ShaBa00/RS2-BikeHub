@@ -85,5 +85,22 @@ namespace BikeHubBck.Controllers
             var result = _serviserService.GetServiserDTOList(searchObject);
             return Ok(result);
         }
+
+        [HttpGet("izvjestaj-serviser")] 
+        public IActionResult GetIzvjestajServiser()
+        {
+            var currentUsername = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (currentUsername != null)
+            {
+
+                if (!_functionHelper.IsUserAdmin(currentUsername))
+                {
+                    throw new UserException("Samo admin ima pristup izvještaju");
+                }
+            }
+
+            var result = _serviserService.GetServiserIzvjestaj();
+            return Ok(result);
+        }
     }
 }

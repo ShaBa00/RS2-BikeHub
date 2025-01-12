@@ -170,7 +170,6 @@ namespace BikeHub.Services
 
         public List<Model.BicikliFM.Bicikli> GetRecommendedBiciklList(int DijeloviID)
         {
-            // Pronađi preporučene bicikle za dati DijeloviID
             var recommendedBicikliIds = _context.RecommendedKategorijas
                 .Where(rk => rk.DijeloviId == DijeloviID && rk.Status == "aktivan")
                 .Select(rk => rk.BicikliId)
@@ -194,7 +193,6 @@ namespace BikeHub.Services
                     return null;
                 }
             }
-            // Filtriraj bicikle s količinom > 0 među preporučenima
             var recommendedBicikli = _context.Bicikls
                 .Include(x => x.SlikeBiciklis)
                 .Where(b => recommendedBicikliIds.Contains(b.BiciklId) && b.Kolicina > 0 && b.Status == "aktivan")
@@ -229,7 +227,6 @@ namespace BikeHub.Services
         }
         public List<Model.DijeloviFM.Dijelovi> GetRecommendedDijeloviList(int BiciklID)
         {
-            // Pronađi preporučene bicikle za dati DijeloviID
             var recommendedDijeloviIds = _context.RecommendedKategorijas
                 .Where(rk => rk.BicikliId == BiciklID && rk.Status == "aktivan")
                 .Select(rk => rk.DijeloviId)

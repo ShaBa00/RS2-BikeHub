@@ -3,6 +3,7 @@
 import 'package:bikehub_desktop/modeli/korisnik/korisnik_model.dart';
 import 'package:bikehub_desktop/screens/korisnik/korisnik_proizvodi_prikaz.dart';
 import 'package:bikehub_desktop/screens/korisnik/rezervacije_korisnika.dart';
+import 'package:bikehub_desktop/screens/ostalo/confirm_prozor.dart';
 import 'package:bikehub_desktop/screens/ostalo/poruka_helper.dart';
 import 'package:bikehub_desktop/screens/prijava/log_in_prozor.dart';
 import 'package:bikehub_desktop/screens/serviser/serviser_profil.dart';
@@ -237,6 +238,10 @@ class _ProfilProzorState extends State<ProfilProzor> {
   }
 
   void obrisi() async {
+    bool? confirmed = await ConfirmProzor.prikaziConfirmProzor(context, 'Da li ste sigurni da želite obrisati vaš profil?');
+    if (confirmed != true) {
+      return;
+    }
     if (widget.korisnikId == 0) {
       PorukaHelper.prikaziPorukuUpozorenja(context, "Problem prilikom dohvacanja vašeg ID-a");
       return;

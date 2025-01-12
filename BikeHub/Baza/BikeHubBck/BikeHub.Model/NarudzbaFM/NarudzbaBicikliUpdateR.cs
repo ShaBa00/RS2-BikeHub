@@ -6,9 +6,6 @@ namespace BikeHub.Model.NarudzbaFM
 {
     public class NarudzbaBicikliUpdateR
     {
-
-        //public int NarudzbaBicikliId { get; set; }
-
         public int? NarudzbaId { get; set; }
 
         public int? BiciklId { get; set; }

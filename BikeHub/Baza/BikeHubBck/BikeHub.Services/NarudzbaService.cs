@@ -94,14 +94,6 @@ namespace BikeHub.Services
             base.BeforeInsert(request, entity);
         }
 
-        //public override void BeforeUpdate(NarudzbaUpdateR request, Database.Narudzba entity)
-        //{
-        //    if (!string.IsNullOrWhiteSpace(request.Status))
-        //    {
-        //        entity.Status = request.Status;
-        //    }
-        //    base.BeforeUpdate(request, entity);
-        //}
 
         public override Model.NarudzbaFM.Narudzba Insert(NarudzbaInsertR request)
         {
@@ -119,7 +111,6 @@ namespace BikeHub.Services
             {
                 throw new UserException("Entitet sa datim ID-om ne postoji");
             }
-            //BeforeUpdate(request, entity);
             var state = _baseDrugaGrupaState.CreateState(entity.Status);
             return state.Update(id, request);
         }
@@ -170,7 +161,6 @@ namespace BikeHub.Services
                 listaDijeloviId.Add(narudzbaDijelovi.DijeloviId);
             }
 
-            // Uzimanje zadnje narudžbe korisnika
             var zadnjaNarudzba = _context.Narudzbas
                 .Where(n => n.KorisnikId == korisnikId && n.NarudzbaId != id)
                 .OrderByDescending(n => n.DatumNarudzbe)
@@ -213,7 +203,7 @@ namespace BikeHub.Services
                             DijeloviId = dijeloviId,
                             BrojPreporuka = 1,
                             DatumKreiranja = DateTime.Now,
-                            Status = "kreiran"
+                            Status = "aktivan"
                         };
                         _context.RecommendedKategorijas.Add(noviRecommendedKategorija);
                     }

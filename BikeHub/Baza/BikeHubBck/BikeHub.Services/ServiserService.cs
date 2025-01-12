@@ -1,5 +1,6 @@
 ﻿using BikeHub.Model;
 using BikeHub.Model.Ostalo;
+using BikeHub.Model.PromocijaFM;
 using BikeHub.Model.ServisFM;
 using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
@@ -214,6 +215,59 @@ namespace BikeHub.Services
                 ResultsList = resultsList
             };
         }
+        public ServiserIzvjestaj GetServiserIzvjestaj()
+        {
+            var izvjestaj = new ServiserIzvjestaj();
 
+            var serviseri = _context.Servisers.ToList();
+            var rezervacije = _context.RezervacijaServisas.ToList();
+
+            var najaktivnijiServiser = rezervacije
+                .Where(r => r.Status == "zavrseno")
+                .GroupBy(r => r.Serviser)
+                .OrderByDescending(g => g.Count())
+                .FirstOrDefault();
+
+            if (najaktivnijiServiser != null)
+            {
+                izvjestaj.NajaktivnijiServiser = najaktivnijiServiser.Key.Korisnik.Username;
+                izvjestaj.BrojZavrsenihServisa = najaktivnijiServiser.Count();
+                izvjestaj.ZbirCijenaZavrsenihServisa = najaktivnijiServiser.Sum(r => r.Serviser.Cijena ?? 0);
+            }
+
+            var currentMonth = DateTime.Now.Month;
+            var lastMonth = DateTime.Now.AddMonths(-1).Month;
+
+            var najboljiServiserTrenutniMjesec = rezervacije
+                .Where(r => r.Status == "zavrseno" && r.DatumRezervacije.Month == currentMonth)
+                .GroupBy(r => r.Serviser)
+                .OrderByDescending(g => g.Average(r => r.Ocjena ?? 0))
+                .FirstOrDefault();
+
+            if (najboljiServiserTrenutniMjesec != null)
+            {
+                izvjestaj.NajboljiServiserTrenutniMjesec = najboljiServiserTrenutniMjesec.Key.Korisnik.Username;
+                izvjestaj.ZbirCijenaTrenutniMjesec = najboljiServiserTrenutniMjesec.Sum(r => r.Serviser.Cijena ?? 0);
+                izvjestaj.ProsjecnaOcjenaTrenutniMjesec = najboljiServiserTrenutniMjesec.Average(r => r.Ocjena ?? 0);
+            }
+
+            var najboljiServiserProsliMjesec = rezervacije
+                .Where(r => r.Status == "zavrseno" && r.DatumRezervacije.Month == lastMonth)
+                .GroupBy(r => r.Serviser)
+                .OrderByDescending(g => g.Average(r => r.Ocjena ?? 0))
+                .FirstOrDefault();
+
+            if (najboljiServiserProsliMjesec != null)
+            {
+                izvjestaj.NajboljiServiserProsliMjesec = najboljiServiserProsliMjesec.Key.Korisnik.Username;
+                izvjestaj.ZbirCijenaProsliMjesec = najboljiServiserProsliMjesec.Sum(r => r.Serviser.Cijena ?? 0);
+                izvjestaj.ProsjecnaOcjenaProsliMjesec = najboljiServiserProsliMjesec.Average(r => r.Ocjena ?? 0);
+            }
+
+            izvjestaj.UkupanBrojServisera = serviseri.Count;
+            izvjestaj.UkupanBrojRezervacija = rezervacije.Count;
+
+            return izvjestaj;
+        }
     }
 }

@@ -14,7 +14,7 @@ class ServiserService {
   List<dynamic> listaServisra = [];
   int count = 0;
 
-    Future<void> _addAuthorizationHeader() async {
+  Future<void> _addAuthorizationHeader() async {
     // Provjera da li je korisnik prijavljen
     final isLoggedIn = await _korisnikService.isLoggedIn();
     if (!isLoggedIn) {
@@ -31,7 +31,7 @@ class ServiserService {
     }
     // Generiraj Authorization header
     final authHeader = _korisnikService.encodeBasicAuth(username, password);
-    _dio.options.headers['Authorization'] = authHeader; 
+    _dio.options.headers['Authorization'] = authHeader;
   }
 
   Future<String?> dodajServisera(int korisnikId, double cijena) async {
@@ -78,7 +78,7 @@ class ServiserService {
 
   Future<List<Map<String, dynamic>>> getServiseriDTO({
     String? username,
-    String? status,//="aktivan",
+    String? status, //="aktivan",
     double? pocetnaCijena,
     double? krajnjaCijena,
     double? pocetnaOcjena,
@@ -115,19 +115,18 @@ class ServiserService {
       );
 
       if (response.statusCode == 200) {
-        listaServisra= response.data['resultsList'] ?? [];
+        listaServisra = response.data['resultsList'] ?? [];
         count = response.data['count'];
         List<Map<String, dynamic>> serviseri = List<Map<String, dynamic>>.from(response.data['resultsList']);
         if (korisniciId != null && korisniciId.isNotEmpty) {
           final filteredDijelovi = serviseri.where((dio) {
             return korisniciId.contains(dio['korisnikId']);
           }).toList();
-          
+
           listaUcitanihServisera.value = filteredDijelovi;
-          serviseri=listaUcitanihServisera.value;
-        }
-        else{
-        listaUcitanihServisera.value = serviseri;
+          serviseri = listaUcitanihServisera.value;
+        } else {
+          listaUcitanihServisera.value = serviseri;
         }
         // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
         listaUcitanihServisera.notifyListeners();
@@ -232,7 +231,25 @@ class ServiserService {
             throw Exception('Greška pri brisanju Servisera');
           }
         }
-      } 
+      }
+    } catch (e) {
+      logger.e('Greška: $e');
+      // ignore: use_rethrow_when_possible
+      throw e;
+    }
+  }
+
+  Future<Map<String, dynamic>> getServiserIzvjestaj() async {
+    try {
+      await _addAuthorizationHeader();
+
+      final response = await _dio.get('${HelperService.baseUrl}/Serviser/izvjestaj-serviser');
+
+      if (response.statusCode == 200) {
+        return response.data;
+      } else {
+        throw Exception("Failed to load Izvjestaj Promocija");
+      }
     } catch (e) {
       logger.e('Greška: $e');
       // ignore: use_rethrow_when_possible

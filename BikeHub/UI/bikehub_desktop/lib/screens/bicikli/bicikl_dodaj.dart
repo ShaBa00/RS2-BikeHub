@@ -214,7 +214,7 @@ class _BiciklDodajProzorState extends State<BiciklDodajProzor> {
       stanje: "",
       ak: 0,
       kolicina: kolicina,
-      korisnikId: korisnikId, // Dodajte odgovarajući korisnik ID
+      korisnikId: korisnikId,
     );
     biciklFinal = bicikl;
     showDialog(
@@ -241,7 +241,6 @@ class _BiciklDodajProzorState extends State<BiciklDodajProzor> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Pozadina celog ekrana sa gradijentom
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(

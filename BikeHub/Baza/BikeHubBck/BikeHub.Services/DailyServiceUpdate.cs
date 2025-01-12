@@ -34,15 +34,12 @@ namespace BikeHub.Services
 
                     if (!context.PromocijaBiciklis.Any() && !context.PromocijaDijelovis.Any() && !context.RezervacijaServisas.Any())
                     {
-                        // Ako baza ne sadrži podatke, čekaj 24 sata i nastavi
                         await Task.Delay(TimeSpan.FromDays(1), stoppingToken);
                         continue;
                     }
 
-                    // Provjeri da li je baza već kreirana
                     if (context == null || !context.PromocijaBiciklis.Any() || !context.PromocijaDijelovis.Any() || !context.RezervacijaServisas.Any())
                     {
-                        // Ako je baza prazna, preskoči izvršavanje i čekaj sljedeći interval
                         await Task.Delay(TimeSpan.FromDays(1), stoppingToken);
                         continue;
                     }
