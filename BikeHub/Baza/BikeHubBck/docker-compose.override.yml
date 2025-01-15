@@ -1,0 +1,11 @@
+version: '3'
+services:
+  rabbitmq:
+    volumes:
+      - ./docker_data/rabbitmq_data:/var/lib/rabbitmq
+      - ./docker_data/rabbitmq_logs:/var/log/rabbitmq
+    command: >
+      bash -c "
+      chmod 600 /var/lib/rabbitmq/.erlang.cookie &&
+      chown rabbitmq:rabbitmq /var/lib/rabbitmq/.erlang.cookie &&
+      docker-entrypoint.sh rabbitmq-server"
