@@ -27,14 +27,19 @@ Before setting up the environments, ensure you have:
 https://github.com/ShaBa00/RS2-BikeHub
 2. **Open the main project folder**
 3. **Add the provided .env file to the folder**
-3. **Type in the command:**
-docker compose up
+Open CMD (Command Prompt) or another terminal and navigate to the location where the project is located
+ (.\RS2-BikeHub\BikeHub\Baza\BikeHubBck)
+4. **Type in the command:**
+
+docker-compose up --build
 Wait for docker to finish composing
+
+To ensure that all parts within Docker have started, within your CMD, if the message 'Subscriber is running...'
+ appears two or more times, it could be a positive sign that you can proceed to test the applications
+
 If you want to check only the API endpoints you can open Swagger
 
- **If you choose the erestorante_desktop follow these steps:**
-
- Once you have started the API or Docker, you can proceed with launching the applications, which are located in the file fit-build-2025-01-12.zip.
+Once you have started the API or Docker, you can proceed with launching the applications, which are located in the file fit-build-2025-01-12.zip.
 
 First, you need to unzip the folder, after which you will find:
 

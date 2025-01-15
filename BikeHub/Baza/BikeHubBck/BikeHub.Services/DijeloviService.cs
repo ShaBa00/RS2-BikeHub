@@ -4,14 +4,12 @@ using BikeHub.Model.DijeloviFM;
 using BikeHub.Model.KorisnikFM;
 using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
-using EasyNetQ;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using RabbitMQ.Client;
+using System.Text.Json;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BikeHub.Services
 {
@@ -19,6 +17,7 @@ namespace BikeHub.Services
         Database.Dijelovi,Model.DijeloviFM.DijeloviInsertR, Model.DijeloviFM.DijeloviUpdateR>, IDijeloviService
     {
         private BikeHubDbContext _context;
+        private readonly IServiceProvider _serviceProvider;
 
         public BasePrvaGrupaState<Model.DijeloviFM.Dijelovi,Database.Dijelovi, Model.DijeloviFM.DijeloviInsertR,
             Model.DijeloviFM.DijeloviUpdateR> _basePrvaGrupaState;
@@ -27,11 +26,14 @@ namespace BikeHub.Services
 
         public DijeloviService(BikeHubDbContext context, IMapper mapper, BasePrvaGrupaState<Model.DijeloviFM.Dijelovi,
             Database.Dijelovi, Model.DijeloviFM.DijeloviInsertR,
-            Model.DijeloviFM.DijeloviUpdateR> basePrvaGrupaState, ISlikeDijeloviService slikeDijeloviService)
+            Model.DijeloviFM.DijeloviUpdateR> basePrvaGrupaState,
+           IServiceProvider serviceProvider,
+           ISlikeDijeloviService slikeDijeloviService)
         : base(context, mapper)
         {
             _context = context;
             _basePrvaGrupaState = basePrvaGrupaState;
+            _serviceProvider = serviceProvider;
             _slikeDijeloviService = (SlikeDijeloviService)slikeDijeloviService;
         }
         public override IQueryable<Database.Dijelovi> AddFilter(DijeloviSearchObject search, IQueryable<Database.Dijelovi> query)
@@ -175,17 +177,34 @@ namespace BikeHub.Services
                 }
                 if (request.Cijena < entity.Cijena)
                 {
-                    var bus = RabbitHutch.CreateBus("host=rabbitmq;virtualHost=/;username=guest;password=guest;port=5672");
+                    using var scope = _serviceProvider.CreateScope();
+                    var channel = scope.ServiceProvider.GetRequiredService<IModel>();
+
                     var korisnici = _context.Korisniks
                         .Where(k => k.SpaseniDijelovis.Any(sb => sb.DijeloviId == entity.DijeloviId))
                         .ToListAsync().Result;
+
                     var korisniciEmails = korisnici.Select(k => k.Email).ToList();
                     var mappedEntity = Mapper.Map<Model.DijeloviFM.Dijelovi>(entity);
-                    bus.PubSub.Publish(new DijeloviAndEmailscs
+
+                    var message = new DijeloviAndEmailscs
                     {
                         Dijelovi = mappedEntity,
                         Emails = korisniciEmails
-                    });
+                    };
+
+                    channel.ExchangeDeclare(exchange: "BikeHubExchange", type: ExchangeType.Direct, durable: true);
+                    channel.QueueDeclare(queue: "EmailDijelovi", durable: true, exclusive: false, autoDelete: false, arguments: null);
+                    channel.QueueBind(queue: "EmailDijelovi", exchange: "BikeHubExchange", routingKey: "EmailDijelovi");
+
+                    var messageBody = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message));
+
+                    channel.BasicPublish(
+                        exchange: "BikeHubExchange",
+                        routingKey: "EmailDijelovi",
+                        basicProperties: null,
+                        body: messageBody
+                    );
 
                 }
                 entity.Cijena = request.Cijena.Value;

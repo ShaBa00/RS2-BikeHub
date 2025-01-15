@@ -1,74 +1,91 @@
-﻿using BikeHub.Services.Database;
-using EasyNetQ;
-using BikeHub.Model.BicikliFM;
-using BikeHub.Model.KorisnikFM;
-// See https://aka.ms/new-console-template for more information
+﻿using System.Text;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
+using System.Text.Json;
 
-var bus = RabbitHutch.CreateBus("host=rabbitmq;virtualHost=/;username=guest;password=guest;port=5672");
-await bus.PubSub.SubscribeAsync<BikeHub.Model.BicikliFM.BiciklAndEmails>("EmailBicikl", async msg =>
-{
-    Console.WriteLine($"Product activated: {msg.Bicikl.Naziv}");
-    try
-    {
-        if (msg.Emails != null && msg.Emails.Any())
-        {
-            foreach (var email in msg.Emails)
-            {
-                Console.WriteLine($"Found korisnik: {email}");
-
-                if (IsValidEmail(email))
-                {
-                    Console.WriteLine($"Sending email to: {email}");
-                    await SendEmailAsync(email, msg.Bicikl.Naziv, (decimal)msg.Bicikl.Cijena, true);
-                }
-            }
-        }
-        else
-        {
-            Console.WriteLine("No users found in message.");
-        }
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error processing message: {ex.Message}");
-    }
-});
-await bus.PubSub.SubscribeAsync<BikeHub.Model.DijeloviFM.DijeloviAndEmailscs>("EmailDijelovi", async msg =>
-{
-    Console.WriteLine($"Product activated: {msg.Dijelovi.Naziv}");
-    try
-    {
-        if (msg.Emails != null && msg.Emails.Any())
-        {
-            foreach (var email in msg.Emails)
-            {
-                Console.WriteLine($"Found korisnik: {email}");
-
-                if (IsValidEmail(email))
-                {
-                    Console.WriteLine($"Sending email to: {email}");
-                    await SendEmailAsync(email, msg.Dijelovi.Naziv, (decimal)msg.Dijelovi.Cijena, false);
-                }
-            }
-        }
-        else
-        {
-            Console.WriteLine("No users found in message.");
-        }
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error processing message: {ex.Message}");
-    }
-});
 Console.WriteLine("Listening for messages, press <return> key to close!");
-Console.ReadLine();
 
+var factory = new ConnectionFactory
+{
+    HostName = "rabbitmq",
+    VirtualHost = "/",
+    UserName = "guest",
+    Password = "guest",
+    Port = 5672
+};
 
+using var connection = factory.CreateConnection();
+using var channel = connection.CreateModel();
+
+// Pretplata na "EmailBicikl"
+channel.QueueDeclare(queue: "EmailBicikl", durable: true, exclusive: false, autoDelete: false, arguments: null);
+
+var consumerBicikl = new EventingBasicConsumer(channel);
+consumerBicikl.Received += async (model, ea) =>
+{
+    var body = ea.Body.ToArray();
+    var message = Encoding.UTF8.GetString(body);
+
+    Console.WriteLine($"Primljena poruka za bicikl: {message}");
+
+    try
+    {
+        var biciklMsg = JsonSerializer.Deserialize<BikeHub.Model.BicikliFM.BiciklAndEmails>(message);
+        if (biciklMsg != null)
+        {
+            foreach (var email in biciklMsg.Emails)
+            {
+                if (IsValidEmail(email))
+                {
+                    await SendEmailAsync(email, biciklMsg.Bicikl.Naziv, biciklMsg.Bicikl.Cijena.GetValueOrDefault(), true);
+                }
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Greška prilikom obrade poruke za bicikl: {ex.Message}");
+    }
+};
+channel.BasicConsume(queue: "EmailBicikl", autoAck: true, consumer: consumerBicikl);
+
+// Pretplata na "EmailDijelovi"
+channel.QueueDeclare(queue: "EmailDijelovi", durable: true, exclusive: false, autoDelete: false, arguments: null);
+
+var consumerDijelovi = new EventingBasicConsumer(channel);
+consumerDijelovi.Received += async (model, ea) =>
+{
+    var body = ea.Body.ToArray();
+    var message = Encoding.UTF8.GetString(body);
+
+    Console.WriteLine($"Primljena poruka za dijelove: {message}");
+
+    try
+    {
+        var dijeloviMsg = JsonSerializer.Deserialize<BikeHub.Model.DijeloviFM.DijeloviAndEmailscs>(message);
+        if (dijeloviMsg != null)
+        {
+            foreach (var email in dijeloviMsg.Emails)
+            {
+                if (IsValidEmail(email))
+                {
+                    await SendEmailAsync(email, dijeloviMsg.Dijelovi.Naziv, dijeloviMsg.Dijelovi.Cijena.GetValueOrDefault(), false);
+                }
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Greška prilikom obrade poruke za dijelove: {ex.Message}");
+    }
+};
+channel.BasicConsume(queue: "EmailDijelovi", autoAck: true, consumer: consumerDijelovi);
+
+// Main Loop
 while (true)
 {
-    await Task.Delay(10000);
     Console.WriteLine("Subscriber is running...");
+    await Task.Delay(10000);
 }
 
 bool IsValidEmail(string email)
@@ -87,31 +104,26 @@ bool IsValidEmail(string email)
 async Task SendEmailAsync(string toEmail, string naziv, decimal novaCijena, bool isBicikl)
 {
     var fromAddress = "bikehubrsii@gmail.com";
-    var toAddress = toEmail;
     var subject = isBicikl ? "Promjena cijene bicikla" : "Promjena cijene dijela";
     var body = isBicikl
         ? $"Bicikl koji ste sačuvali na aplikaciji '{naziv}' je upravo promijenio cijenu na '{novaCijena}'"
         : $"Dio koji ste sačuvali na aplikaciji '{naziv}' je upravo promijenio cijenu na '{novaCijena}'";
 
-    Console.WriteLine($"Attempting to send email to: {toEmail} with subject: {subject} and body: {body}");
-
     try
     {
-        using (var smtp = new System.Net.Mail.SmtpClient())
+        using var smtp = new System.Net.Mail.SmtpClient("smtp.gmail.com", 587)
         {
-            smtp.Host = "smtp.gmail.com";
-            smtp.Port = 587;
-            smtp.Credentials = new System.Net.NetworkCredential("bikehubrsii@gmail.com", "tnpj bcab mqne ivru");
-            smtp.EnableSsl = true;
+            Credentials = new System.Net.NetworkCredential("bikehubrsii@gmail.com", "tnpj bcab mqne ivru"),
+            EnableSsl = true
+        };
 
-            var message = new System.Net.Mail.MailMessage(fromAddress, toAddress, subject, body);
-            await smtp.SendMailAsync(message);
-            Console.WriteLine($"Email poslan na: '{toAddress}'");
-        }
+        using var message = new System.Net.Mail.MailMessage(fromAddress, toEmail, subject, body);
+        await smtp.SendMailAsync(message);
+
+        Console.WriteLine($"Email poslan na: '{toEmail}'");
     }
     catch (Exception ex)
     {
         Console.WriteLine($"Greška prilikom slanja emaila: {ex.Message}");
-        Console.WriteLine($"Detalji greške: {ex.StackTrace}");
     }
 }

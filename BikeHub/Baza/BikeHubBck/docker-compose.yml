@@ -35,8 +35,11 @@ services:
     links:
       - bikehub-sql
     depends_on:
-      - bikehub-sql
-      - rabbitmq
+      bikehub-sql:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+
 
   # rabbitmq docker
   rabbitmq:
@@ -76,8 +79,6 @@ services:
       - RabbitMQ:Password=${RABBITMQ_PASSWORD}
       - RabbitMQ:VirtualHost=${RABBITMQ_VIRTUALHOST}
       - RabbitMQ:Port=${RABBITMQ_PORT}
-    ports:
-      - 7078:7078
     links:
       - bikehub-sql
     depends_on:

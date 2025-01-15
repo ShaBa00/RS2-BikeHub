@@ -133,8 +133,28 @@ builder.Services.AddMapster();
 builder.Services.AddAuthentication("BasicAuthentication")
     .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
 
-var rabbitMqFactory = new ConnectionFactory() { HostName = builder.Configuration["RabbitMQ:HostName"] };
+var rabbitMqFactory = new ConnectionFactory
+{
+    HostName = "rabbitmq",
+    VirtualHost = "/",
+    UserName = "guest",
+    Password = "guest",
+    Port = 5672
+};
+
 builder.Services.AddSingleton(rabbitMqFactory);
+
+builder.Services.AddSingleton<IConnection>(provider =>
+{
+    var factory = provider.GetRequiredService<ConnectionFactory>();
+    return factory.CreateConnection();
+});
+
+builder.Services.AddScoped<IModel>(provider =>
+{
+    var connection = provider.GetRequiredService<IConnection>();
+    return connection.CreateModel();
+});
 
 
 var app = builder.Build();

@@ -2,14 +2,13 @@
 using BikeHub.Model.BicikliFM;
 using BikeHub.Services.BikeHubStateMachine;
 using BikeHub.Services.Database;
-using EasyNetQ;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using System.Text;
-using System.Threading.Tasks;
+using RabbitMQ.Client;
+using System.Text.Json;
+
 
 namespace BikeHub.Services
 {
@@ -17,6 +16,7 @@ namespace BikeHub.Services
         Model.BicikliFM.BicikliInsertR, Model.BicikliFM.BicikliUpdateR> , IBicikliService
     {
         private BikeHubDbContext _context;
+        private readonly IServiceProvider _serviceProvider;
 
         public BasePrvaGrupaState<Model.BicikliFM.Bicikli, Database.Bicikl,
         Model.BicikliFM.BicikliInsertR, Model.BicikliFM.BicikliUpdateR> _basePrvaGrupaState;
@@ -26,11 +26,13 @@ namespace BikeHub.Services
        public BicikliService(BikeHubDbContext context, IMapper mapper,
            BasePrvaGrupaState<Model.BicikliFM.Bicikli, Database.Bicikl,
          Model.BicikliFM.BicikliInsertR, Model.BicikliFM.BicikliUpdateR> basePrvaGrupaState,
+           IServiceProvider serviceProvider,
            ISlikeBicikliService slikeBicikliService)
          : base(context, mapper)
         {
             _context = context; 
             _basePrvaGrupaState = basePrvaGrupaState; 
+            _serviceProvider=serviceProvider;
             _slikeBicikliService = (SlikeBicikliService)slikeBicikliService;
         }
 
@@ -195,21 +197,38 @@ namespace BikeHub.Services
                 {
                     throw new UserException("Cijena bicikla mora biti veća od nule");
                 }
-                if(request.Cijena < entity.Cijena)
+                if (request.Cijena < entity.Cijena)
                 {
-                    var bus = RabbitHutch.CreateBus("host=rabbitmq;virtualHost=/;username=guest;password=guest;port=5672");
+                    using var scope = _serviceProvider.CreateScope();
+                    var channel = scope.ServiceProvider.GetRequiredService<IModel>();
+
                     var korisnici = _context.Korisniks
                         .Where(k => k.SpaseniBiciklis.Any(sb => sb.BiciklId == entity.BiciklId))
                         .ToListAsync().Result;
+
                     var korisniciEmails = korisnici.Select(k => k.Email).ToList();
                     var mappedEntity = Mapper.Map<Model.BicikliFM.Bicikli>(entity);
-                    bus.PubSub.Publish(new BiciklAndEmails
+
+                    var message = new BiciklAndEmails
                     {
                         Bicikl = mappedEntity,
                         Emails = korisniciEmails
-                    });
+                    };
 
+                    channel.ExchangeDeclare(exchange: "BikeHubExchange", type: ExchangeType.Direct, durable: true);
+                    channel.QueueDeclare(queue: "EmailBicikl", durable: true, exclusive: false, autoDelete: false, arguments: null);
+                    channel.QueueBind(queue: "EmailBicikl", exchange: "BikeHubExchange", routingKey: "EmailBicikl");
+
+                    var messageBody = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message));
+
+                    channel.BasicPublish(
+                        exchange: "BikeHubExchange",
+                        routingKey: "EmailBicikl",
+                        basicProperties: null,
+                        body: messageBody
+                    );
                 }
+
                 entity.Cijena = request.Cijena.Value;
             }
             if (request.Kolicina.HasValue)
