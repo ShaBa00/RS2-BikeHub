@@ -26,6 +26,7 @@ Before setting up the environments, ensure you have:
 **Clone the repository:r**
 https://github.com/ShaBa00/RS2-BikeHub
 2. **Open the main project folder**
+"..RS2-BikeHub\BikeHub\Baza\BikeHubBck"
 3. **Add the provided .env file to the folder**
 Open CMD (Command Prompt) or another terminal and navigate to the location where the project is located
  (.\RS2-BikeHub\BikeHub\Baza\BikeHubBck)
