@@ -180,7 +180,7 @@ namespace BikeHubBck.Ostalo
                 {
                     BiciklId = 1,
                     DatumPocetka = DateTime.Now,
-                    DatumZavrsetka = new DateTime(2025, 3, 3),
+                    DatumZavrsetka = new DateTime(2025, 5, 5),
                     CijenaPromocije = 100,
                     Status = "aktivan"
                 });
@@ -283,7 +283,7 @@ namespace BikeHubBck.Ostalo
                 {
                     DijeloviId = 1,
                     DatumPocetka = DateTime.Now,
-                    DatumZavrsetka = new DateTime(2025, 3, 3),
+                    DatumZavrsetka = new DateTime(2025, 5, 5),
                     CijenaPromocije = 50,
                     Status = "aktivan"
                 });
