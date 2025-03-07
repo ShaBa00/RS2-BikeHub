@@ -41,9 +41,17 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
       final serviserData = await _serviserService.getServiseriDTOByKorisnikId(korisnikId: widget.korisnikId);
       setState(() {
         serviser = serviserData;
-        _cijenaController.text = serviser != null && serviser?['cijena'] != null && serviser!['cijena'].toString().isNotEmpty
-            ? (serviser?['cijena'] as double).toString()
-            : "N/A";
+
+        if (serviser != null && serviser?['cijena'] != null) {
+          final cijena = serviser?['cijena'];
+          if (cijena is num) {
+            _cijenaController.text = cijena.toStringAsFixed(2);
+          } else {
+            _cijenaController.text = "N/A";
+          }
+        } else {
+          _cijenaController.text = "N/A";
+        }
 
         loading = false;
       });
@@ -443,7 +451,7 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
                         color: Color.fromARGB(0, 255, 255, 255), // Pozadina za prvi pod-dio
                         child: Center(
                           child: Text(
-                            'Cijena: ${serviser?['cijena'] ?? 'N/A'}',
+                            'Cijena: ${getFormattedCijena(serviser?['cijena'])}',
                             style: TextStyle(
                               fontSize: 18,
                               color: Color.fromARGB(255, 255, 255, 255), // Svijetlo plava boja teksta
@@ -546,6 +554,21 @@ class _KorisnikovServisState extends State<KorisnikovServis> {
         ],
       ),
     );
+  }
+
+  String getFormattedCijena(dynamic cijena) {
+    if (cijena == null) {
+      return "N/A";
+    }
+
+    final double cijenaValue;
+    try {
+      cijenaValue = double.parse(cijena.toString());
+    } catch (e) {
+      return "N/A";
+    }
+
+    return "${cijenaValue.toStringAsFixed(2)} KM";
   }
 
   final _cijenaController = TextEditingController();

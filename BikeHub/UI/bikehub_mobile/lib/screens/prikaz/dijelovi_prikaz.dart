@@ -140,8 +140,12 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
         nazivDijelovi = result['naziv'] != null && result['naziv'].toString().isNotEmpty ? result['naziv'].toString() : "N/A";
 
         cijenaDijelovi = result['cijena'] != null && result['cijena'].toString().isNotEmpty
-            ? (result['cijena'] is double ? result['cijena'].toInt() : int.tryParse(result['cijena'].toString()) ?? 0)
-            : 0;
+            ? (result['cijena'] is double
+                ? double.parse(result['cijena'].toStringAsFixed(2))
+                : double.tryParse(result['cijena'].toString())?.toStringAsFixed(2) != null
+                    ? double.parse(result['cijena'].toStringAsFixed(2))
+                    : 0.0)
+            : 0.0;
 
         kolicinaDijelovi =
             result['kolicina'] != null && result['kolicina'].toString().isNotEmpty ? int.tryParse(result['kolicina'].toString()) ?? 0 : 0;
@@ -439,7 +443,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                     ),
                     child: Center(
                       child: Text(
-                        '${zapis?['cijena']?.toString() ?? 'N/A'} KM',
+                        getFormattedCijena(zapis?['cijena']?.toString()),
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
@@ -451,6 +455,21 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
         ),
       ),
     );
+  }
+
+  String getFormattedCijena(dynamic cijena) {
+    if (cijena == null) {
+      return "N/A";
+    }
+
+    final double cijenaValue;
+    try {
+      cijenaValue = double.parse(cijena.toString());
+    } catch (e) {
+      return "N/A";
+    }
+
+    return "${cijenaValue.toStringAsFixed(2)} KM";
   }
 
   Widget dDio(BuildContext context) {
@@ -921,7 +940,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                             height: MediaQuery.of(context).size.height * 0.05,
                                             alignment: Alignment.center,
                                             child: Text(
-                                              (listaRecomendedBicikala[i]?['cijena']?.toString() ?? 'N/A'),
+                                              (getFormattedCijena(listaRecomendedBicikala[i]?['cijena']?.toString())),
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 color: const Color.fromARGB(255, 255, 255, 255),
@@ -1225,9 +1244,10 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                                 ),
                                                 borderRadius: BorderRadius.circular(10.0),
                                               ),
-                                              child: TextField(
+                                              child: TextFormField(
+                                                initialValue: nazivDijelovi.isEmpty ? '' : nazivDijelovi,
                                                 decoration: InputDecoration(
-                                                  hintText: nazivDijelovi.isEmpty ? "Naziv" : nazivDijelovi,
+                                                  hintText: 'Naziv', // Promijenjen hint text
                                                   hintStyle: TextStyle(color: Colors.white),
                                                   border: OutlineInputBorder(
                                                     borderRadius: BorderRadius.circular(10.0),
@@ -1237,7 +1257,9 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                                 ),
                                                 style: TextStyle(color: Colors.white),
                                                 onChanged: (text) {
-                                                  nazivDijelovi = text;
+                                                  setState(() {
+                                                    nazivDijelovi = text;
+                                                  });
                                                 },
                                               ),
                                             ),
@@ -1265,10 +1287,11 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                                 ),
                                                 borderRadius: BorderRadius.circular(10.0),
                                               ),
-                                              child: TextField(
+                                              child: TextFormField(
+                                                initialValue: cijenaDijelovi == 0 ? '' : cijenaDijelovi.toString(),
                                                 keyboardType: TextInputType.number,
                                                 decoration: InputDecoration(
-                                                  hintText: cijenaDijelovi == 0 ? "Cijena" : cijenaDijelovi.toString(),
+                                                  hintText: 'Cijena', // Promijenjen hint text
                                                   hintStyle: TextStyle(color: Colors.white),
                                                   border: OutlineInputBorder(
                                                     borderRadius: BorderRadius.circular(10.0),
@@ -1278,7 +1301,9 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                                 ),
                                                 style: TextStyle(color: Colors.white),
                                                 onChanged: (text) {
-                                                  cijenaDijelovi = int.tryParse(text) ?? 0;
+                                                  setState(() {
+                                                    cijenaDijelovi = double.tryParse(text) ?? 0.0;
+                                                  });
                                                 },
                                               ),
                                             ),
@@ -1306,10 +1331,11 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                                 ),
                                                 borderRadius: BorderRadius.circular(10.0),
                                               ),
-                                              child: TextField(
+                                              child: TextFormField(
+                                                initialValue: kolicinaDijelovi == 0 ? '' : kolicinaDijelovi.toString(),
                                                 keyboardType: TextInputType.number,
                                                 decoration: InputDecoration(
-                                                  hintText: kolicinaDijelovi == 0 ? "Kolicina" : kolicinaDijelovi.toString(),
+                                                  hintText: 'Količina', // Promijenjen hint text
                                                   hintStyle: TextStyle(color: Colors.white),
                                                   border: OutlineInputBorder(
                                                     borderRadius: BorderRadius.circular(10.0),
@@ -1319,7 +1345,9 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                                 ),
                                                 style: TextStyle(color: Colors.white),
                                                 onChanged: (text) {
-                                                  kolicinaDijelovi = int.tryParse(text) ?? 0;
+                                                  setState(() {
+                                                    kolicinaDijelovi = int.tryParse(text) ?? 0;
+                                                  });
                                                 },
                                               ),
                                             ),
@@ -1347,9 +1375,10 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                                 ),
                                                 borderRadius: BorderRadius.circular(10.0),
                                               ),
-                                              child: TextField(
+                                              child: TextFormField(
+                                                initialValue: opis.isEmpty ? '' : opis,
                                                 decoration: InputDecoration(
-                                                  hintText: opis.isEmpty ? "Opis" : opis,
+                                                  hintText: 'Opis', // Promijenjen hint text
                                                   hintStyle: TextStyle(color: Colors.white),
                                                   border: OutlineInputBorder(
                                                     borderRadius: BorderRadius.circular(10.0),
@@ -1359,7 +1388,9 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                                 ),
                                                 style: TextStyle(color: Colors.white),
                                                 onChanged: (text) {
-                                                  opis = text;
+                                                  setState(() {
+                                                    opis = text;
+                                                  });
                                                 },
                                               ),
                                             ),
@@ -1389,33 +1420,52 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                               ),
                                               child: DropdownButton<String>(
                                                 isExpanded: true,
-                                                value: _odabranaKategorijaDijelovi != null ? _odabranaKategorijaDijelovi!['naziv'] ?? 'N/A' : null,
+                                                value: _odabranaKategorijaDijelovi != null &&
+                                                        _kategorijeDijelovi!
+                                                            .any((kategorija) => kategorija['naziv'] == _odabranaKategorijaDijelovi!['naziv'])
+                                                    ? _odabranaKategorijaDijelovi!['naziv']
+                                                    : 'Nije dostupna',
                                                 hint: Text(
                                                   'Kategorija',
                                                   style: TextStyle(color: Colors.white),
                                                 ),
                                                 onChanged: (String? newValue) {
                                                   setState(() {
-                                                    _odabranaKategorijaDijelovi = _kategorijeDijelovi
-                                                        ?.firstWhere((kategorija) => kategorija['naziv'] == newValue, orElse: () => {'naziv': 'N/A'});
+                                                    _odabranaKategorijaDijelovi = _kategorijeDijelovi?.firstWhere(
+                                                        (kategorija) => kategorija['naziv'] == newValue,
+                                                        orElse: () => {'naziv': 'Nije dostupna'});
                                                   });
                                                 },
-                                                items: _kategorijeDijelovi?.map<DropdownMenuItem<String>>((kategorija) {
-                                                      return DropdownMenuItem<String>(
-                                                        value: kategorija['naziv'] ?? 'N/A',
-                                                        child: Container(
-                                                          width: MediaQuery.of(context).size.width * 0.3,
-                                                          height: MediaQuery.of(context).size.height * 0.04,
-                                                          child: Center(
-                                                            child: Text(
-                                                              kategorija['naziv'] ?? 'N/A',
-                                                              style: TextStyle(color: Colors.white),
-                                                            ),
+                                                items: [
+                                                  DropdownMenuItem<String>(
+                                                    value: 'Nije dostupna',
+                                                    child: Container(
+                                                      width: MediaQuery.of(context).size.width * 0.3,
+                                                      height: MediaQuery.of(context).size.height * 0.04,
+                                                      child: Center(
+                                                        child: Text(
+                                                          'Nije dostupna',
+                                                          style: TextStyle(color: Colors.white),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  ...?_kategorijeDijelovi?.map<DropdownMenuItem<String>>((kategorija) {
+                                                    return DropdownMenuItem<String>(
+                                                      value: kategorija['naziv'] ?? 'N/A',
+                                                      child: Container(
+                                                        width: MediaQuery.of(context).size.width * 0.3,
+                                                        height: MediaQuery.of(context).size.height * 0.04,
+                                                        child: Center(
+                                                          child: Text(
+                                                            kategorija['naziv'] ?? 'N/A',
+                                                            style: TextStyle(color: Colors.white),
                                                           ),
                                                         ),
-                                                      );
-                                                    }).toList() ??
-                                                    [],
+                                                      ),
+                                                    );
+                                                  })
+                                                ],
                                                 dropdownColor: Colors.blue[700],
                                                 iconEnabledColor: Colors.white,
                                                 style: TextStyle(color: Colors.white),
@@ -1511,7 +1561,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
 
   int korisnikId = 0;
   String nazivDijelovi = "";
-  int cijenaDijelovi = 0;
+  double cijenaDijelovi = 0;
   int kolicinaDijelovi = 0;
   String opis = "";
   List<Map<String, dynamic>>? _kategorijeDijelovi;

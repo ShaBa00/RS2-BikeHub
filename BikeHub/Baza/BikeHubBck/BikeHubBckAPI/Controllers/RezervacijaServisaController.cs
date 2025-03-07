@@ -142,7 +142,8 @@ namespace BikeHubBck.Controllers
             var zauzetiDani = _context.RezervacijaServisas
                 .Where(r => r.ServiserId == serviserId
                             && r.DatumRezervacije.Month == mjesec
-                            && r.DatumRezervacije.Year == godina)
+                            && r.DatumRezervacije.Year == godina
+                            && r.Status != "obrisan")
                 .Select(r => r.DatumRezervacije.Day)
                 .ToList();
 
@@ -152,7 +153,7 @@ namespace BikeHubBck.Controllers
                 .Where(dan => !zauzetiDani.Contains(dan) &&
                               (godina > trenutniDatum.Year ||
                               (godina == trenutniDatum.Year && mjesec > trenutniDatum.Month) ||
-                              (godina == trenutniDatum.Year && mjesec == trenutniDatum.Month && dan > trenutniDatum.Day))) 
+                              (godina == trenutniDatum.Year && mjesec == trenutniDatum.Month && dan > trenutniDatum.Day)))
                 .ToList();
 
             return Ok(slobodniDani);

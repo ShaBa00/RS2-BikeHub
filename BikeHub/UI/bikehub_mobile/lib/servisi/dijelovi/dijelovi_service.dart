@@ -26,8 +26,7 @@ class DijeloviService {
     dio.httpClientAdapter = IOHttpClientAdapter(
       createHttpClient: () {
         final HttpClient client = HttpClient();
-        client.badCertificateCallback =
-            (X509Certificate cert, String host, int port) => true;
+        client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
         return client;
       },
     );
@@ -58,16 +57,12 @@ class DijeloviService {
   Future<Map<String, dynamic>> getDijeloviById(int dijeloviId) async {
     final String url = '${HelperService.baseUrl}/Dijelovi/$dijeloviId';
 
-    final HttpClient httpClient = HttpClient()
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
+    final HttpClient httpClient = HttpClient()..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
 
     final IOClient ioClient = IOClient(httpClient);
 
     try {
-      final http.Response response = await ioClient
-          .get(Uri.parse(url))
-          .timeout(const Duration(seconds: 10));
+      final http.Response response = await ioClient.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
@@ -115,7 +110,11 @@ class DijeloviService {
       queryParams['kategorijaId'] = kategorijaId.toString();
     }
     if (status != null && status.isNotEmpty) {
-      queryParams['status'] = status;
+      if (status != "sve") {
+        queryParams['status'] = status;
+      }
+    } else {
+      queryParams['status'] = "aktivan";
     }
     if (isSlikaIncluded != null) {
       queryParams['isSlikaIncluded'] = isSlikaIncluded.toString();
@@ -133,16 +132,12 @@ class DijeloviService {
 
     final String url = uri.toString();
 
-    final HttpClient httpClient = HttpClient()
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
+    final HttpClient httpClient = HttpClient()..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
 
     final IOClient ioClient = IOClient(httpClient);
 
     try {
-      final http.Response response = await ioClient
-          .get(Uri.parse(url))
-          .timeout(const Duration(seconds: 40));
+      final http.Response response = await ioClient.get(Uri.parse(url)).timeout(const Duration(seconds: 40));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -167,19 +162,15 @@ class DijeloviService {
     final String baseUrl = '${HelperService.baseUrl}/Dijelovi';
     Uri uri;
 
-    HttpClient httpClient = HttpClient()
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
+    HttpClient httpClient = HttpClient()..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
 
     try {
       await _addAuthorizationHeader(); // Dodavanje authorization header-a
 
       if (status == "aktivan") {
-        uri = Uri.parse('$baseUrl/aktivacija/$odabraniId')
-            .replace(queryParameters: {'aktivacija': 'true'});
+        uri = Uri.parse('$baseUrl/aktivacija/$odabraniId').replace(queryParameters: {'aktivacija': 'true'});
       } else if (status == "vracen") {
-        uri = Uri.parse('$baseUrl/aktivacija/$odabraniId')
-            .replace(queryParameters: {'aktivacija': 'false'});
+        uri = Uri.parse('$baseUrl/aktivacija/$odabraniId').replace(queryParameters: {'aktivacija': 'false'});
       } else if (status == "obrisan") {
         uri = Uri.parse('$baseUrl/$odabraniId');
       } else {
@@ -187,9 +178,7 @@ class DijeloviService {
       }
 
       final request = await httpClient.openUrl(
-        status == "obrisan"
-            ? 'DELETE'
-            : 'PUT', // Odabir metode temeljem statusa
+        status == "obrisan" ? 'DELETE' : 'PUT', // Odabir metode temeljem statusa
         uri,
       );
 
@@ -223,11 +212,7 @@ class DijeloviService {
     required int korisnikId,
   }) async {
     // Provjera podataka
-    if (naziv.isEmpty ||
-        cijena <= 0 ||
-        kolicina <= 0 ||
-        kategorijaId <= 0 ||
-        korisnikId <= 0) {
+    if (naziv.isEmpty || cijena <= 0 || kolicina <= 0 || kategorijaId <= 0 || korisnikId <= 0) {
       return {'poruka': "Pogresni podatci", 'dijeloviId': null};
     }
 
@@ -243,9 +228,7 @@ class DijeloviService {
       'korisnikId': korisnikId.toString(),
     };
 
-    final HttpClient httpClient = HttpClient()
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
+    final HttpClient httpClient = HttpClient()..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
 
     try {
       await _addAuthorizationHeader(); // Dodavanje authorization header-a
@@ -264,18 +247,12 @@ class DijeloviService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(responseBody);
-        return {
-          'poruka': "Uspjesno dodat dio",
-          'dijeloviId': data['dijeloviId']
-        };
+        return {'poruka': "Uspjesno dodat dio", 'dijeloviId': data['dijeloviId']};
       } else {
         return {'poruka': "Greska prilikom dodavanja", 'dijeloviId': null};
       }
     } on TimeoutException catch (_) {
-      return {
-        'poruka': "Greska prilikom dodavanja: Server nije dostupan",
-        'biciklId': null
-      };
+      return {'poruka': "Greska prilikom dodavanja: Server nije dostupan", 'biciklId': null};
     } catch (e) {
       logger.e("Greška pri dodavanju bicikla: $e");
       return {'poruka': "Greska prilikom dodavanja", 'dijeloviId': null};
@@ -284,14 +261,11 @@ class DijeloviService {
     }
   }
 
-  Future<String?> putDijelovi(int dijeloviId, String? naziv, int? cijena,
-      String? opis, int? kategorijaId, int? kolicina, int korisnikId) async {
+  Future<String?> putDijelovi(int dijeloviId, String? naziv, double? cijena, String? opis, int? kategorijaId, int? kolicina, int korisnikId) async {
     final String baseUrl = '${HelperService.baseUrl}/Dijelovi';
     Uri uri;
 
-    HttpClient httpClient = HttpClient()
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
+    HttpClient httpClient = HttpClient()..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
 
     try {
       if (dijeloviId == 0) {
@@ -300,11 +274,7 @@ class DijeloviService {
       if (korisnikId == 0) {
         return "Korisnik ID je obavezan";
       }
-      if ((naziv == null || naziv.isEmpty) &&
-          cijena == null &&
-          (opis == null || opis.isEmpty) &&
-          kategorijaId == null &&
-          kolicina == null) {
+      if ((naziv == null || naziv.isEmpty) && cijena == null && (opis == null || opis.isEmpty) && kategorijaId == null && kolicina == null) {
         return "Potrebno je izmijeniti barem jedan zapis";
       }
       await _addAuthorizationHeader();
@@ -331,8 +301,7 @@ class DijeloviService {
       final request = await httpClient.putUrl(uri);
       request.headers.set('accept', 'application/json');
       request.headers.set('Content-Type', 'application/json');
-      request.headers
-          .set('Authorization', _dio.options.headers['Authorization']);
+      request.headers.set('Authorization', _dio.options.headers['Authorization']);
 
       request.write(jsonEncode(body));
 

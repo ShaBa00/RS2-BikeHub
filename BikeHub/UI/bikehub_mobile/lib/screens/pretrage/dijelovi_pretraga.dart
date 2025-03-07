@@ -41,6 +41,21 @@ class _DijeloviPretragaState extends State<DijeloviPretraga> with SingleTickerPr
     ));
   }
 
+  String getFormattedCijena(dynamic cijena) {
+    if (cijena == null) {
+      return "N/A";
+    }
+
+    final double cijenaValue;
+    try {
+      cijenaValue = double.parse(cijena.toString());
+    } catch (e) {
+      return "N/A";
+    }
+
+    return "${cijenaValue.toStringAsFixed(2)} KM";
+  }
+
   void _togglePopupFilter() {
     if (!mounted) return;
     setState(() {
@@ -564,7 +579,7 @@ class _DijeloviPretragaState extends State<DijeloviPretraga> with SingleTickerPr
                                     Expanded(
                                       child: Center(
                                         child: Text(
-                                          listaZapisa[firstIndex]['cijena'] != null ? "${listaZapisa[firstIndex]['cijena'].toString()} KM" : 'N/A',
+                                          listaZapisa[firstIndex]['cijena'] != null ? getFormattedCijena(listaZapisa[firstIndex]['cijena']) : 'N/A',
                                           style: TextStyle(
                                             color: const Color.fromARGB(255, 0, 0, 0),
                                           ),
@@ -572,7 +587,7 @@ class _DijeloviPretragaState extends State<DijeloviPretraga> with SingleTickerPr
                                           softWrap: false,
                                         ),
                                       ),
-                                    ),
+                                    )
                                   ],
                                 ),
                               ),
@@ -653,7 +668,7 @@ class _DijeloviPretragaState extends State<DijeloviPretraga> with SingleTickerPr
                                     Expanded(
                                       child: Center(
                                         child: Text(
-                                          listaZapisa[secondIndex]['cijena'] != null ? "${listaZapisa[secondIndex]['cijena'].toString()} KM" : 'N/A',
+                                          listaZapisa[secondIndex]['cijena'] != null ? getFormattedCijena(listaZapisa[secondIndex]['cijena']) : 'N/A',
                                           style: TextStyle(
                                             color: const Color.fromARGB(255, 0, 0, 0),
                                           ),
@@ -661,7 +676,7 @@ class _DijeloviPretragaState extends State<DijeloviPretraga> with SingleTickerPr
                                           softWrap: false,
                                         ),
                                       ),
-                                    ),
+                                    )
                                   ],
                                 ),
                               ),

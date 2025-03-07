@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_null_comparison
+
 import 'package:bikehub_desktop/services/adresa/adresa_service.dart';
 import 'bicikl_prikaz.dart';
 import 'package:flutter/material.dart';
@@ -24,10 +26,12 @@ class _BiciklProzorState extends State<BiciklProzor> {
   int? brojBrzina;
   RangeValues _currentRangeValues = const RangeValues(0, 1500);
   double pocetnaCijena = 0;
-  double krajnjaCijena = 1500;
+  double krajnjaCijena = 150000.0;
   int? selectedKategorijaId;
   int? kategorijaId;
   int? selectedGradId;
+
+  double maxCijena = 150000.0;
 
   int _currentPage = 0;
   final int _pageSize = 12;
@@ -37,6 +41,7 @@ class _BiciklProzorState extends State<BiciklProzor> {
     super.initState();
     getKategorije();
     _loadBicikli();
+    getMaxCijena();
     adresaService.getGradKorisniciDto();
   }
 
@@ -47,6 +52,21 @@ class _BiciklProzorState extends State<BiciklProzor> {
     _listaBikeKategorijeNotifier.value = List<Map<String, dynamic>>.from(bikeKategorije.where((kategorija) => kategorija['status'] == 'aktivan'));
   }
 
+  getMaxCijena() async {
+    final biciklMaxCijena = await biciklService.getBicikli(
+      status: "aktivan",
+      sortOrder: "desc",
+      page: 0,
+      pageSize: 1,
+    );
+
+    if (biciklMaxCijena != null) {
+      setState(() {
+        maxCijena = biciklMaxCijena[0]["cijena"];
+      });
+    }
+  }
+
   Future<void> _loadBicikli() async {
     List<int>? korisniciId;
     if (selectedGradId != null) {
@@ -54,12 +74,12 @@ class _BiciklProzorState extends State<BiciklProzor> {
           adresaService.listaGradKorisniciDto.value.firstWhere((adresa) => adresa['GradId'] == selectedGradId, orElse: () => <String, dynamic>{});
 
       List<int>? korisniciIds;
-      // ignore: unnecessary_null_comparison
       if (selectedGrad != null) {
         korisniciIds = List<int>.from(selectedGrad['KorisnikIds']);
         korisniciId = korisniciIds;
       }
     }
+
     final bicikli = await biciklService.getBicikli(
         naziv: naziv,
         velicinaRama: velicinaRama,
@@ -277,13 +297,14 @@ class _BiciklProzorState extends State<BiciklProzor> {
                     ),
                     const SizedBox(height: 16),
                     RangeSlider(
-                      values: _currentRangeValues,
+                      values:
+                          _currentRangeValues.start >= 0 && _currentRangeValues.end <= maxCijena ? _currentRangeValues : RangeValues(0, maxCijena),
                       min: 0,
-                      max: 1500,
+                      max: maxCijena,
                       divisions: 15,
                       labels: RangeLabels(
                         _currentRangeValues.start.round().toString(),
-                        _currentRangeValues.end.round().toString(),
+                        _currentRangeValues.end.toString(),
                       ),
                       onChanged: (RangeValues values) {
                         setState(() {
@@ -297,7 +318,7 @@ class _BiciklProzorState extends State<BiciklProzor> {
                     ),
                     const Text('Cijena:'),
                     Text(
-                      'Od: ${_currentRangeValues.start.round()} do: ${_currentRangeValues.end.round()}',
+                      'Od: ${_currentRangeValues.start.round()} do: $maxCijena',
                       style: const TextStyle(color: Colors.white),
                     ),
                     const SizedBox(height: 16),
@@ -397,7 +418,7 @@ class _BiciklProzorState extends State<BiciklProzor> {
                                               children: [
                                                 Text(naziv, style: const TextStyle(fontWeight: FontWeight.bold)),
                                                 const SizedBox(height: 4),
-                                                Text('Cijena: $cijena KM'),
+                                                Text('Cijena: ${getFormattedCijena(cijena)}'),
                                               ],
                                             ),
                                           ),
@@ -431,5 +452,20 @@ class _BiciklProzorState extends State<BiciklProzor> {
         ],
       ),
     );
+  }
+
+  String getFormattedCijena(dynamic cijena) {
+    if (cijena == null) {
+      return "Cijena nije pronađena";
+    }
+
+    final double cijenaValue;
+    try {
+      cijenaValue = double.parse(cijena.toString());
+    } catch (e) {
+      return "Cijena nije pronađena";
+    }
+
+    return "${cijenaValue.toStringAsFixed(2)} KM";
   }
 }

@@ -162,46 +162,50 @@ class _DijeloviDodajProzorState extends State<DijeloviDodajProzor> {
       opisError = null;
       kategorijaError = null;
     });
+    bool greska = false;
 
     if (naziv.isEmpty) {
       setState(() {
         nazivError = "Naziv ne može biti prazan";
       });
-      return;
+      greska = true;
     }
     if (cijena == 0.0 || cijena < 0) {
       setState(() {
-        cijenaError = "Cijena mora biti numerickog tipa";
+        cijenaError = "Cijena mora biti numerickog tipa i veca od nule";
       });
-      return;
+      greska = true;
     }
     if (kolicina == 0 || kolicina < 0) {
       setState(() {
-        kolicinaError = "Količina mora biti veća od nule";
+        kolicinaError = "Količina mora biti numerickog tipa i veća od nule";
       });
-      return;
+      greska = true;
     }
     if (slikeDijelovi.isEmpty) {
       prikaziPorukuUpozorenja(context, "Potrebno je dodati barem jednu sliku");
-      return;
+      greska = true;
     }
     if (slikeDijelovi.length > 8) {
       prikaziPorukuUpozorenja(context, "Moguce je dodati maximalno 8 slika");
-      return;
+      greska = true;
     }
     if (opis.isEmpty) {
       setState(() {
         opisError = "Opis ne može biti prazan";
       });
-      return;
+      greska = true;
     }
     if (selectedKategorijaId == 0 || selectedKategorijaId == null) {
       setState(() {
         kategorijaError = "Potrebno je odabrati kategoriju";
       });
-      return;
+      greska = true;
     }
 
+    if (greska) {
+      return;
+    }
     final korisnikId = int.parse(korisnikInfo['korisnikId'] ?? '0');
     // ignore: unused_local_variable
     Dijelovi dijelovi = Dijelovi(

@@ -27,8 +27,7 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
   final KorisnikServis _korisnikService = KorisnikServis();
   final NarudbaService _narudbaService = NarudbaService();
   final NarudbaBiciklService _narudbaBiciklService = NarudbaBiciklService();
-  final NarudbaDijeloviService _narudbaDijeloviService =
-      NarudbaDijeloviService();
+  final NarudbaDijeloviService _narudbaDijeloviService = NarudbaDijeloviService();
   final RezervacijaServis _rezervacijaServis = RezervacijaServis();
   final BiciklService _biciklService = BiciklService();
   final DijeloviService _dijeloviService = DijeloviService();
@@ -121,16 +120,13 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
         // Drugi dio
         Container(
           width: double.infinity,
-          height:
-              MediaQuery.of(context).size.height * 0.10, // 10% visine ekrana
+          height: MediaQuery.of(context).size.height * 0.10, // 10% visine ekrana
           color: Color.fromARGB(0, 255, 235, 59), // Zamijenite s bojom po želji
           child: Align(
             alignment: Alignment.bottomCenter,
             child: Container(
-              width:
-                  MediaQuery.of(context).size.width * 0.95, // 95% širine ekrana
-              height:
-                  MediaQuery.of(context).size.height * 0.05, // 5% visine ekrana
+              width: MediaQuery.of(context).size.width * 0.95, // 95% širine ekrana
+              height: MediaQuery.of(context).size.height * 0.05, // 5% visine ekrana
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(25.0),
@@ -139,23 +135,18 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                 children: [
                   // dD
                   Container(
-                    width: MediaQuery.of(context).size.width *
-                        0.55, // 40% širine ekrana
-                    height: MediaQuery.of(context).size.height *
-                        0.09, // 9% visine ekrana
-                    color: const Color.fromARGB(
-                        0, 244, 67, 54), // Zamijenite s bojom po želji
+                    width: MediaQuery.of(context).size.width * 0.55, // 40% širine ekrana
+                    height: MediaQuery.of(context).size.height * 0.09, // 9% visine ekrana
+                    color: const Color.fromARGB(0, 244, 67, 54), // Zamijenite s bojom po želji
                     child: Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.arrow_back,
-                              color: Colors.black), // Ikone crne boje
+                          icon: const Icon(Icons.arrow_back, color: Colors.black), // Ikone crne boje
                           iconSize: 24.0, // Veličina ikone
                           onPressed: () {
                             Navigator.pushReplacement(
                               context,
-                              MaterialPageRoute(
-                                  builder: (context) => const GlavniProzor()),
+                              MaterialPageRoute(builder: (context) => const GlavniProzor()),
                             );
                           },
                         ),
@@ -168,12 +159,9 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                   ),
                   // lD
                   Container(
-                    width: MediaQuery.of(context).size.width *
-                        0.40, // 55% širine ekrana
-                    height: MediaQuery.of(context).size.height *
-                        0.09, // 9% visine ekrana
-                    color: const Color.fromARGB(
-                        0, 33, 149, 243), // Zamijenite s bojom po želji
+                    width: MediaQuery.of(context).size.width * 0.40, // 55% širine ekrana
+                    height: MediaQuery.of(context).size.height * 0.09, // 9% visine ekrana
+                    color: const Color.fromARGB(0, 33, 149, 243), // Zamijenite s bojom po želji
                   ),
                 ],
               ),
@@ -184,19 +172,14 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
         //dP
         Container(
           width: MediaQuery.of(context).size.width, // 100% širine ekrana
-          height:
-              MediaQuery.of(context).size.height * 0.12, // 15% visine ekrana
-          color: const Color.fromARGB(
-              0, 255, 153, 0), // Zamijenite s bojom po želji
+          height: MediaQuery.of(context).size.height * 0.12, // 15% visine ekrana
+          color: const Color.fromARGB(0, 255, 153, 0), // Zamijenite s bojom po želji
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              customButton(context, 'bicikl', Icons.directions_bike,
-                  _selectedSection, _updateSection),
-              customButton(context, 'serviseri', Icons.build, _selectedSection,
-                  _updateSection),
-              customButton(context, 'dijelovi', Icons.handyman,
-                  _selectedSection, _updateSection),
+              customButton(context, 'bicikl', Icons.directions_bike, _selectedSection, _updateSection),
+              customButton(context, 'serviseri', Icons.build, _selectedSection, _updateSection),
+              customButton(context, 'dijelovi', Icons.handyman, _selectedSection, _updateSection),
             ],
           ),
         ),
@@ -257,40 +240,31 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                                         setState(() {
                                           zapisUcitan = false;
                                           _selectedSection = "biciklPrikaz";
-                                          _odabraniId =
-                                              narudzba['narudzbaBicikliId'];
+                                          _odabraniId = narudzba['narudzbaBicikliId'];
                                         });
                                         await getBicikl();
                                       },
                                       child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.85,
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
-                                        margin:
-                                            EdgeInsets.symmetric(vertical: 5),
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          gradient: const LinearGradient(
-                                            colors: [
-                                              Color.fromARGB(255, 82, 205, 210),
-                                              Color.fromARGB(255, 7, 161, 235),
-                                            ],
-                                            begin: Alignment.topLeft,
-                                            end: Alignment.bottomRight,
+                                          width: MediaQuery.of(context).size.width * 0.85,
+                                          height: MediaQuery.of(context).size.height * 0.06,
+                                          margin: EdgeInsets.symmetric(vertical: 5),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(10),
+                                            gradient: const LinearGradient(
+                                              colors: [
+                                                Color.fromARGB(255, 82, 205, 210),
+                                                Color.fromARGB(255, 7, 161, 235),
+                                              ],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            ),
                                           ),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            'Cijena: ${narudzba['cijena']}KM, Kolicina: ${narudzba['kolicina']}',
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                        ),
-                                      ),
+                                          child: Center(
+                                            child: Text(
+                                              'Cijena: ${getFormattedCijena(narudzba['cijena'])}, Kolicina: ${narudzba['kolicina']}',
+                                              style: TextStyle(color: Colors.white),
+                                            ),
+                                          )),
                                     );
                                   }).toList(),
                                 ),
@@ -312,21 +286,18 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                             height: MediaQuery.of(context).size.height * 0.05,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Color.fromARGB(255, 87, 202, 255),
+                                backgroundColor: Color.fromARGB(255, 87, 202, 255),
                               ),
                               onPressed: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const LogIn()),
+                                  MaterialPageRoute(builder: (context) => const LogIn()),
                                 );
                               },
                               child: Text(
                                 "Prijava",
                                 style: TextStyle(
-                                  color:
-                                      const Color.fromARGB(255, 255, 255, 255),
+                                  color: const Color.fromARGB(255, 255, 255, 255),
                                   fontSize: 18,
                                 ),
                               ),
@@ -432,8 +403,7 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                               child: Center(
                                   child: Container(
                                 width: MediaQuery.of(context).size.width * 0.37,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.19,
+                                height: MediaQuery.of(context).size.height * 0.19,
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: [
@@ -450,22 +420,17 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => BicikliPrikaz(
-                                            biciklId: bicikl['biciklId']),
+                                        builder: (context) => BicikliPrikaz(biciklId: bicikl['biciklId']),
                                       ),
                                     );
                                   },
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(20.0),
                                     child: bicikl['slikeBiciklis'] != null &&
-                                            bicikl['slikeBiciklis']
-                                                .isNotEmpty &&
-                                            bicikl['slikeBiciklis'][0]
-                                                    ['slika'] !=
-                                                null
+                                            bicikl['slikeBiciklis'].isNotEmpty &&
+                                            bicikl['slikeBiciklis'][0]['slika'] != null
                                         ? Image.memory(
-                                            base64Decode(bicikl['slikeBiciklis']
-                                                [0]['slika']),
+                                            base64Decode(bicikl['slikeBiciklis'][0]['slika']),
                                             fit: BoxFit.cover,
                                           )
                                         : Icon(
@@ -483,33 +448,20 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                               child: Column(
                                 children: [
                                   Container(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.77,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.065,
+                                    width: MediaQuery.of(context).size.width * 0.77,
+                                    height: MediaQuery.of(context).size.height * 0.065,
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                       children: [
                                         Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.3,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.055,
+                                          width: MediaQuery.of(context).size.width * 0.3,
+                                          height: MediaQuery.of(context).size.height * 0.055,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10.0),
+                                            borderRadius: BorderRadius.circular(10.0),
                                             border: Border(
-                                              bottom: BorderSide(
-                                                  color: Colors.white),
-                                              right: BorderSide(
-                                                  color: Colors.white),
-                                              left: BorderSide(
-                                                  color: Colors.white),
+                                              bottom: BorderSide(color: Colors.white),
+                                              right: BorderSide(color: Colors.white),
+                                              left: BorderSide(color: Colors.white),
                                             ),
                                           ),
                                           child: Center(
@@ -517,31 +469,20 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                                               fit: BoxFit.scaleDown,
                                               child: Text(
                                                 'Kolicina: ${biciklNarudba['kolicina'] ?? 'N/A'}',
-                                                style: TextStyle(
-                                                    color: Colors.white),
+                                                style: TextStyle(color: Colors.white),
                                               ),
                                             ),
                                           ),
                                         ),
                                         Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.3,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.055,
+                                          width: MediaQuery.of(context).size.width * 0.3,
+                                          height: MediaQuery.of(context).size.height * 0.055,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10.0),
+                                            borderRadius: BorderRadius.circular(10.0),
                                             border: Border(
-                                              bottom: BorderSide(
-                                                  color: Colors.white),
-                                              right: BorderSide(
-                                                  color: Colors.white),
-                                              left: BorderSide(
-                                                  color: Colors.white),
+                                              bottom: BorderSide(color: Colors.white),
+                                              right: BorderSide(color: Colors.white),
+                                              left: BorderSide(color: Colors.white),
                                             ),
                                           ),
                                           child: Center(
@@ -549,8 +490,7 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                                               fit: BoxFit.scaleDown,
                                               child: Text(
                                                 'Cijena: ${biciklNarudba['cijena'] ?? 'N/A'}',
-                                                style: TextStyle(
-                                                    color: Colors.white),
+                                                style: TextStyle(color: Colors.white),
                                               ),
                                             ),
                                           ),
@@ -559,36 +499,20 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                                     ),
                                   ),
                                   Container(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.77,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.065,
+                                    width: MediaQuery.of(context).size.width * 0.77,
+                                    height: MediaQuery.of(context).size.height * 0.065,
                                     child: Row(
                                       children: [
-                                        SizedBox(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.06),
+                                        SizedBox(width: MediaQuery.of(context).size.width * 0.06),
                                         Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.45,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.055,
+                                          width: MediaQuery.of(context).size.width * 0.45,
+                                          height: MediaQuery.of(context).size.height * 0.055,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10.0),
+                                            borderRadius: BorderRadius.circular(10.0),
                                             border: Border(
-                                              bottom: BorderSide(
-                                                  color: Colors.white),
-                                              right: BorderSide(
-                                                  color: Colors.white),
-                                              left: BorderSide(
-                                                  color: Colors.white),
+                                              bottom: BorderSide(color: Colors.white),
+                                              right: BorderSide(color: Colors.white),
+                                              left: BorderSide(color: Colors.white),
                                             ),
                                           ),
                                           child: Center(
@@ -596,8 +520,7 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                                               fit: BoxFit.scaleDown,
                                               child: Text(
                                                 'Status: ${biciklNarudba['status'] == 'vracen' ? 'Otkazana' : biciklNarudba['status'] == 'kreiran' ? 'Obrada' : biciklNarudba['status'] == 'zavrseno' || biciklNarudba['status'] == 'obrisan' ? 'Isporucena' : biciklNarudba['status'] != null ? 'U isporuci' : 'N/A'}',
-                                                style: TextStyle(
-                                                    color: Colors.white),
+                                                style: TextStyle(color: Colors.white),
                                               ),
                                             ),
                                           ),
@@ -657,8 +580,7 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
 
   Future<void> getBicikl() async {
     try {
-      biciklNarudba =
-          await _narudbaBiciklService.getNarudbaBiciklById(_odabraniId);
+      biciklNarudba = await _narudbaBiciklService.getNarudbaBiciklById(_odabraniId);
 
       bicikl = await _biciklService.getBiciklById(biciklNarudba['biciklId']);
       setState(() {
@@ -724,23 +646,16 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                                         setState(() {
                                           zapisUcitan = false;
                                           _selectedSection = "serviseriPrikaz";
-                                          _odabraniId =
-                                              narudzba['rezervacijaId'];
+                                          _odabraniId = narudzba['rezervacijaId'];
                                         });
                                         await getRezervacija();
                                       },
                                       child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.85,
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
-                                        margin:
-                                            EdgeInsets.symmetric(vertical: 5),
+                                        width: MediaQuery.of(context).size.width * 0.85,
+                                        height: MediaQuery.of(context).size.height * 0.06,
+                                        margin: EdgeInsets.symmetric(vertical: 5),
                                         decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(10),
                                           gradient: const LinearGradient(
                                             colors: [
                                               Color.fromARGB(255, 82, 205, 210),
@@ -754,8 +669,7 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                                           child: Center(
                                             child: Text(
                                               'Datum rezervacije: ${narudzba['datumRezervacije'] != null ? formatDate(narudzba['datumRezervacije']) : 'N/A'}, Ocjena: ${narudzba['ocjena'] ?? 'N/A'}',
-                                              style: TextStyle(
-                                                  color: Colors.white),
+                                              style: TextStyle(color: Colors.white),
                                             ),
                                           ),
                                         ),
@@ -781,21 +695,18 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                             height: MediaQuery.of(context).size.height * 0.05,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Color.fromARGB(255, 87, 202, 255),
+                                backgroundColor: Color.fromARGB(255, 87, 202, 255),
                               ),
                               onPressed: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const LogIn()),
+                                  MaterialPageRoute(builder: (context) => const LogIn()),
                                 );
                               },
                               child: Text(
                                 "Prijava",
                                 style: TextStyle(
-                                  color:
-                                      const Color.fromARGB(255, 255, 255, 255),
+                                  color: const Color.fromARGB(255, 255, 255, 255),
                                   fontSize: 18,
                                 ),
                               ),
@@ -897,15 +808,12 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                             SizedBox(height: 10),
                             Container(
                               width: MediaQuery.of(context).size.width * 0.77,
-                              height:
-                                  MediaQuery.of(context).size.height * 0.075,
+                              height: MediaQuery.of(context).size.height * 0.075,
                               color: const Color.fromARGB(0, 244, 67, 54),
                               child: Center(
                                 child: Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.5,
-                                  height: MediaQuery.of(context).size.height *
-                                      0.065,
+                                  width: MediaQuery.of(context).size.width * 0.5,
+                                  height: MediaQuery.of(context).size.height * 0.065,
                                   decoration: BoxDecoration(
                                     color: Color.fromARGB(0, 255, 255, 255),
                                     borderRadius: BorderRadius.circular(20.0),
@@ -917,13 +825,8 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                                   ),
                                   child: Center(
                                     child: Text(
-                                      rezervacija['ocjena'] != null
-                                          ? 'Ocjena: ${rezervacija['ocjena'].toString()}'
-                                          : 'N/A',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: const Color.fromARGB(
-                                              255, 253, 253, 253)),
+                                      rezervacija['ocjena'] != null ? 'Ocjena: ${rezervacija['ocjena'].toString()}' : 'N/A',
+                                      style: TextStyle(fontSize: 16, color: const Color.fromARGB(255, 253, 253, 253)),
                                     ),
                                   ),
                                 ),
@@ -931,18 +834,14 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                             ),
                             Container(
                               width: MediaQuery.of(context).size.width * 0.77,
-                              height:
-                                  MediaQuery.of(context).size.height * 0.075,
+                              height: MediaQuery.of(context).size.height * 0.075,
                               color: const Color.fromARGB(0, 76, 175, 79),
                               child: Center(
                                 child: Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.5,
-                                  height: MediaQuery.of(context).size.height *
-                                      0.065,
+                                  width: MediaQuery.of(context).size.width * 0.5,
+                                  height: MediaQuery.of(context).size.height * 0.065,
                                   decoration: BoxDecoration(
-                                    color:
-                                        const Color.fromARGB(0, 255, 255, 255),
+                                    color: const Color.fromARGB(0, 255, 255, 255),
                                     borderRadius: BorderRadius.circular(20.0),
                                     border: Border(
                                       bottom: BorderSide(color: Colors.white),
@@ -955,10 +854,7 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                                       rezervacija['datumRezervacije'] != null
                                           ? 'Datum: ${DateFormat('dd MM yyyy').format(DateTime.parse(rezervacija['datumRezervacije']))}'
                                           : 'N/A',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: const Color.fromARGB(
-                                              255, 252, 252, 252)),
+                                      style: TextStyle(fontSize: 16, color: const Color.fromARGB(255, 252, 252, 252)),
                                     ),
                                   ),
                                 ),
@@ -966,15 +862,12 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                             ),
                             Container(
                               width: MediaQuery.of(context).size.width * 0.77,
-                              height:
-                                  MediaQuery.of(context).size.height * 0.075,
+                              height: MediaQuery.of(context).size.height * 0.075,
                               color: const Color.fromARGB(0, 33, 149, 243),
                               child: Center(
                                 child: Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.5,
-                                  height: MediaQuery.of(context).size.height *
-                                      0.065,
+                                  width: MediaQuery.of(context).size.width * 0.5,
+                                  height: MediaQuery.of(context).size.height * 0.065,
                                   decoration: BoxDecoration(
                                     color: Color.fromARGB(0, 255, 255, 255),
                                     borderRadius: BorderRadius.circular(20.0),
@@ -990,17 +883,14 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                                       icon: Icon(Icons.arrow_downward),
                                       iconSize: 24,
                                       elevation: 16,
-                                      style: TextStyle(
-                                          color: Color.fromARGB(255, 0, 0, 0)),
+                                      style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
                                       underline: Container(),
                                       onChanged: (String? newValue) {
                                         setState(() {
                                           odabranaOcjena = newValue!;
                                         });
                                       },
-                                      items: <String>['1', '2', '3', '4', '5']
-                                          .map<DropdownMenuItem<String>>(
-                                              (String value) {
+                                      items: <String>['1', '2', '3', '4', '5'].map<DropdownMenuItem<String>>((String value) {
                                         return DropdownMenuItem<String>(
                                           value: value,
                                           child: Text(value),
@@ -1017,8 +907,7 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                             ),
                             Container(
                               width: MediaQuery.of(context).size.width * 0.77,
-                              height:
-                                  MediaQuery.of(context).size.height * 0.075,
+                              height: MediaQuery.of(context).size.height * 0.075,
                               color: const Color.fromARGB(0, 255, 235, 59),
                               child: Center(
                                 child: GestureDetector(
@@ -1026,10 +915,8 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                                     ocjeniRezervaciju();
                                   },
                                   child: Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.5,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.065,
+                                    width: MediaQuery.of(context).size.width * 0.5,
+                                    height: MediaQuery.of(context).size.height * 0.065,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(20.0),
                                       border: Border(
@@ -1041,9 +928,7 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                                     child: Center(
                                       child: Text(
                                         'Ocjeni',
-                                        style: TextStyle(
-                                            color: const Color.fromARGB(
-                                                255, 255, 255, 255)),
+                                        style: TextStyle(color: const Color.fromARGB(255, 255, 255, 255)),
                                       ),
                                     ),
                                   ),
@@ -1134,8 +1019,7 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
   }
 
   getRezervacije() async {
-    listaRezervacija = (await _rezervacijaServis.getRezervacije(
-        status: "zavrseno", korisnikId: korisnikId))!;
+    listaRezervacija = (await _rezervacijaServis.getRezervacije(status: "zavrseno", korisnikId: korisnikId))!;
   }
 
   //Dijelovi
@@ -1185,47 +1069,37 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                               )
                             : SingleChildScrollView(
                                 child: Column(
-                                  children:
-                                      listaNarudbaDijelovi.map((narudzba) {
+                                  children: listaNarudbaDijelovi.map((narudzba) {
                                     return GestureDetector(
                                       onTap: () async {
                                         setState(() {
                                           zapisUcitan = false;
                                           _selectedSection = "dijeloviPrikaz";
-                                          _odabraniId =
-                                              narudzba['narudzbaDijeloviId'];
+                                          _odabraniId = narudzba['narudzbaDijeloviId'];
                                         });
                                         await getDijelovi();
                                       },
                                       child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.85,
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.06,
-                                        margin:
-                                            EdgeInsets.symmetric(vertical: 5),
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          gradient: const LinearGradient(
-                                            colors: [
-                                              Color.fromARGB(255, 82, 205, 210),
-                                              Color.fromARGB(255, 7, 161, 235),
-                                            ],
-                                            begin: Alignment.topLeft,
-                                            end: Alignment.bottomRight,
+                                          width: MediaQuery.of(context).size.width * 0.85,
+                                          height: MediaQuery.of(context).size.height * 0.06,
+                                          margin: EdgeInsets.symmetric(vertical: 5),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(10),
+                                            gradient: const LinearGradient(
+                                              colors: [
+                                                Color.fromARGB(255, 82, 205, 210),
+                                                Color.fromARGB(255, 7, 161, 235),
+                                              ],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            ),
                                           ),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            'Cijena: ${narudzba['cijena']}KM, Kolicina: ${narudzba['kolicina']}',
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                        ),
-                                      ),
+                                          child: Center(
+                                            child: Text(
+                                              'Cijena: ${getFormattedCijena(narudzba['cijena'])}, Kolicina: ${narudzba['kolicina']}',
+                                              style: TextStyle(color: Colors.white),
+                                            ),
+                                          )),
                                     );
                                   }).toList(),
                                 ),
@@ -1247,21 +1121,18 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                             height: MediaQuery.of(context).size.height * 0.05,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Color.fromARGB(255, 87, 202, 255),
+                                backgroundColor: Color.fromARGB(255, 87, 202, 255),
                               ),
                               onPressed: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const LogIn()),
+                                  MaterialPageRoute(builder: (context) => const LogIn()),
                                 );
                               },
                               child: Text(
                                 "Prijava",
                                 style: TextStyle(
-                                  color:
-                                      const Color.fromARGB(255, 255, 255, 255),
+                                  color: const Color.fromARGB(255, 255, 255, 255),
                                   fontSize: 18,
                                 ),
                               ),
@@ -1273,6 +1144,21 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
         ),
       ),
     );
+  }
+
+  String getFormattedCijena(dynamic cijena) {
+    if (cijena == null) {
+      return "N/A";
+    }
+
+    final double cijenaValue;
+    try {
+      cijenaValue = double.parse(cijena.toString());
+    } catch (e) {
+      return "N/A";
+    }
+
+    return "${cijenaValue.toStringAsFixed(2)} KM";
   }
 
   late Map<String, dynamic> dijelovi;
@@ -1369,10 +1255,8 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                               height: MediaQuery.of(context).size.height * 0.2,
                               child: Center(
                                 child: Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.37,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.19,
+                                  width: MediaQuery.of(context).size.width * 0.37,
+                                  height: MediaQuery.of(context).size.height * 0.19,
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [
@@ -1389,32 +1273,24 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => DijeloviPrikaz(
-                                              dijeloviId:
-                                                  dijelovi['dijeloviId']),
+                                          builder: (context) => DijeloviPrikaz(dijeloviId: dijelovi['dijeloviId']),
                                         ),
                                       );
                                     },
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(20.0),
-                                      child:
-                                          dijelovi['slikeDijelovis'] != null &&
-                                                  dijelovi['slikeDijelovis']
-                                                      .isNotEmpty &&
-                                                  dijelovi['slikeDijelovis'][0]
-                                                          ['slika'] !=
-                                                      null
-                                              ? Image.memory(
-                                                  base64Decode(
-                                                      dijelovi['slikeDijelovis']
-                                                          [0]['slika']),
-                                                  fit: BoxFit.cover,
-                                                )
-                                              : Icon(
-                                                  Icons.image_not_supported,
-                                                  color: Colors.white,
-                                                  size: 50,
-                                                ),
+                                      child: dijelovi['slikeDijelovis'] != null &&
+                                              dijelovi['slikeDijelovis'].isNotEmpty &&
+                                              dijelovi['slikeDijelovis'][0]['slika'] != null
+                                          ? Image.memory(
+                                              base64Decode(dijelovi['slikeDijelovis'][0]['slika']),
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Icon(
+                                              Icons.image_not_supported,
+                                              color: Colors.white,
+                                              size: 50,
+                                            ),
                                     ),
                                   ),
                                 ),
@@ -1426,33 +1302,20 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                               child: Column(
                                 children: [
                                   Container(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.77,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.065,
+                                    width: MediaQuery.of(context).size.width * 0.77,
+                                    height: MediaQuery.of(context).size.height * 0.065,
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                       children: [
                                         Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.3,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.055,
+                                          width: MediaQuery.of(context).size.width * 0.3,
+                                          height: MediaQuery.of(context).size.height * 0.055,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10.0),
+                                            borderRadius: BorderRadius.circular(10.0),
                                             border: Border(
-                                              bottom: BorderSide(
-                                                  color: Colors.white),
-                                              right: BorderSide(
-                                                  color: Colors.white),
-                                              left: BorderSide(
-                                                  color: Colors.white),
+                                              bottom: BorderSide(color: Colors.white),
+                                              right: BorderSide(color: Colors.white),
+                                              left: BorderSide(color: Colors.white),
                                             ),
                                           ),
                                           child: Center(
@@ -1460,31 +1323,20 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                                               fit: BoxFit.scaleDown,
                                               child: Text(
                                                 'Kolicina: ${dijeloviNarudba['kolicina'] ?? 'N/A'}',
-                                                style: TextStyle(
-                                                    color: Colors.white),
+                                                style: TextStyle(color: Colors.white),
                                               ),
                                             ),
                                           ),
                                         ),
                                         Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.3,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.055,
+                                          width: MediaQuery.of(context).size.width * 0.3,
+                                          height: MediaQuery.of(context).size.height * 0.055,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10.0),
+                                            borderRadius: BorderRadius.circular(10.0),
                                             border: Border(
-                                              bottom: BorderSide(
-                                                  color: Colors.white),
-                                              right: BorderSide(
-                                                  color: Colors.white),
-                                              left: BorderSide(
-                                                  color: Colors.white),
+                                              bottom: BorderSide(color: Colors.white),
+                                              right: BorderSide(color: Colors.white),
+                                              left: BorderSide(color: Colors.white),
                                             ),
                                           ),
                                           child: Center(
@@ -1492,8 +1344,7 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                                               fit: BoxFit.scaleDown,
                                               child: Text(
                                                 'Cijena: ${dijeloviNarudba['cijena'] ?? 'N/A'}',
-                                                style: TextStyle(
-                                                    color: Colors.white),
+                                                style: TextStyle(color: Colors.white),
                                               ),
                                             ),
                                           ),
@@ -1502,36 +1353,20 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                                     ),
                                   ),
                                   Container(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.77,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.065,
+                                    width: MediaQuery.of(context).size.width * 0.77,
+                                    height: MediaQuery.of(context).size.height * 0.065,
                                     child: Row(
                                       children: [
-                                        SizedBox(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.06),
+                                        SizedBox(width: MediaQuery.of(context).size.width * 0.06),
                                         Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.45,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.055,
+                                          width: MediaQuery.of(context).size.width * 0.45,
+                                          height: MediaQuery.of(context).size.height * 0.055,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10.0),
+                                            borderRadius: BorderRadius.circular(10.0),
                                             border: Border(
-                                              bottom: BorderSide(
-                                                  color: Colors.white),
-                                              right: BorderSide(
-                                                  color: Colors.white),
-                                              left: BorderSide(
-                                                  color: Colors.white),
+                                              bottom: BorderSide(color: Colors.white),
+                                              right: BorderSide(color: Colors.white),
+                                              left: BorderSide(color: Colors.white),
                                             ),
                                           ),
                                           child: Center(
@@ -1539,8 +1374,7 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
                                               fit: BoxFit.scaleDown,
                                               child: Text(
                                                 'Status: ${biciklNarudba['status'] == 'vracen' ? 'Otkazana' : biciklNarudba['status'] == 'kreiran' ? 'Obrada' : biciklNarudba['status'] == 'zavrseno' || biciklNarudba['status'] == 'obrisan' ? 'Isporucena' : biciklNarudba['status'] != null ? 'U isporuci' : 'N/A'}',
-                                                style: TextStyle(
-                                                    color: Colors.white),
+                                                style: TextStyle(color: Colors.white),
                                               ),
                                             ),
                                           ),
@@ -1597,11 +1431,9 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
 
   Future<void> getDijelovi() async {
     try {
-      dijeloviNarudba =
-          await _narudbaDijeloviService.getNarudbaDijeloviById(_odabraniId);
+      dijeloviNarudba = await _narudbaDijeloviService.getNarudbaDijeloviById(_odabraniId);
 
-      dijelovi =
-          await _dijeloviService.getDijeloviById(dijeloviNarudba['dijeloviId']);
+      dijelovi = await _dijeloviService.getDijeloviById(dijeloviNarudba['dijeloviId']);
       setState(() {
         zapisUcitan = true;
       });
@@ -1614,8 +1446,7 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
   //zajednicke funkcije
 
   Future<void> zavrsiNarudbu(int odabranaNarudbaId) async {
-    String poruka =
-        await _narudbaService.upravljanjeNarudbom(odabranaNarudbaId);
+    String poruka = await _narudbaService.upravljanjeNarudbom(odabranaNarudbaId);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -1623,8 +1454,7 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
           poruka,
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor:
-            poruka == "Uspjesno potvrdeno" ? Colors.green : Colors.red,
+        backgroundColor: poruka == "Uspjesno potvrdeno" ? Colors.green : Colors.red,
       ),
     );
     setState(() {
@@ -1661,8 +1491,7 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
   }
 
   //dugmici
-  Widget customButton(BuildContext context, String title, IconData icon,
-      String currentSection, Function onPressed) {
+  Widget customButton(BuildContext context, String title, IconData icon, String currentSection, Function onPressed) {
     bool isSelected = currentSection == title;
     return Container(
       width: 70.0, // Povećanje veličine dugmića
@@ -1672,10 +1501,7 @@ class _KorisnikovaHistorijaState extends State<KorisnikovaHistorija> {
         gradient: LinearGradient(
           colors: isSelected
               ? [Colors.blue, Colors.lightBlueAccent] // Boje za odabrani dugmić
-              : [
-                  Color.fromARGB(255, 82, 205, 210),
-                  Color.fromARGB(255, 7, 161, 235)
-                ], // Boje za neodabrane dugmiće
+              : [Color.fromARGB(255, 82, 205, 210), Color.fromARGB(255, 7, 161, 235)], // Boje za neodabrane dugmiće
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

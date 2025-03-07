@@ -99,7 +99,7 @@ class _KorisnikProizvodiPrikazState extends State<KorisnikProizvodiPrikaz> {
                                       children: [
                                         Text(naziv, style: const TextStyle(fontWeight: FontWeight.bold)),
                                         const SizedBox(height: 4),
-                                        Text('Cijena: $cijena KM'),
+                                        Text('Cijena: ${getFormattedCijena(cijena)}'),
                                       ],
                                     ),
                                     IconButton(
@@ -208,7 +208,7 @@ class _KorisnikProizvodiPrikazState extends State<KorisnikProizvodiPrikaz> {
                                       children: [
                                         Text(naziv, style: const TextStyle(fontWeight: FontWeight.bold)),
                                         const SizedBox(height: 4),
-                                        Text('Cijena: $cijena KM'),
+                                        Text('Cijena: ${getFormattedCijena(cijena)}'),
                                       ],
                                     ),
                                     IconButton(
@@ -242,6 +242,21 @@ class _KorisnikProizvodiPrikazState extends State<KorisnikProizvodiPrikaz> {
         ),
       ],
     );
+  }
+
+  String getFormattedCijena(dynamic cijena) {
+    if (cijena == null) {
+      return "Cijena nije pronađena";
+    }
+
+    final double cijenaValue;
+    try {
+      cijenaValue = double.parse(cijena.toString());
+    } catch (e) {
+      return "Cijena nije pronađena";
+    }
+
+    return "${cijenaValue.toStringAsFixed(2)} KM";
   }
 
   @override

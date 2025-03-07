@@ -24,8 +24,7 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
   final BiciklService _biciklService = BiciklService();
   final BiciklSacuvaniServis _biciklSacuvaniServis = BiciklSacuvaniServis();
 
-  final DijeloviSacuvaniServis _dijeloviSacuvaniServis =
-      DijeloviSacuvaniServis();
+  final DijeloviSacuvaniServis _dijeloviSacuvaniServis = DijeloviSacuvaniServis();
   final DijeloviService _dijeloviService = DijeloviService();
 
   String _selectedSection = 'bicikl';
@@ -72,8 +71,7 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
   Future<void> getSacuvaniBicikli() async {
     List<int>? biciklIDovi = [];
     bicikliPodaci = [];
-    final sacuvaniPodaci =
-        await _biciklSacuvaniServis.getSacuvani(korisnikId: korisnikId);
+    final sacuvaniPodaci = await _biciklSacuvaniServis.getSacuvani(korisnikId: korisnikId);
 
     if (sacuvaniPodaci != null) {
       for (var zapis in sacuvaniPodaci) {
@@ -109,8 +107,7 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
     List<int>? dijeloviIDovi = [];
     dijeloviPodaci = [];
 
-    final sacuvaniPodaci =
-        await _dijeloviSacuvaniServis.getSacuvani(korisnikId: korisnikId);
+    final sacuvaniPodaci = await _dijeloviSacuvaniServis.getSacuvani(korisnikId: korisnikId);
 
     if (sacuvaniPodaci != null) {
       for (var zapis in sacuvaniPodaci) {
@@ -182,10 +179,8 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
           child: Align(
             alignment: Alignment.bottomCenter,
             child: Container(
-              width:
-                  MediaQuery.of(context).size.width * 0.95, // 95% širine ekrana
-              height:
-                  MediaQuery.of(context).size.height * 0.05, // 5% visine ekrana
+              width: MediaQuery.of(context).size.width * 0.95, // 95% širine ekrana
+              height: MediaQuery.of(context).size.height * 0.05, // 5% visine ekrana
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(25.0),
@@ -194,23 +189,18 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
                 children: [
                   // dD
                   Container(
-                    width: MediaQuery.of(context).size.width *
-                        0.55, // 40% širine ekrana
-                    height: MediaQuery.of(context).size.height *
-                        0.09, // 9% visine ekrana
-                    color: const Color.fromARGB(
-                        0, 244, 67, 54), // Zamijenite s bojom po želji
+                    width: MediaQuery.of(context).size.width * 0.55, // 40% širine ekrana
+                    height: MediaQuery.of(context).size.height * 0.09, // 9% visine ekrana
+                    color: const Color.fromARGB(0, 244, 67, 54), // Zamijenite s bojom po želji
                     child: Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.arrow_back,
-                              color: Colors.black), // Ikone crne boje
+                          icon: const Icon(Icons.arrow_back, color: Colors.black), // Ikone crne boje
                           iconSize: 24.0, // Veličina ikone
                           onPressed: () {
                             Navigator.pushReplacement(
                               context,
-                              MaterialPageRoute(
-                                  builder: (context) => const GlavniProzor()),
+                              MaterialPageRoute(builder: (context) => const GlavniProzor()),
                             );
                           },
                         ),
@@ -223,12 +213,9 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
                   ),
                   // lD
                   Container(
-                    width: MediaQuery.of(context).size.width *
-                        0.40, // 55% širine ekrana
-                    height: MediaQuery.of(context).size.height *
-                        0.09, // 9% visine ekrana
-                    color: const Color.fromARGB(
-                        0, 33, 149, 243), // Zamijenite s bojom po želji
+                    width: MediaQuery.of(context).size.width * 0.40, // 55% širine ekrana
+                    height: MediaQuery.of(context).size.height * 0.09, // 9% visine ekrana
+                    color: const Color.fromARGB(0, 33, 149, 243), // Zamijenite s bojom po želji
                   ),
                 ],
               ),
@@ -239,17 +226,13 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
         //dP
         Container(
           width: MediaQuery.of(context).size.width, // 100% širine ekrana
-          height:
-              MediaQuery.of(context).size.height * 0.12, // 15% visine ekrana
-          color: const Color.fromARGB(
-              0, 255, 153, 0), // Zamijenite s bojom po želji
+          height: MediaQuery.of(context).size.height * 0.12, // 15% visine ekrana
+          color: const Color.fromARGB(0, 255, 153, 0), // Zamijenite s bojom po želji
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              customButton(context, 'bicikl', Icons.directions_bike,
-                  _selectedSection, _updateSection),
-              customButton(context, 'dijelovi', Icons.handyman,
-                  _selectedSection, _updateSection),
+              customButton(context, 'bicikl', Icons.directions_bike, _selectedSection, _updateSection),
+              customButton(context, 'dijelovi', Icons.handyman, _selectedSection, _updateSection),
             ],
           ),
         ),
@@ -258,8 +241,7 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
   }
 
   //dugmici za pretraku Bicikla, dijela i servisera
-  Widget customButton(BuildContext context, String title, IconData icon,
-      String currentSection, Function onPressed) {
+  Widget customButton(BuildContext context, String title, IconData icon, String currentSection, Function onPressed) {
     bool isSelected = currentSection == title;
     return Container(
       width: 70.0, // Povećanje veličine dugmića
@@ -269,10 +251,7 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
         gradient: LinearGradient(
           colors: isSelected
               ? [Colors.blue, Colors.lightBlueAccent] // Boje za odabrani dugmić
-              : [
-                  Color.fromARGB(255, 82, 205, 210),
-                  Color.fromARGB(255, 7, 161, 235)
-                ], // Boje za neodabrane dugmiće
+              : [Color.fromARGB(255, 82, 205, 210), Color.fromARGB(255, 7, 161, 235)], // Boje za neodabrane dugmiće
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -351,21 +330,18 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
                             height: MediaQuery.of(context).size.height * 0.05,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Color.fromARGB(255, 87, 202, 255),
+                                backgroundColor: Color.fromARGB(255, 87, 202, 255),
                               ),
                               onPressed: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const LogIn()),
+                                  MaterialPageRoute(builder: (context) => const LogIn()),
                                 );
                               },
                               child: Text(
                                 "Prijava",
                                 style: TextStyle(
-                                  color:
-                                      const Color.fromARGB(255, 255, 255, 255),
+                                  color: const Color.fromARGB(255, 255, 255, 255),
                                   fontSize: 18,
                                 ),
                               ),
@@ -417,9 +393,7 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
                                 bool? result = await Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => BicikliPrikaz(
-                                        biciklId: bicikliPodaci[firstIndex]
-                                            ['biciklId']),
+                                    builder: (context) => BicikliPrikaz(biciklId: bicikliPodaci[firstIndex]['biciklId']),
                                   ),
                                 );
                                 if (result == true) {
@@ -431,86 +405,58 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
                               },
                               child: Container(
                                 width: MediaQuery.of(context).size.width * 0.4,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.2,
+                                height: MediaQuery.of(context).size.height * 0.2,
                                 decoration: BoxDecoration(
-                                  color:
-                                      const Color.fromARGB(244, 255, 255, 255),
-                                  borderRadius: BorderRadius.circular(
-                                      10.0), // Dodano zaobljenje ivica
+                                  color: const Color.fromARGB(244, 255, 255, 255),
+                                  borderRadius: BorderRadius.circular(10.0), // Dodano zaobljenje ivica
                                 ),
                                 child: Column(
                                   children: [
                                     Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.4,
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.16,
+                                      width: MediaQuery.of(context).size.width * 0.4,
+                                      height: MediaQuery.of(context).size.height * 0.16,
                                       decoration: BoxDecoration(
-                                        color: const Color.fromARGB(
-                                            0, 244, 67, 54),
+                                        color: const Color.fromARGB(0, 244, 67, 54),
                                         borderRadius: BorderRadius.only(
                                           topLeft: Radius.circular(10.0),
                                           topRight: Radius.circular(10.0),
                                         ), // Zaobljene gornje ivice
                                       ),
-                                      child: bicikliPodaci[firstIndex]
-                                                      ['slikeBiciklis'] !=
-                                                  null &&
-                                              bicikliPodaci[firstIndex]
-                                                      ['slikeBiciklis']
-                                                  .isNotEmpty
-                                          ? ClipRRect(
-                                              borderRadius: BorderRadius.only(
-                                                topLeft: Radius.circular(10.0),
-                                                topRight: Radius.circular(10.0),
-                                              ),
-                                              child: Image.memory(
-                                                base64Decode(
-                                                    bicikliPodaci[firstIndex]
-                                                            ['slikeBiciklis'][0]
-                                                        ['slika']),
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.45,
-                                                height: MediaQuery.of(context)
-                                                        .size
-                                                        .height *
-                                                    0.16,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            )
-                                          : Center(
-                                              child: Icon(
-                                                Icons.image_not_supported,
-                                                color: Colors.grey,
-                                                size: 40.0,
-                                              ),
-                                            ),
+                                      child:
+                                          bicikliPodaci[firstIndex]['slikeBiciklis'] != null && bicikliPodaci[firstIndex]['slikeBiciklis'].isNotEmpty
+                                              ? ClipRRect(
+                                                  borderRadius: BorderRadius.only(
+                                                    topLeft: Radius.circular(10.0),
+                                                    topRight: Radius.circular(10.0),
+                                                  ),
+                                                  child: Image.memory(
+                                                    base64Decode(bicikliPodaci[firstIndex]['slikeBiciklis'][0]['slika']),
+                                                    width: MediaQuery.of(context).size.width * 0.45,
+                                                    height: MediaQuery.of(context).size.height * 0.16,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                )
+                                              : Center(
+                                                  child: Icon(
+                                                    Icons.image_not_supported,
+                                                    color: Colors.grey,
+                                                    size: 40.0,
+                                                  ),
+                                                ),
                                     ),
                                     Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.45,
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.04,
-                                      color:
-                                          const Color.fromARGB(0, 33, 149, 243),
+                                      width: MediaQuery.of(context).size.width * 0.45,
+                                      height: MediaQuery.of(context).size.height * 0.04,
+                                      color: const Color.fromARGB(0, 33, 149, 243),
                                       child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Expanded(
                                             child: Center(
                                               child: Text(
-                                                bicikliPodaci[firstIndex]
-                                                        ['naziv'] ??
-                                                    'N/A',
+                                                bicikliPodaci[firstIndex]['naziv'] ?? 'N/A',
                                                 style: TextStyle(
-                                                  color: const Color.fromARGB(
-                                                      255, 0, 0, 0),
+                                                  color: const Color.fromARGB(255, 0, 0, 0),
                                                 ),
                                                 overflow: TextOverflow.ellipsis,
                                                 softWrap: false,
@@ -520,20 +466,17 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
                                           Expanded(
                                             child: Center(
                                               child: Text(
-                                                bicikliPodaci[firstIndex]
-                                                            ['cijena'] !=
-                                                        null
-                                                    ? "${bicikliPodaci[firstIndex]['cijena'].toString()} KM"
+                                                bicikliPodaci[firstIndex]['cijena'] != null
+                                                    ? getFormattedCijena(bicikliPodaci[firstIndex]['cijena'])
                                                     : 'N/A',
                                                 style: TextStyle(
-                                                  color: const Color.fromARGB(
-                                                      255, 0, 0, 0),
+                                                  color: const Color.fromARGB(255, 0, 0, 0),
                                                 ),
                                                 overflow: TextOverflow.ellipsis,
                                                 softWrap: false,
                                               ),
                                             ),
-                                          ),
+                                          )
                                         ],
                                       ),
                                     ),
@@ -547,9 +490,7 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
                                 bool? result = await Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => BicikliPrikaz(
-                                        biciklId: bicikliPodaci[secondIndex]
-                                            ['biciklId']),
+                                    builder: (context) => BicikliPrikaz(biciklId: bicikliPodaci[secondIndex]['biciklId']),
                                   ),
                                 );
                                 if (result == true) {
@@ -561,54 +502,34 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
                               },
                               child: Container(
                                 width: MediaQuery.of(context).size.width * 0.4,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.2,
+                                height: MediaQuery.of(context).size.height * 0.2,
                                 decoration: BoxDecoration(
-                                  color:
-                                      const Color.fromARGB(244, 255, 255, 255),
-                                  borderRadius: BorderRadius.circular(
-                                      10.0), // Dodano zaobljenje ivica
+                                  color: const Color.fromARGB(244, 255, 255, 255),
+                                  borderRadius: BorderRadius.circular(10.0), // Dodano zaobljenje ivica
                                 ),
                                 child: Column(
                                   children: [
                                     Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.4,
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.16,
+                                      width: MediaQuery.of(context).size.width * 0.4,
+                                      height: MediaQuery.of(context).size.height * 0.16,
                                       decoration: BoxDecoration(
-                                        color: const Color.fromARGB(
-                                            0, 244, 67, 54),
+                                        color: const Color.fromARGB(0, 244, 67, 54),
                                         borderRadius: BorderRadius.only(
                                           topLeft: Radius.circular(10.0),
                                           topRight: Radius.circular(10.0),
                                         ), // Zaobljene gornje ivice
                                       ),
-                                      child: bicikliPodaci[secondIndex]
-                                                      ['slikeBiciklis'] !=
-                                                  null &&
-                                              bicikliPodaci[secondIndex]
-                                                      ['slikeBiciklis']
-                                                  .isNotEmpty
+                                      child: bicikliPodaci[secondIndex]['slikeBiciklis'] != null &&
+                                              bicikliPodaci[secondIndex]['slikeBiciklis'].isNotEmpty
                                           ? ClipRRect(
                                               borderRadius: BorderRadius.only(
                                                 topLeft: Radius.circular(10.0),
                                                 topRight: Radius.circular(10.0),
                                               ),
                                               child: Image.memory(
-                                                base64Decode(
-                                                    bicikliPodaci[secondIndex]
-                                                            ['slikeBiciklis'][0]
-                                                        ['slika']),
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.45,
-                                                height: MediaQuery.of(context)
-                                                        .size
-                                                        .height *
-                                                    0.16,
+                                                base64Decode(bicikliPodaci[secondIndex]['slikeBiciklis'][0]['slika']),
+                                                width: MediaQuery.of(context).size.width * 0.45,
+                                                height: MediaQuery.of(context).size.height * 0.16,
                                                 fit: BoxFit.cover,
                                               ),
                                             )
@@ -621,26 +542,18 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
                                             ),
                                     ),
                                     Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.45,
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.04,
-                                      color:
-                                          const Color.fromARGB(0, 33, 149, 243),
+                                      width: MediaQuery.of(context).size.width * 0.45,
+                                      height: MediaQuery.of(context).size.height * 0.04,
+                                      color: const Color.fromARGB(0, 33, 149, 243),
                                       child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Expanded(
                                             child: Center(
                                               child: Text(
-                                                bicikliPodaci[secondIndex]
-                                                        ['naziv'] ??
-                                                    'N/A',
+                                                bicikliPodaci[secondIndex]['naziv'] ?? 'N/A',
                                                 style: TextStyle(
-                                                  color: const Color.fromARGB(
-                                                      255, 0, 0, 0),
+                                                  color: const Color.fromARGB(255, 0, 0, 0),
                                                 ),
                                                 overflow: TextOverflow.ellipsis,
                                                 softWrap: false,
@@ -650,20 +563,17 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
                                           Expanded(
                                             child: Center(
                                               child: Text(
-                                                bicikliPodaci[secondIndex]
-                                                            ['cijena'] !=
-                                                        null
-                                                    ? "${bicikliPodaci[secondIndex]['cijena'].toString()} KM"
+                                                bicikliPodaci[firstIndex]['cijena'] != null
+                                                    ? getFormattedCijena(bicikliPodaci[firstIndex]['cijena'])
                                                     : 'N/A',
                                                 style: TextStyle(
-                                                  color: const Color.fromARGB(
-                                                      255, 0, 0, 0),
+                                                  color: const Color.fromARGB(255, 0, 0, 0),
                                                 ),
                                                 overflow: TextOverflow.ellipsis,
                                                 softWrap: false,
                                               ),
                                             ),
-                                          ),
+                                          )
                                         ],
                                       ),
                                     ),
@@ -712,8 +622,7 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
                 ),
                 IconButton(
                   icon: Icon(Icons.arrow_forward),
-                  onPressed: currentPage <
-                          (bicikliPodaci.length / itemsPerPage).ceil() - 1
+                  onPressed: currentPage < (bicikliPodaci.length / itemsPerPage).ceil() - 1
                       ? () {
                           setState(() {
                             currentPage++;
@@ -727,6 +636,21 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
         ],
       ),
     );
+  }
+
+  String getFormattedCijena(dynamic cijena) {
+    if (cijena == null) {
+      return "N/A";
+    }
+
+    final double cijenaValue;
+    try {
+      cijenaValue = double.parse(cijena.toString());
+    } catch (e) {
+      return "N/A";
+    }
+
+    return "${cijenaValue.toStringAsFixed(2)} KM";
   }
 
   Widget dioSacuvaniDijelova(BuildContext context) {
@@ -787,8 +711,7 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(
-                                  builder: (context) => const LogIn()),
+                              MaterialPageRoute(builder: (context) => const LogIn()),
                             );
                           },
                           child: Text(
@@ -829,8 +752,7 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
                 children: List.generate(
                   (dijeloviPodaci.length / 2).ceil().clamp(0, 5),
                   (index) {
-                    int firstIndex =
-                        index * 2 + currentPageDijelovi * itemsPerPageDijelovi;
+                    int firstIndex = index * 2 + currentPageDijelovi * itemsPerPageDijelovi;
                     int secondIndex = firstIndex + 1;
                     if (firstIndex >= dijeloviPodaci.length) return Container();
 
@@ -847,9 +769,7 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
                                 bool? result = await Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => DijeloviPrikaz(
-                                        dijeloviId: dijeloviPodaci[firstIndex]
-                                            ['dijeloviId']),
+                                    builder: (context) => DijeloviPrikaz(dijeloviId: dijeloviPodaci[firstIndex]['dijeloviId']),
                                   ),
                                 );
                                 if (result == true) {
@@ -861,54 +781,34 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
                               },
                               child: Container(
                                 width: MediaQuery.of(context).size.width * 0.4,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.2,
+                                height: MediaQuery.of(context).size.height * 0.2,
                                 decoration: BoxDecoration(
-                                  color:
-                                      const Color.fromARGB(244, 255, 255, 255),
-                                  borderRadius: BorderRadius.circular(
-                                      10.0), // Dodano zaobljenje ivica
+                                  color: const Color.fromARGB(244, 255, 255, 255),
+                                  borderRadius: BorderRadius.circular(10.0), // Dodano zaobljenje ivica
                                 ),
                                 child: Column(
                                   children: [
                                     Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.4,
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.16,
+                                      width: MediaQuery.of(context).size.width * 0.4,
+                                      height: MediaQuery.of(context).size.height * 0.16,
                                       decoration: BoxDecoration(
-                                        color: const Color.fromARGB(
-                                            0, 244, 67, 54),
+                                        color: const Color.fromARGB(0, 244, 67, 54),
                                         borderRadius: BorderRadius.only(
                                           topLeft: Radius.circular(10.0),
                                           topRight: Radius.circular(10.0),
                                         ), // Zaobljene gornje ivice
                                       ),
-                                      child: dijeloviPodaci[firstIndex]
-                                                      ['slikeDijelovis'] !=
-                                                  null &&
-                                              dijeloviPodaci[firstIndex]
-                                                      ['slikeDijelovis']
-                                                  .isNotEmpty
+                                      child: dijeloviPodaci[firstIndex]['slikeDijelovis'] != null &&
+                                              dijeloviPodaci[firstIndex]['slikeDijelovis'].isNotEmpty
                                           ? ClipRRect(
                                               borderRadius: BorderRadius.only(
                                                 topLeft: Radius.circular(10.0),
                                                 topRight: Radius.circular(10.0),
                                               ),
                                               child: Image.memory(
-                                                base64Decode(
-                                                    dijeloviPodaci[firstIndex]
-                                                            ['slikeDijelovis']
-                                                        [0]['slika']),
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.45,
-                                                height: MediaQuery.of(context)
-                                                        .size
-                                                        .height *
-                                                    0.16,
+                                                base64Decode(dijeloviPodaci[firstIndex]['slikeDijelovis'][0]['slika']),
+                                                width: MediaQuery.of(context).size.width * 0.45,
+                                                height: MediaQuery.of(context).size.height * 0.16,
                                                 fit: BoxFit.cover,
                                               ),
                                             )
@@ -921,26 +821,18 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
                                             ),
                                     ),
                                     Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.45,
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.04,
-                                      color:
-                                          const Color.fromARGB(0, 33, 149, 243),
+                                      width: MediaQuery.of(context).size.width * 0.45,
+                                      height: MediaQuery.of(context).size.height * 0.04,
+                                      color: const Color.fromARGB(0, 33, 149, 243),
                                       child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Expanded(
                                             child: Center(
                                               child: Text(
-                                                dijeloviPodaci[firstIndex]
-                                                        ['naziv'] ??
-                                                    'N/A',
+                                                dijeloviPodaci[firstIndex]['naziv'] ?? 'N/A',
                                                 style: TextStyle(
-                                                  color: const Color.fromARGB(
-                                                      255, 0, 0, 0),
+                                                  color: const Color.fromARGB(255, 0, 0, 0),
                                                 ),
                                                 overflow: TextOverflow.ellipsis,
                                                 softWrap: false,
@@ -950,14 +842,11 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
                                           Expanded(
                                             child: Center(
                                               child: Text(
-                                                dijeloviPodaci[firstIndex]
-                                                            ['cijena'] !=
-                                                        null
-                                                    ? "${dijeloviPodaci[firstIndex]['cijena'].toString()} KM"
+                                                dijeloviPodaci[firstIndex]['cijena'] != null
+                                                    ? getFormattedCijena(dijeloviPodaci[firstIndex]['cijena'])
                                                     : 'N/A',
                                                 style: TextStyle(
-                                                  color: const Color.fromARGB(
-                                                      255, 0, 0, 0),
+                                                  color: const Color.fromARGB(255, 0, 0, 0),
                                                 ),
                                                 overflow: TextOverflow.ellipsis,
                                                 softWrap: false,
@@ -977,9 +866,7 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
                                 bool? result = await Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => DijeloviPrikaz(
-                                        dijeloviId: dijeloviPodaci[secondIndex]
-                                            ['dijeloviId']),
+                                    builder: (context) => DijeloviPrikaz(dijeloviId: dijeloviPodaci[secondIndex]['dijeloviId']),
                                   ),
                                 );
                                 if (result == true) {
@@ -991,53 +878,34 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
                               },
                               child: Container(
                                 width: MediaQuery.of(context).size.width * 0.4,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.2,
+                                height: MediaQuery.of(context).size.height * 0.2,
                                 decoration: BoxDecoration(
-                                  color:
-                                      const Color.fromARGB(244, 255, 255, 255),
+                                  color: const Color.fromARGB(244, 255, 255, 255),
                                   borderRadius: BorderRadius.circular(10.0),
                                 ),
                                 child: Column(
                                   children: [
                                     Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.4,
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.16,
+                                      width: MediaQuery.of(context).size.width * 0.4,
+                                      height: MediaQuery.of(context).size.height * 0.16,
                                       decoration: BoxDecoration(
-                                        color: const Color.fromARGB(
-                                            0, 244, 67, 54),
+                                        color: const Color.fromARGB(0, 244, 67, 54),
                                         borderRadius: BorderRadius.only(
                                           topLeft: Radius.circular(10.0),
                                           topRight: Radius.circular(10.0),
                                         ),
                                       ),
-                                      child: dijeloviPodaci[secondIndex]
-                                                      ['slikeDijelovis'] !=
-                                                  null &&
-                                              dijeloviPodaci[secondIndex]
-                                                      ['slikeDijelovis']
-                                                  .isNotEmpty
+                                      child: dijeloviPodaci[secondIndex]['slikeDijelovis'] != null &&
+                                              dijeloviPodaci[secondIndex]['slikeDijelovis'].isNotEmpty
                                           ? ClipRRect(
                                               borderRadius: BorderRadius.only(
                                                 topLeft: Radius.circular(10.0),
                                                 topRight: Radius.circular(10.0),
                                               ),
                                               child: Image.memory(
-                                                base64Decode(
-                                                    dijeloviPodaci[secondIndex]
-                                                            ['slikeDijelovis']
-                                                        [0]['slika']),
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.45,
-                                                height: MediaQuery.of(context)
-                                                        .size
-                                                        .height *
-                                                    0.16,
+                                                base64Decode(dijeloviPodaci[secondIndex]['slikeDijelovis'][0]['slika']),
+                                                width: MediaQuery.of(context).size.width * 0.45,
+                                                height: MediaQuery.of(context).size.height * 0.16,
                                                 fit: BoxFit.cover,
                                               ),
                                             )
@@ -1050,26 +918,18 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
                                             ),
                                     ),
                                     Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.45,
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.04,
-                                      color:
-                                          const Color.fromARGB(0, 33, 149, 243),
+                                      width: MediaQuery.of(context).size.width * 0.45,
+                                      height: MediaQuery.of(context).size.height * 0.04,
+                                      color: const Color.fromARGB(0, 33, 149, 243),
                                       child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Expanded(
                                             child: Center(
                                               child: Text(
-                                                dijeloviPodaci[secondIndex]
-                                                        ['naziv'] ??
-                                                    'N/A',
+                                                dijeloviPodaci[secondIndex]['naziv'] ?? 'N/A',
                                                 style: TextStyle(
-                                                  color: const Color.fromARGB(
-                                                      255, 0, 0, 0),
+                                                  color: const Color.fromARGB(255, 0, 0, 0),
                                                 ),
                                                 overflow: TextOverflow.ellipsis,
                                                 softWrap: false,
@@ -1079,14 +939,11 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
                                           Expanded(
                                             child: Center(
                                               child: Text(
-                                                dijeloviPodaci[secondIndex]
-                                                            ['cijena'] !=
-                                                        null
-                                                    ? "${dijeloviPodaci[secondIndex]['cijena'].toString()} KM"
+                                                dijeloviPodaci[secondIndex]['cijena'] != null
+                                                    ? getFormattedCijena(dijeloviPodaci[secondIndex]['cijena'])
                                                     : 'N/A',
                                                 style: TextStyle(
-                                                  color: const Color.fromARGB(
-                                                      255, 0, 0, 0),
+                                                  color: const Color.fromARGB(255, 0, 0, 0),
                                                 ),
                                                 overflow: TextOverflow.ellipsis,
                                                 softWrap: false,
@@ -1141,10 +998,7 @@ class _KoriskinoviSacuvaiState extends State<KoriskinoviSacuvai> {
                 ),
                 IconButton(
                   icon: Icon(Icons.arrow_forward),
-                  onPressed: currentPageDijelovi <
-                          (dijeloviPodaci.length / itemsPerPageDijelovi)
-                                  .ceil() -
-                              1
+                  onPressed: currentPageDijelovi < (dijeloviPodaci.length / itemsPerPageDijelovi).ceil() - 1
                       ? () {
                           setState(() {
                             currentPageDijelovi++;

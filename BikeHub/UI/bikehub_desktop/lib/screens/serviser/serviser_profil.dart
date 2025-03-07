@@ -160,8 +160,6 @@ class _ServiserProfilState extends State<ServiserProfil> {
                       child: Row(
                         children: [
                           const SizedBox(width: 10.0),
-                          _buildDetailContainer('Serviser ID', {rezervacija['serviserId']}, 0.18),
-                          const SizedBox(width: 10.0),
                           _buildDetailContainer('Datum kreiranja', formatDate(rezervacija['datumKreiranja']), 0.18),
                           const SizedBox(width: 10.0),
                           _buildDetailContainer('Datum ', formatDate(rezervacija['datumRezervacije']), 0.18),
@@ -314,7 +312,7 @@ class _ServiserProfilState extends State<ServiserProfil> {
                                   const SizedBox(width: 10.0),
                                   _buildDetailContainer('Ocjena', serviserData?['ukupnaOcjena']?.toString() ?? 'Ocjena nije pronađena', 0.12),
                                   const SizedBox(width: 10.0),
-                                  _buildDetailContainer('Cijena', serviserData?['cijena']?.toString() ?? 'Cijena nije pronađena', 0.12),
+                                  _buildDetailContainer('Cijena', getFormattedCijena(serviserData?['cijena']?.toString()), 0.12),
                                   const SizedBox(width: 10.0),
                                   _buildDetailContainer('Grad', serviserData?['grad'] ?? 'Grad nije pronađen', 0.12),
                                 ],
@@ -509,6 +507,21 @@ class _ServiserProfilState extends State<ServiserProfil> {
         ),
       ),
     );
+  }
+
+  String getFormattedCijena(dynamic cijena) {
+    if (cijena == null) {
+      return "Cijena nije pronađena";
+    }
+
+    final double cijenaValue;
+    try {
+      cijenaValue = double.parse(cijena.toString());
+    } catch (e) {
+      return "Cijena nije pronađena";
+    }
+
+    return "${cijenaValue.toStringAsFixed(2)} KM";
   }
 
   Widget _buildDetailContainer(String label, dynamic value, double sirina) {

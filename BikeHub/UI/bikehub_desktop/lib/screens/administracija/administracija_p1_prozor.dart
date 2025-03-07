@@ -962,7 +962,7 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                     style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
                   ),
                   pw.Bullet(
-                    text: 'Ukupna zarada: ${(podatci['ukupnaZarada']?.toString() ?? 'N/A')}',
+                    text: 'Ukupna zarada: ${getFormattedCijena(podatci['ukupnaZarada'])}',
                     style: pw.TextStyle(fontSize: 14),
                   ),
                   pw.Bullet(
@@ -979,7 +979,7 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                     style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
                   ),
                   pw.Bullet(
-                    text: 'Zbir cijene promocija: ${(podatci['zbirCijenePromocijaTrenutniMjesec']?.toString() ?? 'N/A')}',
+                    text: 'Zbir cijene promocija: ${getFormattedCijena(podatci['zbirCijenePromocijaTrenutniMjesec'])}',
                     style: pw.TextStyle(fontSize: 14),
                   ),
                   pw.Bullet(
@@ -992,7 +992,7 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                     style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
                   ),
                   pw.Bullet(
-                    text: 'Zbir cijene promocija: ${(podatci['zbirCijenePromocijaProsliMjesec']?.toString() ?? 'N/A')}',
+                    text: 'Zbir cijene promocija: ${getFormattedCijena(podatci['zbirCijenePromocijaProsliMjesec'])}',
                     style: pw.TextStyle(fontSize: 14),
                   ),
                   pw.Bullet(
@@ -1009,7 +1009,7 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                     style: pw.TextStyle(fontSize: 14),
                   ),
                   pw.Bullet(
-                    text: 'Najveća zarada mjeseca: ${(podatci['najvecaZaradaMjeseca']?.toString() ?? 'N/A')}',
+                    text: 'Najveća zarada mjeseca: ${getFormattedCijena(podatci['najvecaZaradaMjeseca'])}',
                     style: pw.TextStyle(fontSize: 14),
                   ),
                   pw.SizedBox(height: 20),
@@ -1106,7 +1106,7 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                     style: pw.TextStyle(fontSize: 14),
                   ),
                   pw.Bullet(
-                    text: 'Zbir cijena zavrsenih servisa: ${(podatci['zbirCijenaZavrsenihServisa']?.toString() ?? 'N/A')}',
+                    text: 'Zbir cijena zavrsenih servisa: ${getFormattedCijena(podatci['zbirCijenaZavrsenihServisa'])}',
                     style: pw.TextStyle(fontSize: 14),
                   ),
                   pw.SizedBox(height: 10),
@@ -1119,7 +1119,7 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                     style: pw.TextStyle(fontSize: 14),
                   ),
                   pw.Bullet(
-                    text: 'Zbir cijena servisa: ${(podatci['zbirCijenaTrenutniMjesec']?.toString() ?? 'N/A')}',
+                    text: 'Zbir cijena servisa:${getFormattedCijena(podatci['zbirCijenaTrenutniMjesec'])}',
                     style: pw.TextStyle(fontSize: 14),
                   ),
                   pw.Bullet(
@@ -1136,7 +1136,7 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                     style: pw.TextStyle(fontSize: 14),
                   ),
                   pw.Bullet(
-                    text: 'Zbir cijena servisa: ${(podatci['zbirCijenaProsliMjesec']?.toString() ?? 'N/A')}',
+                    text: 'Zbir cijena servisa: ${getFormattedCijena(podatci['zbirCijenaProsliMjesec'])}',
                     style: pw.TextStyle(fontSize: 14),
                   ),
                   pw.Bullet(
@@ -1289,15 +1289,14 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                                 ),
                                 child: Center(
                                   child: FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    child: Text(
-                                      "$ukupnaCijenaString KM",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: MediaQuery.of(context).size.width * 0.017,
-                                      ),
-                                    ),
-                                  ),
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        getFormattedCijena(ukupnaCijenaString),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: MediaQuery.of(context).size.width * 0.017,
+                                        ),
+                                      )),
                                 ),
                               ),
                             ),
@@ -1691,7 +1690,7 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                                   ),
                                   Expanded(
                                     child: Text(
-                                      bicikl['cijena'].toString(),
+                                      getFormattedCijena(bicikl['cijena']),
                                       style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 0, 0, 0)),
                                       textAlign: TextAlign.center,
                                     ),
@@ -1841,7 +1840,7 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                                   ),
                                   Expanded(
                                     child: Text(
-                                      dijelovi['cijena'].toString(),
+                                      getFormattedCijena(dijelovi['cijena']),
                                       style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 0, 0, 0)),
                                       textAlign: TextAlign.center,
                                     ),
@@ -1908,6 +1907,21 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
         ),
       ],
     );
+  }
+
+  String getFormattedCijena(dynamic cijena) {
+    if (cijena == null) {
+      return "Cijena nije pronađena";
+    }
+
+    final double cijenaValue;
+    try {
+      cijenaValue = double.parse(cijena.toString());
+    } catch (e) {
+      return "Cijena nije pronađena";
+    }
+
+    return "${cijenaValue.toStringAsFixed(2)} KM";
   }
 
   Widget _buildServiseri() {
@@ -2323,28 +2337,52 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
   final _lozinkaPotvrdaController = TextEditingController();
   final _emailController = TextEditingController();
 
+  String? usernameError = "";
+  String? lozinkaError = "";
+  String? lozinkaPotvrdaError = "";
+  String? emailError = "";
+
   void dodajAdministratora() async {
+    usernameError = "";
+    lozinkaError = "";
+    lozinkaPotvrdaError = "";
+    emailError = "";
+    bool greska = false;
     if (_usernameController.text.isEmpty) {
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati username");
-      return;
+      usernameError = "Potrebno je dodati username";
+      greska = true;
     }
     if (_lozinkaController.text.isEmpty) {
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati lozinku");
-      return;
+      lozinkaError = "Potrebno je dodati lozinku";
+      greska = true;
     }
     if (_lozinkaPotvrdaController.text.isEmpty) {
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati potvrdenu lozinku");
-      return;
+      lozinkaPotvrdaError = "Potrebno je dodati potvrdenu lozinku";
+      greska = true;
     }
     if (_lozinkaController.text != _lozinkaPotvrdaController.text) {
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Lozinka i potvrdena lozinka moraju biti iste");
-      return;
+      lozinkaPotvrdaError = "Lozinka i potvrdena lozinka moraju biti iste";
+      greska = true;
     }
     if (_emailController.text.isEmpty) {
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati email");
+      emailError = "Potrebno je dodati email";
+      greska = true;
+    }
+    if (greska) {
+      setState(() {
+        usernameError;
+        lozinkaError;
+        lozinkaPotvrdaError;
+        emailError;
+      });
       return;
     }
-
+    setState(() {
+      usernameError;
+      lozinkaError;
+      lozinkaPotvrdaError;
+      emailError;
+    });
     KorisnikModel noviAdministrator = KorisnikModel(
       korisnikId: 0,
       username: _usernameController.text,
@@ -2396,115 +2434,212 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
             flex: 85,
             child: Container(
               width: double.infinity,
-              color: const Color.fromARGB(0, 76, 175, 79),
+              color: Color.fromARGB(0, 76, 175, 79),
               child: Center(
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.25,
-                  height: MediaQuery.of(context).size.height * 0.4,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [
-                        Color.fromARGB(255, 82, 205, 210),
-                        Color.fromARGB(255, 7, 161, 235),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+                child: SingleChildScrollView(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.4,
+                    height: MediaQuery.of(context).size.height * 0.45,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color.fromARGB(255, 82, 205, 210),
+                          Color.fromARGB(255, 7, 161, 235),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(15),
                     ),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        height: MediaQuery.of(context).size.height * 0.07,
-                        width: MediaQuery.of(context).size.width * 0.18,
-                        child: TextField(
-                          controller: _usernameController,
-                          decoration: InputDecoration(
-                            labelText: 'Username',
-                            labelStyle: TextStyle(color: Colors.white),
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
+                    child: Column(
+                      children: [
+                        Flexible(
+                          flex: 4,
+                          child: Container(
+                            height: MediaQuery.of(context).size.height * 0.4,
+                            width: MediaQuery.of(context).size.width * 0.5,
+                            color: Color.fromARGB(0, 33, 149, 243),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Flexible(
+                                  flex: 1,
+                                  child: Container(
+                                    color: Color.fromARGB(0, 205, 243, 33),
+                                    height: MediaQuery.of(context).size.height * 0.3,
+                                    width: MediaQuery.of(context).size.width * 0.17,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      children: [
+                                        Flexible(
+                                          flex: 1,
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              TextField(
+                                                controller: _usernameController,
+                                                decoration: InputDecoration(
+                                                  labelText: 'Username',
+                                                  labelStyle: TextStyle(color: Colors.white),
+                                                  enabledBorder: UnderlineInputBorder(
+                                                    borderSide: BorderSide(color: Colors.white),
+                                                  ),
+                                                  focusedBorder: UnderlineInputBorder(
+                                                    borderSide: BorderSide(color: Colors.white),
+                                                  ),
+                                                ),
+                                                style: TextStyle(color: Colors.white),
+                                              ),
+                                              if (usernameError != null && usernameError!.isNotEmpty)
+                                                Padding(
+                                                  padding: const EdgeInsets.only(top: 4.0),
+                                                  child: Text(
+                                                    usernameError!,
+                                                    style: TextStyle(color: Colors.red, fontSize: 12),
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                        ),
+                                        Flexible(
+                                          flex: 1,
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              TextField(
+                                                controller: _emailController,
+                                                decoration: InputDecoration(
+                                                  labelText: 'Email',
+                                                  labelStyle: TextStyle(color: Colors.white),
+                                                  enabledBorder: UnderlineInputBorder(
+                                                    borderSide: BorderSide(color: Colors.white),
+                                                  ),
+                                                  focusedBorder: UnderlineInputBorder(
+                                                    borderSide: BorderSide(color: Colors.white),
+                                                  ),
+                                                ),
+                                                style: TextStyle(color: Colors.white),
+                                              ),
+                                              if (emailError != null && emailError!.isNotEmpty)
+                                                Padding(
+                                                  padding: EdgeInsets.only(top: 4.0),
+                                                  child: Text(
+                                                    emailError!,
+                                                    style: TextStyle(color: Colors.red, fontSize: 12),
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Flexible(
+                                  flex: 1,
+                                  child: Container(
+                                    height: MediaQuery.of(context).size.height * 0.3,
+                                    width: MediaQuery.of(context).size.width * 0.17,
+                                    color: Color.fromARGB(0, 243, 142, 33),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      children: [
+                                        Flexible(
+                                          flex: 1,
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              TextField(
+                                                controller: _lozinkaController,
+                                                decoration: InputDecoration(
+                                                  labelText: 'Lozinka',
+                                                  labelStyle: TextStyle(color: Colors.white),
+                                                  enabledBorder: UnderlineInputBorder(
+                                                    borderSide: BorderSide(color: Colors.white),
+                                                  ),
+                                                  focusedBorder: UnderlineInputBorder(
+                                                    borderSide: BorderSide(color: Colors.white),
+                                                  ),
+                                                ),
+                                                obscureText: true,
+                                                style: TextStyle(color: Colors.white),
+                                              ),
+                                              if (lozinkaError != null && lozinkaError!.isNotEmpty)
+                                                Padding(
+                                                  padding: const EdgeInsets.only(top: 4.0),
+                                                  child: Text(
+                                                    lozinkaError!,
+                                                    style: TextStyle(color: Colors.red, fontSize: 12),
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                        ),
+                                        Flexible(
+                                          flex: 1,
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              TextField(
+                                                controller: _lozinkaPotvrdaController,
+                                                decoration: InputDecoration(
+                                                  labelText: 'Potvrda Lozinke',
+                                                  labelStyle: TextStyle(color: Colors.white),
+                                                  enabledBorder: UnderlineInputBorder(
+                                                    borderSide: BorderSide(color: Colors.white),
+                                                  ),
+                                                  focusedBorder: UnderlineInputBorder(
+                                                    borderSide: BorderSide(color: Colors.white),
+                                                  ),
+                                                ),
+                                                obscureText: true,
+                                                style: TextStyle(color: Colors.white),
+                                              ),
+                                              if (lozinkaPotvrdaError != null && lozinkaPotvrdaError!.isNotEmpty)
+                                                Padding(
+                                                  padding: const EdgeInsets.only(top: 4.0),
+                                                  child: Text(
+                                                    lozinkaPotvrdaError!,
+                                                    style: TextStyle(color: Colors.red, fontSize: 12),
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          style: TextStyle(color: Colors.white),
                         ),
-                      ),
-                      Container(
-                        height: MediaQuery.of(context).size.height * 0.07,
-                        width: MediaQuery.of(context).size.width * 0.18,
-                        child: TextField(
-                          controller: _lozinkaController,
-                          decoration: InputDecoration(
-                            labelText: 'Lozinka',
-                            labelStyle: TextStyle(color: Colors.white),
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
+                        Flexible(
+                          flex: 0,
+                          child: Container(
+                            height: MediaQuery.of(context).size.height * 0.05,
+                            width: MediaQuery.of(context).size.width * 0.5,
+                            color: Color.fromARGB(0, 33, 243, 138),
+                            child: Center(
+                              child: ElevatedButton(
+                                onPressed: dodajAdministratora,
+                                child: Text(
+                                  'Dodaj',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                          obscureText: true,
-                          style: TextStyle(color: Colors.white),
                         ),
-                      ),
-                      Container(
-                        height: MediaQuery.of(context).size.height * 0.07,
-                        width: MediaQuery.of(context).size.width * 0.18,
-                        child: TextField(
-                          controller: _lozinkaPotvrdaController,
-                          decoration: InputDecoration(
-                            labelText: 'Potvrda Lozinke',
-                            labelStyle: TextStyle(color: Colors.white),
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
-                          ),
-                          obscureText: true,
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      Container(
-                        height: MediaQuery.of(context).size.height * 0.07,
-                        width: MediaQuery.of(context).size.width * 0.18,
-                        child: TextField(
-                          controller: _emailController,
-                          decoration: InputDecoration(
-                            labelText: 'Email',
-                            labelStyle: TextStyle(color: Colors.white),
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
-                          ),
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: dodajAdministratora,
-                        child: Text(
-                          'Dodaj',
-                          style: TextStyle(
-                            color: Colors.blue,
-                          ),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
+          )
         ],
       ),
     );
@@ -2729,7 +2864,6 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                                     SizedBox(
                                       height: MediaQuery.of(context).size.height * 0.008,
                                     ),
-                                    _buildDetailContainer('User ID', korisnik['korisnikId'] ?? 'N/A'),
                                     SizedBox(
                                       height: MediaQuery.of(context).size.height * 0.008,
                                     ),
@@ -2949,7 +3083,7 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                                     SizedBox(
                                       height: MediaQuery.of(context).size.height * 0.008,
                                     ),
-                                    _buildDetailContainer('Cijena', bicikl['cijena']),
+                                    _buildDetailContainer('Cijena', getFormattedCijena(bicikl['cijena'])),
                                     SizedBox(
                                       height: MediaQuery.of(context).size.height * 0.008,
                                     ),
@@ -3008,7 +3142,7 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                                     SizedBox(
                                       height: MediaQuery.of(context).size.height * 0.008,
                                     ),
-                                    _buildDetailContainer('Kategorija Id', bicikl['kategorijaId']),
+                                    _buildDetailContainer('Kategorija', getKategorijaNaziv(bicikl['kategorijaId'], _listaBikeKategorije)),
                                     SizedBox(
                                       height: MediaQuery.of(context).size.height * 0.008,
                                     ),
@@ -3057,6 +3191,20 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
         }
       },
     );
+  }
+
+  String getKategorijaNaziv(int? kategorijaId, List<Map<String, dynamic>> kategorije) {
+    if (kategorijaId == null) {
+      return "N/A";
+    }
+
+    for (var kategorija in kategorije) {
+      if (kategorija['kategorijaId'] == kategorijaId) {
+        return kategorija['naziv'] ?? "N/A";
+      }
+    }
+
+    return "N/A";
   }
 
   Widget _buildBicikliPromocijaInfo() {
@@ -3140,7 +3288,7 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                                     SizedBox(
                                       height: MediaQuery.of(context).size.height * 0.008,
                                     ),
-                                    _buildDetailContainer('Cijena', bicikl['cijena']),
+                                    _buildDetailContainer('Cijena', getFormattedCijena(bicikl['cijena'])),
                                     SizedBox(
                                       height: MediaQuery.of(context).size.height * 0.008,
                                     ),
@@ -3325,7 +3473,7 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                                     SizedBox(
                                       height: MediaQuery.of(context).size.height * 0.008,
                                     ),
-                                    _buildDetailContainer('Cijena', dio['cijena']),
+                                    _buildDetailContainer('Cijena', getFormattedCijena(dio['cijena'])),
                                     SizedBox(
                                       height: MediaQuery.of(context).size.height * 0.008,
                                     ),
@@ -3510,7 +3658,7 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                                     SizedBox(
                                       height: MediaQuery.of(context).size.height * 0.008,
                                     ),
-                                    _buildDetailContainer('Cijena', dio['cijena']),
+                                    _buildDetailContainer('Cijena', getFormattedCijena(dio['cijena'])),
                                     SizedBox(
                                       height: MediaQuery.of(context).size.height * 0.008,
                                     ),
@@ -3557,7 +3705,7 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    _buildDetailContainer('KategorijaId', dio['kategorijaId']),
+                                    _buildDetailContainer('Kategorija', getKategorijaNaziv(dio['kategorijaId'], _listaDijeloviKategorije)),
                                     SizedBox(
                                       height: MediaQuery.of(context).size.height * 0.008,
                                     ),
@@ -3688,11 +3836,9 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                                     SizedBox(
                                       height: MediaQuery.of(context).size.height * 0.008,
                                     ),
-                                    _buildDetailContainer('Serviser Id', serviser['serviserId'] ?? 'null'),
                                     SizedBox(
                                       height: MediaQuery.of(context).size.height * 0.008,
                                     ),
-                                    _buildDetailContainer('User ID', serviser['korisnikId'] ?? 'null'),
                                     SizedBox(
                                       height: MediaQuery.of(context).size.height * 0.008,
                                     ),
@@ -3717,7 +3863,7 @@ class _AdministracijaP1ProzorState extends State<AdministracijaP1Prozor> {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    _buildDetailContainer('Cijena', serviser['cijena'] ?? 'null'),
+                                    _buildDetailContainer('Cijena', getFormattedCijena(serviser['cijena'])),
                                     SizedBox(
                                       height: MediaQuery.of(context).size.height * 0.008,
                                     ),

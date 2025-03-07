@@ -87,16 +87,19 @@ namespace BikeHub.Services
             var existingReservation = _context.RezervacijaServisas
                 .Where(r => r.ServiserId == request.ServiserId && r.DatumRezervacije.Date == request.DatumRezervacije.Date)
                 .FirstOrDefault();
-            if (existingReservation != null)
+
+            if (existingReservation != null && existingReservation.Status != "obrisan")
             {
                 throw new UserException($"Serviser već ima rezervaciju za {request.DatumRezervacije.Date.ToShortDateString()}.");
             }
+
             entity.KorisnikId = request.KorisnikId;
             entity.ServiserId = request.ServiserId;
             entity.DatumKreiranja = request.DatumKreiranja;
             entity.DatumRezervacije = request.DatumRezervacije;
             base.BeforeInsert(request, entity);
         }
+
 
         public override Model.ServisFM.RezervacijaServisa Insert(RezervacijaServisaInsertR request)
         {

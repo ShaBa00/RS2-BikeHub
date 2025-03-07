@@ -496,7 +496,7 @@ class _BiciklPrikazState extends State<BiciklPrikaz> {
                               children: [
                                 _buildDetailContainer('Naziv:', bicikl?['naziv'] ?? 'Naziv nije pronađen'),
                                 _buildDetailContainer('Veličina Rama:', bicikl?['velicinaRama'] ?? 'Veličina rama nije pronađena'),
-                                _buildDetailContainer('Cijena:', bicikl?['cijena']?.toString() ?? 'Cijena nije pronađena'),
+                                _buildDetailContainer('Cijena:', getFormattedCijena(bicikl?['cijena'])),
                               ],
                             ),
                             Row(
@@ -599,10 +599,10 @@ class _BiciklPrikazState extends State<BiciklPrikaz> {
                                                   children: [
                                                     Text(naziv, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                                                     const SizedBox(height: 4),
-                                                    Text('Cijena: $cijena KM', style: const TextStyle(fontSize: 12)),
+                                                    Text('Cijena: ${getFormattedCijena(cijena)}', style: const TextStyle(fontSize: 12)),
                                                   ],
                                                 ),
-                                              ),
+                                              )
                                             ],
                                           ),
                                         ),
@@ -618,6 +618,21 @@ class _BiciklPrikazState extends State<BiciklPrikaz> {
               ),
       ),
     );
+  }
+
+  String getFormattedCijena(dynamic cijena) {
+    if (cijena == null) {
+      return "Cijena nije pronađena";
+    }
+
+    final double cijenaValue;
+    try {
+      cijenaValue = double.parse(cijena.toString());
+    } catch (e) {
+      return "Cijena nije pronađena";
+    }
+
+    return "${cijenaValue.toStringAsFixed(2)} KM";
   }
 
   obrisiBicikl() async {
@@ -712,14 +727,15 @@ class _BiciklPrikazState extends State<BiciklPrikaz> {
                                                 left: BorderSide(color: Colors.white),
                                               ),
                                             ),
-                                            child: TextField(
+                                            child: TextFormField(
+                                              initialValue: nazivNovog,
                                               onChanged: (value) {
                                                 setState(() {
                                                   nazivNovog = value;
                                                 });
                                               },
                                               decoration: InputDecoration(
-                                                hintText: nazivNovog.isNotEmpty ? nazivNovog : 'Naziv',
+                                                hintText: 'Naziv',
                                                 hintStyle: TextStyle(color: Colors.white),
                                                 border: InputBorder.none,
                                                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -743,14 +759,16 @@ class _BiciklPrikazState extends State<BiciklPrikaz> {
                                                 left: BorderSide(color: Colors.white),
                                               ),
                                             ),
-                                            child: TextField(
+                                            child: TextFormField(
+                                              initialValue: CijenaNovog.isNotEmpty ? double.parse(CijenaNovog).toStringAsFixed(2) : '',
+                                              keyboardType: TextInputType.numberWithOptions(decimal: true),
                                               onChanged: (value) {
                                                 setState(() {
                                                   CijenaNovog = value;
                                                 });
                                               },
                                               decoration: InputDecoration(
-                                                hintText: CijenaNovog.isNotEmpty ? CijenaNovog : 'Cijena',
+                                                hintText: 'Cijena',
                                                 hintStyle: TextStyle(color: Colors.white),
                                                 border: InputBorder.none,
                                                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -774,14 +792,16 @@ class _BiciklPrikazState extends State<BiciklPrikaz> {
                                                 left: BorderSide(color: Colors.white),
                                               ),
                                             ),
-                                            child: TextField(
+                                            child: TextFormField(
+                                              initialValue: KolicinaNovog,
+                                              keyboardType: TextInputType.number,
                                               onChanged: (value) {
                                                 setState(() {
                                                   KolicinaNovog = value;
                                                 });
                                               },
                                               decoration: InputDecoration(
-                                                hintText: KolicinaNovog.isNotEmpty ? KolicinaNovog : 'Kolicina',
+                                                hintText: 'Kolicina',
                                                 hintStyle: TextStyle(color: Colors.white),
                                                 border: InputBorder.none,
                                                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -805,14 +825,16 @@ class _BiciklPrikazState extends State<BiciklPrikaz> {
                                                 left: BorderSide(color: Colors.white),
                                               ),
                                             ),
-                                            child: TextField(
+                                            child: TextFormField(
+                                              initialValue: brojBrzinaNovog,
+                                              keyboardType: TextInputType.number,
                                               onChanged: (value) {
                                                 setState(() {
                                                   brojBrzinaNovog = value;
                                                 });
                                               },
                                               decoration: InputDecoration(
-                                                hintText: brojBrzinaNovog.isNotEmpty ? brojBrzinaNovog : 'Broj brzina',
+                                                hintText: 'Broj brzina',
                                                 hintStyle: TextStyle(color: Colors.white),
                                                 border: InputBorder.none,
                                                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -845,14 +867,16 @@ class _BiciklPrikazState extends State<BiciklPrikaz> {
                                                 left: BorderSide(color: Colors.white),
                                               ),
                                             ),
-                                            child: TextField(
+                                            child: TextFormField(
+                                              initialValue: VelicinaRamaNovog,
+                                              keyboardType: TextInputType.number,
                                               onChanged: (value) {
                                                 setState(() {
                                                   VelicinaRamaNovog = value;
                                                 });
                                               },
                                               decoration: InputDecoration(
-                                                hintText: VelicinaRamaNovog.isNotEmpty ? VelicinaRamaNovog : 'Velicina rama',
+                                                hintText: 'Velicina rama',
                                                 hintStyle: TextStyle(color: Colors.white),
                                                 border: InputBorder.none,
                                                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -876,14 +900,16 @@ class _BiciklPrikazState extends State<BiciklPrikaz> {
                                                 left: BorderSide(color: Colors.white),
                                               ),
                                             ),
-                                            child: TextField(
+                                            child: TextFormField(
+                                              initialValue: VelicinaTockaNovog,
+                                              keyboardType: TextInputType.number,
                                               onChanged: (value) {
                                                 setState(() {
                                                   VelicinaTockaNovog = value;
                                                 });
                                               },
                                               decoration: InputDecoration(
-                                                hintText: VelicinaTockaNovog.isNotEmpty ? VelicinaTockaNovog : 'Velicina tocka',
+                                                hintText: 'Velicina tocka',
                                                 hintStyle: TextStyle(color: Colors.white),
                                                 border: InputBorder.none,
                                                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -911,8 +937,28 @@ class _BiciklPrikazState extends State<BiciklPrikaz> {
                                               child: ValueListenableBuilder(
                                                 valueListenable: _listaBikeKategorijeNotifier,
                                                 builder: (context, kategorije, _) {
+                                                  List<DropdownMenuItem<int?>> dropdownItems = [
+                                                    const DropdownMenuItem<int?>(value: null, child: Text("Sve Kategorije")),
+                                                    ...kategorije.map<DropdownMenuItem<int>>((kategorija) {
+                                                      return DropdownMenuItem<int>(
+                                                        value: kategorija['kategorijaId'],
+                                                        child: Container(
+                                                          width: MediaQuery.of(context).size.width * 0.10,
+                                                          alignment: Alignment.center,
+                                                          child: Text(kategorija['naziv']),
+                                                        ),
+                                                      );
+                                                    }).toList(),
+                                                  ];
+
+                                                  // Postavljanje odabrane kategorije ako postoji
+                                                  int? selectedValue = selectedKategorijaId ??
+                                                      (bicikl != null && dropdownItems.any((item) => item.value == bicikl!['kategorijaId'])
+                                                          ? bicikl!['kategorijaId']
+                                                          : null);
+
                                                   return DropdownButton<int?>(
-                                                    value: selectedKategorijaId,
+                                                    value: selectedValue,
                                                     icon: const Icon(Icons.arrow_downward, color: Colors.white),
                                                     iconSize: 24,
                                                     elevation: 16,
@@ -927,22 +973,10 @@ class _BiciklPrikazState extends State<BiciklPrikaz> {
                                                     ),
                                                     onChanged: (int? newValue) {
                                                       setState(() {
-                                                        selectedKategorijaId = newValue;
+                                                        selectedKategorijaId = newValue; // Ažuriranje vrijednosti
                                                       });
                                                     },
-                                                    items: [
-                                                      const DropdownMenuItem<int?>(value: null, child: Text("Sve Kategorije")),
-                                                      ...kategorije.map<DropdownMenuItem<int>>((kategorija) {
-                                                        return DropdownMenuItem<int>(
-                                                          value: kategorija['kategorijaId'],
-                                                          child: Container(
-                                                            width: MediaQuery.of(context).size.width * 0.10,
-                                                            alignment: Alignment.center,
-                                                            child: Text(kategorija['naziv']),
-                                                          ),
-                                                        );
-                                                      }).toList(),
-                                                    ],
+                                                    items: dropdownItems,
                                                     dropdownColor: Colors.transparent,
                                                   );
                                                 },
@@ -1196,7 +1230,7 @@ class _BiciklPrikazState extends State<BiciklPrikaz> {
                               ),
                             ),
                             child: Text(
-                              'Edit podatci',
+                              'Snimi',
                               style: TextStyle(
                                 color: Colors.white,
                               ),
@@ -1215,7 +1249,7 @@ class _BiciklPrikazState extends State<BiciklPrikaz> {
                               ),
                             ),
                             child: Text(
-                              'Edit slike',
+                              'Snimi slike',
                               style: TextStyle(
                                 color: Colors.white,
                               ),

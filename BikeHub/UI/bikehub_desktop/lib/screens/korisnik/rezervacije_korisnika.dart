@@ -295,6 +295,23 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
                                 ),
                               ),
                             ),
+                            const SizedBox(width: 20),
+                            ElevatedButton(
+                              onPressed: () {
+                                _currentPage = 0;
+                                tipRezervacije("obrisan");
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    zadnjiStatus == "obrisan" ? Color.fromARGB(255, 87, 202, 255) : const Color.fromARGB(255, 242, 242, 242),
+                              ),
+                              child: Text(
+                                'Obrisane',
+                                style: TextStyle(
+                                  color: zadnjiStatus == "obrisan" ? Colors.white : Colors.blue,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -449,8 +466,6 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
                       height: MediaQuery.of(context).size.height * 0.048,
                       child: Row(
                         children: [
-                          const SizedBox(width: 10.0),
-                          _buildDetailContainer('Serviser ID', {rezervacija['serviserId']}, 0.1),
                           const SizedBox(width: 10.0),
                           _buildDetailContainer('Datum kreiranja', formatDate(rezervacija['datumKreiranja']), 0.18),
                           const SizedBox(width: 10.0),

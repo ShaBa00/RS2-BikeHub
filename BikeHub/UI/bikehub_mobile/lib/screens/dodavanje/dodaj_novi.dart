@@ -183,57 +183,61 @@ class _DodajNoviState extends State<DodajNovi> {
       );
       return;
     }
+    bool greska = false;
     setState(() {
       if (slike.isEmpty) {
         errorSlike = 'Potrebno je dodati barem jednu sliku';
-        return;
+        greska = true;
       } else {
         errorSlike = '';
       }
       if (nazivBicikla.isEmpty) {
         errorNazivBicikla = 'Potrebno je dodati naziv';
-        return;
+        greska = true;
       } else {
         errorNazivBicikla = '';
       }
       if (cijenaBicikla <= 0) {
         errorCijenaBicikla = 'Potrebno je dodati cijenu u numerickom obliku';
-        return;
+        greska = true;
       } else {
         errorCijenaBicikla = '';
       }
       if (kolicinaBicikla <= 0) {
         errorKolicinaBicikla = 'Potrebno je dodati količinu u numerickom obliku';
-        return;
+        greska = true;
       } else {
         errorKolicinaBicikla = '';
       }
       if (selectedRam.isEmpty) {
         errorSelectedRam = 'Potrebno je odabrati veličinu rama';
-        return;
+        greska = true;
       } else {
         errorSelectedRam = '';
       }
       if (selectedVelicina.isEmpty) {
         errorSelectedVelicina = 'Potrebno je odabrati veličinu točka';
-        return;
+        greska = true;
       } else {
         errorSelectedVelicina = '';
       }
       if (brojBrzina <= 0) {
         errorBrojBrzina = 'Potrebno je odabrati broj brzina';
-        return;
+        greska = true;
       } else {
         errorBrojBrzina = '';
       }
       if (_odabranaKategorijaBicikli == null) {
         errorOdabranaKategorijaBicikli = 'Potrebno je odabrati kategoriju';
-        return;
+        greska = true;
       } else {
         errorOdabranaKategorijaBicikli = '';
       }
     });
 
+    if (greska) {
+      return;
+    }
     Map<String, dynamic> rezultat = await _biciklService.postBicikl(
       naziv: nazivBicikla,
       cijena: cijenaBicikla,
@@ -1014,45 +1018,49 @@ class _DodajNoviState extends State<DodajNovi> {
   String errorOdabranaKategorijaDijela = "";
 
   dodajDijelovi() async {
+    bool greska = false;
     setState(() {
       if (slikeDijelovi.isEmpty) {
         errorSlikeD = 'Potrebno je dodati barem jednu sliku';
-        return;
+        greska = true;
       } else {
         errorSlikeD = '';
       }
       if (nazivDijelovi.isEmpty) {
         errorNazivDijela = 'Potrebno je dodati naziv';
-        return;
+        greska = true;
       } else {
         errorNazivDijela = '';
       }
       if (cijenaDijelovi <= 0) {
         errorCijenaDijela = 'Potrebno je dodati cijenu u numerickom obliku';
-        return;
+        greska = true;
       } else {
         errorCijenaDijela = '';
       }
       if (kolicinaDijelovi <= 0) {
         errorKolicinaDijela = 'Potrebno je dodati količinu u numerickom obliku';
-        return;
+        greska = true;
       } else {
         errorKolicinaDijela = '';
       }
       if (opis.isEmpty) {
         errorOpis = 'Potrebno je dodati opis';
-        return;
+        greska = true;
       } else {
         errorOpis = '';
       }
       if (_odabranaKategorijaDijelovi == null) {
         errorOdabranaKategorijaDijela = 'Potrebno je odabrati kategoriju';
-        return;
+        greska = true;
       } else {
         errorOdabranaKategorijaDijela = '';
       }
     });
 
+    if (greska) {
+      return;
+    }
     Map<String, dynamic> rezultat = await _dijeloviService.postDijelovi(
       naziv: nazivDijelovi,
       cijena: cijenaDijelovi,

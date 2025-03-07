@@ -256,7 +256,7 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                                         ),
                                         child: Center(
                                           child: Text(
-                                            'Cijena: ${narudzba['cijena']}KM, Kolicina: ${narudzba['kolicina']}',
+                                            'Cijena: ${getFormattedCijena(narudzba['cijena'])}, Kolicina: ${narudzba['kolicina']}',
                                             style: TextStyle(color: Colors.white),
                                           ),
                                         ),
@@ -305,6 +305,21 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
         ),
       ),
     );
+  }
+
+  String getFormattedCijena(dynamic cijena) {
+    if (cijena == null) {
+      return "N/A";
+    }
+
+    final double cijenaValue;
+    try {
+      cijenaValue = double.parse(cijena.toString());
+    } catch (e) {
+      return "N/A";
+    }
+
+    return "${cijenaValue.toStringAsFixed(2)} KM";
   }
 
   Widget buildNarudbaBicikl(BuildContext context) {
@@ -485,7 +500,7 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                                             child: FittedBox(
                                               fit: BoxFit.scaleDown,
                                               child: Text(
-                                                'Cijena: ${biciklNarudba['cijena'] ?? 'N/A'}',
+                                                'Cijena: ${getFormattedCijena(biciklNarudba['cijena'])}',
                                                 style: TextStyle(color: Colors.white),
                                               ),
                                             ),
@@ -695,7 +710,7 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                                         ),
                                         child: Center(
                                           child: Text(
-                                            'Cijena: ${narudzba['cijena']}KM, Kolicina: ${narudzba['kolicina']}',
+                                            'Cijena: ${getFormattedCijena(narudzba['cijena'])}, Kolicina: ${narudzba['kolicina']}',
                                             style: TextStyle(color: Colors.white),
                                           ),
                                         ),
@@ -928,7 +943,7 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
                                             child: FittedBox(
                                               fit: BoxFit.scaleDown,
                                               child: Text(
-                                                'Cijena: ${dijeloviNarudba['cijena'] ?? 'N/A'}',
+                                                'Cijena: ${getFormattedCijena(dijeloviNarudba['cijena'])}',
                                                 style: TextStyle(color: Colors.white),
                                               ),
                                             ),
@@ -1063,7 +1078,7 @@ class _NarudbeZahtjevaState extends State<NarudbeZahtjev> {
   //zajednicke funkcije
 
   Future<void> posaljiNarudbom(int odabranaNarudbaId, bool aktivacija) async {
-    bool? confirmed = await ConfirmProzor.prikaziConfirmProzor(context, "Da li ste sigurni da želite vratiti narudbu?");
+    bool? confirmed = await ConfirmProzor.prikaziConfirmProzor(context, "Da li ste sigurni da želite poslati narudbu?");
     if (confirmed != true) {
       return;
     }

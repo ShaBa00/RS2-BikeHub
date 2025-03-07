@@ -591,7 +591,7 @@ class _BiciklPretragaState extends State<BiciklPretraga> with SingleTickerProvid
                                     Expanded(
                                       child: Center(
                                         child: Text(
-                                          listaZapisa[firstIndex]['cijena'] != null ? "${listaZapisa[firstIndex]['cijena'].toString()} KM" : 'N/A',
+                                          listaZapisa[firstIndex]['cijena'] != null ? getFormattedCijena(listaZapisa[firstIndex]['cijena']) : 'N/A',
                                           style: TextStyle(
                                             color: const Color.fromARGB(255, 0, 0, 0),
                                           ),
@@ -599,7 +599,7 @@ class _BiciklPretragaState extends State<BiciklPretraga> with SingleTickerProvid
                                           softWrap: false,
                                         ),
                                       ),
-                                    ),
+                                    )
                                   ],
                                 ),
                               ),
@@ -680,7 +680,7 @@ class _BiciklPretragaState extends State<BiciklPretraga> with SingleTickerProvid
                                     Expanded(
                                       child: Center(
                                         child: Text(
-                                          listaZapisa[secondIndex]['cijena'] != null ? "${listaZapisa[secondIndex]['cijena'].toString()} KM" : 'N/A',
+                                          listaZapisa[secondIndex]['cijena'] != null ? getFormattedCijena(listaZapisa[secondIndex]['cijena']) : 'N/A',
                                           style: TextStyle(
                                             color: const Color.fromARGB(255, 0, 0, 0),
                                           ),
@@ -688,7 +688,7 @@ class _BiciklPretragaState extends State<BiciklPretraga> with SingleTickerProvid
                                           softWrap: false,
                                         ),
                                       ),
-                                    ),
+                                    )
                                   ],
                                 ),
                               ),
@@ -704,6 +704,21 @@ class _BiciklPretragaState extends State<BiciklPretraga> with SingleTickerProvid
         ),
       ),
     );
+  }
+
+  String getFormattedCijena(dynamic cijena) {
+    if (cijena == null) {
+      return "N/A";
+    }
+
+    final double cijenaValue;
+    try {
+      cijenaValue = double.parse(cijena.toString());
+    } catch (e) {
+      return "N/A";
+    }
+
+    return "${cijenaValue.toStringAsFixed(2)} KM";
   }
 
   Widget _buildPopupFilter(BuildContext context) {

@@ -111,10 +111,8 @@ class _GlavniProzorState extends State<GlavniProzor> {
         //dP
         Container(
           width: MediaQuery.of(context).size.width, // 100% širine ekrana
-          height:
-              MediaQuery.of(context).size.height * 0.12, // 15% visine ekrana
-          color: const Color.fromARGB(
-              0, 255, 153, 0), // Zamijenite s bojom po želji
+          height: MediaQuery.of(context).size.height * 0.12, // 15% visine ekrana
+          color: const Color.fromARGB(0, 255, 153, 0), // Zamijenite s bojom po želji
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -235,9 +233,8 @@ class _GlavniProzorState extends State<GlavniProzor> {
                     Widget _buildItem(Map<String, dynamic> item) {
                       bool isBicikl = item.containsKey('biciklId');
                       String naziv = item['naziv'] ?? 'N/A';
-                      String cijena = item['cijena'] != null
-                          ? "${item['cijena']} KM"
-                          : 'N/A';
+                      String cijena = item['cijena'] != null ? getFormattedCijena(item['cijena']) : 'N/A';
+
                       List slike = item['slike'] ?? [];
 
                       return GestureDetector(
@@ -247,8 +244,7 @@ class _GlavniProzorState extends State<GlavniProzor> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    BicikliPrikaz(biciklId: biciklId),
+                                builder: (context) => BicikliPrikaz(biciklId: biciklId),
                               ),
                             );
                           } else {
@@ -256,8 +252,7 @@ class _GlavniProzorState extends State<GlavniProzor> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    DijeloviPrikaz(dijeloviId: dijeloviId),
+                                builder: (context) => DijeloviPrikaz(dijeloviId: dijeloviId),
                               ),
                             );
                           }
@@ -273,8 +268,7 @@ class _GlavniProzorState extends State<GlavniProzor> {
                             children: [
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.4,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.16,
+                                height: MediaQuery.of(context).size.height * 0.16,
                                 decoration: BoxDecoration(
                                   color: Color.fromARGB(229, 244, 67, 54),
                                   borderRadius: const BorderRadius.only(
@@ -290,14 +284,8 @@ class _GlavniProzorState extends State<GlavniProzor> {
                                         ),
                                         child: Image.memory(
                                           base64Decode(slike[0]['slika']),
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.4,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.16,
+                                          width: MediaQuery.of(context).size.width * 0.4,
+                                          height: MediaQuery.of(context).size.height * 0.16,
                                           fit: BoxFit.cover,
                                         ),
                                       )
@@ -311,12 +299,10 @@ class _GlavniProzorState extends State<GlavniProzor> {
                               ),
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.4,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.04,
+                                height: MediaQuery.of(context).size.height * 0.04,
                                 color: const Color.fromARGB(0, 33, 149, 243),
                                 child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Expanded(
                                       child: Center(
@@ -358,10 +344,8 @@ class _GlavniProzorState extends State<GlavniProzor> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          if (firstIndex < listaZapisa.length)
-                            _buildItem(listaZapisa[firstIndex]),
-                          if (secondIndex < listaZapisa.length)
-                            _buildItem(listaZapisa[secondIndex]),
+                          if (firstIndex < listaZapisa.length) _buildItem(listaZapisa[firstIndex]),
+                          if (secondIndex < listaZapisa.length) _buildItem(listaZapisa[secondIndex]),
                         ],
                       ),
                     );
@@ -372,12 +356,26 @@ class _GlavniProzorState extends State<GlavniProzor> {
     );
   }
 
+  String getFormattedCijena(dynamic cijena) {
+    if (cijena == null) {
+      return "N/A";
+    }
+
+    final double cijenaValue;
+    try {
+      cijenaValue = double.parse(cijena.toString());
+    } catch (e) {
+      return "N/A";
+    }
+
+    return "${cijenaValue.toStringAsFixed(2)} KM";
+  }
+
   Widget dioNovi(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width, // 100% širine ekrana
       height: MediaQuery.of(context).size.height * 0.10, // 10% visine ekrana
-      color:
-          const Color.fromARGB(0, 33, 149, 243), // Zamijenite s bojom po želji
+      color: const Color.fromARGB(0, 33, 149, 243), // Zamijenite s bojom po želji
       child: Stack(
         children: [
           Align(

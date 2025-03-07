@@ -24,8 +24,7 @@ class KategorijaServis {
     dio.httpClientAdapter = IOHttpClientAdapter(
       createHttpClient: () {
         final HttpClient client = HttpClient();
-        client.badCertificateCallback =
-            (X509Certificate cert, String host, int port) => true;
+        client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
         return client;
       },
     );
@@ -52,31 +51,26 @@ class KategorijaServis {
 
   List<dynamic> listaKategorija = [];
 
-  Future<List<Map<String, dynamic>>?> getKategorije(
-      {bool? isBikeKategorija, int? page, int? pageSize}) async {
+  Future<List<Map<String, dynamic>>?> getKategorije({bool? isBikeKategorija, int? page, int? pageSize}) async {
     final Map<String, dynamic> queryParams = {};
     if (isBikeKategorija != null) {
       queryParams['isBikeKategorija'] = isBikeKategorija.toString();
     }
     if (page != null) queryParams['page'] = page.toString();
     if (pageSize != null) queryParams['pageSize'] = pageSize.toString();
-
+    queryParams['status'] = "aktivan";
     // Ručno sastavljanje URL-a
     Uri uri = Uri.parse('${HelperService.baseUrl}/Kategorija');
     uri = uri.replace(queryParameters: queryParams);
 
     final String url = uri.toString();
 
-    final HttpClient httpClient = HttpClient()
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
+    final HttpClient httpClient = HttpClient()..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
 
     final IOClient ioClient = IOClient(httpClient);
 
     try {
-      final http.Response response = await ioClient
-          .get(Uri.parse(url))
-          .timeout(const Duration(seconds: 10));
+      final http.Response response = await ioClient.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
@@ -101,16 +95,12 @@ class KategorijaServis {
   Future<Map<String, dynamic>> getKategorijaById(int kategorijaId) async {
     final String url = '${HelperService.baseUrl}/Kategorija/$kategorijaId';
 
-    final HttpClient httpClient = HttpClient()
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
+    final HttpClient httpClient = HttpClient()..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
 
     final IOClient ioClient = IOClient(httpClient);
 
     try {
-      final http.Response response = await ioClient
-          .get(Uri.parse(url))
-          .timeout(const Duration(seconds: 10));
+      final http.Response response = await ioClient.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body);

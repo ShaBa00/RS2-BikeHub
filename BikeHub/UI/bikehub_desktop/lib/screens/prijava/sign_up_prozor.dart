@@ -24,6 +24,15 @@ class _SignUpProzorState extends State<SignUpProzor> with SingleTickerProviderSt
   int currentCardIndex = 0;
   late AnimationController _controller;
   late Animation<double> _animation;
+  bool lozinkaError = false;
+  String potvrdaLozinkeError = "";
+  String emailError = "";
+  String usernameError = "";
+  String imePrezimeError = "";
+  bool brojTelefonaError = false;
+  bool gradError = false;
+  bool postanskiBrojError = false;
+  bool ulicaError = false;
 
   @override
   void initState() {
@@ -133,9 +142,9 @@ class _SignUpProzorState extends State<SignUpProzor> with SingleTickerProviderSt
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10.0),
                                       border: Border(
-                                        bottom: BorderSide(color: Colors.white),
-                                        right: BorderSide(color: Colors.white),
-                                        left: BorderSide(color: Colors.white),
+                                        bottom: BorderSide(color: usernameError.isNotEmpty ? Colors.red : Colors.white),
+                                        right: BorderSide(color: usernameError.isNotEmpty ? Colors.red : Colors.white),
+                                        left: BorderSide(color: usernameError.isNotEmpty ? Colors.red : Colors.white),
                                       ),
                                     ),
                                     child: TextFormField(
@@ -156,10 +165,19 @@ class _SignUpProzorState extends State<SignUpProzor> with SingleTickerProviderSt
                                       onChanged: (text) {
                                         setState(() {
                                           username = text;
+                                          usernameError = text.isEmpty ? "Potrebno je dodati uzername" : "";
                                         });
                                       },
                                     ),
                                   ),
+                                  if (usernameError.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Text(
+                                        usernameError,
+                                        style: TextStyle(color: Colors.red, fontSize: 12),
+                                      ),
+                                    ),
                                   SizedBox(height: 10),
                                   Container(
                                     width: MediaQuery.of(context).size.width * 0.15,
@@ -167,9 +185,9 @@ class _SignUpProzorState extends State<SignUpProzor> with SingleTickerProviderSt
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10.0),
                                       border: Border(
-                                        bottom: BorderSide(color: Colors.white),
-                                        right: BorderSide(color: Colors.white),
-                                        left: BorderSide(color: Colors.white),
+                                        bottom: BorderSide(color: lozinkaError ? Colors.red : Colors.white),
+                                        right: BorderSide(color: lozinkaError ? Colors.red : Colors.white),
+                                        left: BorderSide(color: lozinkaError ? Colors.red : Colors.white),
                                       ),
                                     ),
                                     child: TextFormField(
@@ -187,14 +205,23 @@ class _SignUpProzorState extends State<SignUpProzor> with SingleTickerProviderSt
                                         ),
                                         contentPadding: EdgeInsets.only(left: 8.0),
                                       ),
-                                      obscureText: true, // Omogućava prikazivanje kao zvjezdice ili točke
+                                      obscureText: true,
                                       onChanged: (text) {
                                         setState(() {
                                           lozinka = text;
+                                          lozinkaError = text.isEmpty;
                                         });
                                       },
                                     ),
                                   ),
+                                  if (lozinkaError)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Text(
+                                        "Lozinka je potrebna",
+                                        style: TextStyle(color: Colors.red, fontSize: 12),
+                                      ),
+                                    ),
                                   SizedBox(height: 10),
                                   Container(
                                     width: MediaQuery.of(context).size.width * 0.15,
@@ -202,9 +229,9 @@ class _SignUpProzorState extends State<SignUpProzor> with SingleTickerProviderSt
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10.0),
                                       border: Border(
-                                        bottom: BorderSide(color: Colors.white),
-                                        right: BorderSide(color: Colors.white),
-                                        left: BorderSide(color: Colors.white),
+                                        bottom: BorderSide(color: potvrdaLozinkeError.isNotEmpty ? Colors.red : Colors.white),
+                                        right: BorderSide(color: potvrdaLozinkeError.isNotEmpty ? Colors.red : Colors.white),
+                                        left: BorderSide(color: potvrdaLozinkeError.isNotEmpty ? Colors.red : Colors.white),
                                       ),
                                     ),
                                     child: TextFormField(
@@ -222,14 +249,23 @@ class _SignUpProzorState extends State<SignUpProzor> with SingleTickerProviderSt
                                         ),
                                         contentPadding: EdgeInsets.only(left: 8.0),
                                       ),
-                                      obscureText: true, // Omogućava prikazivanje kao zvjezdice ili točke
+                                      obscureText: true,
                                       onChanged: (text) {
                                         setState(() {
                                           potvrdaLozinke = text;
+                                          potvrdaLozinkeError = text.isEmpty ? "Potvrda lozinke je potrebna" : "";
                                         });
                                       },
                                     ),
                                   ),
+                                  if (potvrdaLozinkeError.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Text(
+                                        potvrdaLozinkeError,
+                                        style: TextStyle(color: Colors.red, fontSize: 12),
+                                      ),
+                                    ),
                                   SizedBox(height: 10),
                                   Container(
                                     width: MediaQuery.of(context).size.width * 0.15,
@@ -237,9 +273,9 @@ class _SignUpProzorState extends State<SignUpProzor> with SingleTickerProviderSt
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10.0),
                                       border: Border(
-                                        bottom: BorderSide(color: Colors.white),
-                                        right: BorderSide(color: Colors.white),
-                                        left: BorderSide(color: Colors.white),
+                                        bottom: BorderSide(color: emailError.isNotEmpty ? Colors.red : Colors.white),
+                                        right: BorderSide(color: emailError.isNotEmpty ? Colors.red : Colors.white),
+                                        left: BorderSide(color: emailError.isNotEmpty ? Colors.red : Colors.white),
                                       ),
                                     ),
                                     child: TextFormField(
@@ -260,10 +296,19 @@ class _SignUpProzorState extends State<SignUpProzor> with SingleTickerProviderSt
                                       onChanged: (text) {
                                         setState(() {
                                           email = text;
+                                          emailError = text.isEmpty ? "Email je potreban" : "";
                                         });
                                       },
                                     ),
                                   ),
+                                  if (emailError.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Text(
+                                        emailError,
+                                        style: TextStyle(color: Colors.red, fontSize: 12),
+                                      ),
+                                    ),
                                 ],
                               ),
                             ),
@@ -285,9 +330,9 @@ class _SignUpProzorState extends State<SignUpProzor> with SingleTickerProviderSt
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10.0),
                                       border: Border(
-                                        bottom: BorderSide(color: Colors.white),
-                                        right: BorderSide(color: Colors.white),
-                                        left: BorderSide(color: Colors.white),
+                                        bottom: BorderSide(color: imePrezimeError.isNotEmpty ? Colors.red : Colors.white),
+                                        right: BorderSide(color: imePrezimeError.isNotEmpty ? Colors.red : Colors.white),
+                                        left: BorderSide(color: imePrezimeError.isNotEmpty ? Colors.red : Colors.white),
                                       ),
                                     ),
                                     child: TextFormField(
@@ -308,10 +353,19 @@ class _SignUpProzorState extends State<SignUpProzor> with SingleTickerProviderSt
                                       onChanged: (text) {
                                         setState(() {
                                           imePrezime = text;
+                                          imePrezimeError = text.isEmpty ? "Ime i prezime je potrebno" : "";
                                         });
                                       },
                                     ),
                                   ),
+                                  if (imePrezimeError.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Text(
+                                        imePrezimeError,
+                                        style: TextStyle(color: Colors.red, fontSize: 12),
+                                      ),
+                                    ),
                                   SizedBox(height: 10),
                                   Container(
                                     width: MediaQuery.of(context).size.width * 0.15,
@@ -319,9 +373,9 @@ class _SignUpProzorState extends State<SignUpProzor> with SingleTickerProviderSt
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10.0),
                                       border: Border(
-                                        bottom: BorderSide(color: Colors.white),
-                                        right: BorderSide(color: Colors.white),
-                                        left: BorderSide(color: Colors.white),
+                                        bottom: BorderSide(color: brojTelefonaError ? Colors.red : Colors.white),
+                                        right: BorderSide(color: brojTelefonaError ? Colors.red : Colors.white),
+                                        left: BorderSide(color: brojTelefonaError ? Colors.red : Colors.white),
                                       ),
                                     ),
                                     child: TextFormField(
@@ -342,10 +396,19 @@ class _SignUpProzorState extends State<SignUpProzor> with SingleTickerProviderSt
                                       onChanged: (text) {
                                         setState(() {
                                           brojTelefona = text;
+                                          brojTelefonaError = text.isEmpty;
                                         });
                                       },
                                     ),
                                   ),
+                                  if (brojTelefonaError)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Text(
+                                        "Broj telefona je potreban",
+                                        style: TextStyle(color: Colors.red, fontSize: 12),
+                                      ),
+                                    ),
                                 ],
                               ),
                             ),
@@ -367,9 +430,9 @@ class _SignUpProzorState extends State<SignUpProzor> with SingleTickerProviderSt
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10.0),
                                       border: Border(
-                                        bottom: BorderSide(color: Colors.white),
-                                        right: BorderSide(color: Colors.white),
-                                        left: BorderSide(color: Colors.white),
+                                        bottom: BorderSide(color: gradError ? Colors.red : Colors.white),
+                                        right: BorderSide(color: gradError ? Colors.red : Colors.white),
+                                        left: BorderSide(color: gradError ? Colors.red : Colors.white),
                                       ),
                                     ),
                                     child: TextFormField(
@@ -390,10 +453,19 @@ class _SignUpProzorState extends State<SignUpProzor> with SingleTickerProviderSt
                                       onChanged: (text) {
                                         setState(() {
                                           grad = text;
+                                          gradError = text.isEmpty;
                                         });
                                       },
                                     ),
                                   ),
+                                  if (gradError)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Text(
+                                        "Grad je potreban",
+                                        style: TextStyle(color: Colors.red, fontSize: 12),
+                                      ),
+                                    ),
                                   SizedBox(height: 10),
                                   Container(
                                     width: MediaQuery.of(context).size.width * 0.15,
@@ -401,9 +473,9 @@ class _SignUpProzorState extends State<SignUpProzor> with SingleTickerProviderSt
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10.0),
                                       border: Border(
-                                        bottom: BorderSide(color: Colors.white),
-                                        right: BorderSide(color: Colors.white),
-                                        left: BorderSide(color: Colors.white),
+                                        bottom: BorderSide(color: postanskiBrojError ? Colors.red : Colors.white),
+                                        right: BorderSide(color: postanskiBrojError ? Colors.red : Colors.white),
+                                        left: BorderSide(color: postanskiBrojError ? Colors.red : Colors.white),
                                       ),
                                     ),
                                     child: TextFormField(
@@ -424,10 +496,19 @@ class _SignUpProzorState extends State<SignUpProzor> with SingleTickerProviderSt
                                       onChanged: (text) {
                                         setState(() {
                                           postanskiBroj = text;
+                                          postanskiBrojError = text.isEmpty;
                                         });
                                       },
                                     ),
                                   ),
+                                  if (postanskiBrojError)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Text(
+                                        "Postanski broj je potreban",
+                                        style: TextStyle(color: Colors.red, fontSize: 12),
+                                      ),
+                                    ),
                                   SizedBox(height: 10),
                                   Container(
                                     width: MediaQuery.of(context).size.width * 0.15,
@@ -435,9 +516,9 @@ class _SignUpProzorState extends State<SignUpProzor> with SingleTickerProviderSt
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10.0),
                                       border: Border(
-                                        bottom: BorderSide(color: Colors.white),
-                                        right: BorderSide(color: Colors.white),
-                                        left: BorderSide(color: Colors.white),
+                                        bottom: BorderSide(color: ulicaError ? Colors.red : Colors.white),
+                                        right: BorderSide(color: ulicaError ? Colors.red : Colors.white),
+                                        left: BorderSide(color: ulicaError ? Colors.red : Colors.white),
                                       ),
                                     ),
                                     child: TextFormField(
@@ -458,10 +539,19 @@ class _SignUpProzorState extends State<SignUpProzor> with SingleTickerProviderSt
                                       onChanged: (text) {
                                         setState(() {
                                           ulica = text;
+                                          ulicaError = text.isEmpty;
                                         });
                                       },
                                     ),
                                   ),
+                                  if (ulicaError)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Text(
+                                        "Ulica je potrebna",
+                                        style: TextStyle(color: Colors.red, fontSize: 12),
+                                      ),
+                                    ),
                                 ],
                               ),
                             ),
@@ -522,100 +612,114 @@ class _SignUpProzorState extends State<SignUpProzor> with SingleTickerProviderSt
   }
 
   signUp() async {
+    bool errorFirstPage = false;
+    usernameError = "";
+    lozinkaError = false;
+    potvrdaLozinkeError = "";
+    emailError = "";
+    brojTelefonaError = false;
+    imePrezimeError = "";
+    gradError = false;
+    postanskiBrojError = false;
+    ulicaError = false;
     if (username.isEmpty) {
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati Username");
-      setState(() {
-        currentCardIndex = 0;
-      });
-      return;
+      errorFirstPage = true;
+      usernameError = "Potrebno je dodati username";
     }
     if (lozinka.isEmpty) {
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati Lozinku");
-      setState(() {
-        currentCardIndex = 0;
-      });
-      return;
+      errorFirstPage = true;
+      lozinkaError = true;
     }
     if (potvrdaLozinke.isEmpty) {
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati Potvrdu lozinke");
+      errorFirstPage = true;
+      potvrdaLozinkeError = "Potrebno je potvrditi lozinku";
+    }
+    if (email.isEmpty) {
+      errorFirstPage = true;
+      emailError = "Potrebno je dodati email";
+    }
+    if (errorFirstPage) {
       setState(() {
+        usernameError;
+        lozinkaError;
+        potvrdaLozinkeError;
+        emailError;
         currentCardIndex = 0;
       });
       return;
     }
     if (lozinka != potvrdaLozinke) {
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Lozinka i potvrda moraju biti iste");
       setState(() {
-        currentCardIndex = 0;
-      });
-      return;
-    }
-    if (email.isEmpty) {
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati Email");
-      setState(() {
+        potvrdaLozinkeError = "Lozinka i potvrda moraju biti iste";
         currentCardIndex = 0;
       });
       return;
     }
     if (!isValidEmail(email)) {
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Email je u pogresnom formatu");
       setState(() {
         currentCardIndex = 0;
+        emailError = "Email je u pogresnom formatu";
       });
       return;
     }
     bool korisnikU = await korisnikService.ceckKorisnikUsername(username: username);
     if (korisnikU) {
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Username je zauzet");
       setState(() {
         currentCardIndex = 0;
+        usernameError = "Username je zauzet";
       });
       return;
     }
     bool korisnikE = await korisnikService.ceckKorisnikEmail(email: email);
     if (korisnikE) {
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Email je zauzet");
       setState(() {
         currentCardIndex = 0;
+        emailError = "Email je zauzet";
       });
       return;
     }
+    bool errorSecundPage = false;
     if (imePrezime.isEmpty) {
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati ime i prezime");
-      setState(() {
-        currentCardIndex = 1;
-      });
-      return;
+      errorSecundPage = true;
+      imePrezimeError = "Potrebno je dodati ime i prezime";
     }
     if (!isValidImePrezime(imePrezime)) {
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Ime Prezime je u pogresnom formatu");
-      setState(() {
-        currentCardIndex = 1;
-      });
-      return;
+      errorSecundPage = true;
+      imePrezimeError = "Ime i prezime je pogresnog formata";
     }
     if (brojTelefona.isEmpty) {
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati broj telefona");
+      errorSecundPage = true;
+      brojTelefonaError = true;
+    }
+    if (errorSecundPage) {
       setState(() {
         currentCardIndex = 1;
+        imePrezimeError;
+        brojTelefonaError;
       });
       return;
     }
+    bool errorThPage = false;
     if (grad.isEmpty) {
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati grad");
-
-      return;
+      errorThPage = true;
+      gradError = true;
     }
     if (postanskiBroj.isEmpty) {
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati postanski broj");
-
-      return;
+      errorThPage = true;
+      postanskiBrojError = true;
     }
     if (ulica.isEmpty) {
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati ulicu");
+      errorThPage = true;
+      ulicaError = true;
+    }
+    if (errorThPage) {
+      setState(() {
+        ulicaError;
+        postanskiBrojError;
+        gradError;
+      });
       return;
     }
-
     var response = await korisnikService.postKorisnik(username: username, lozinka: lozinka, lozinkaPotvrda: potvrdaLozinke, email: email);
     if (response['korisnikId'] != null && response['korisnikId'] != 0) {
       await korisnikService.login(username, lozinka);

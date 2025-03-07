@@ -156,6 +156,11 @@ class _ServiserProzorState extends State<ServiserProzor> {
                       _loadServisere();
                     },
                   ),
+                  const SizedBox(height: 5),
+                  Text(
+                    '${getFormattedCijenaa(cijenaOd)} - ${getFormattedCijena(cijenaDo)}',
+                    style: const TextStyle(color: Colors.white),
+                  ),
                   const SizedBox(height: 16),
                   const Text("Broj Servisa", style: TextStyle(color: Colors.white)),
                   RangeSlider(
@@ -381,13 +386,13 @@ class _ServiserProzorState extends State<ServiserProzor> {
                                         ),
                                         Expanded(
                                           child: Text(
-                                            'Cijena: ${serviser['cijena'] ?? 'N/A'}',
+                                            getFormattedCijena(serviser['cijena']),
                                             style: const TextStyle(
                                               color: Colors.white,
                                               fontSize: 16,
                                             ),
                                           ),
-                                        ),
+                                        )
                                       ],
                                     ),
                                   ),
@@ -431,5 +436,24 @@ class _ServiserProzorState extends State<ServiserProzor> {
         ],
       ),
     );
+  }
+
+  String getFormattedCijenaa(double cijena) {
+    return "${cijena.toStringAsFixed(2)} KM";
+  }
+
+  String getFormattedCijena(dynamic cijena) {
+    if (cijena == null) {
+      return "Cijena nije pronađena";
+    }
+
+    final double cijenaValue;
+    try {
+      cijenaValue = double.parse(cijena.toString());
+    } catch (e) {
+      return "Cijena nije pronađena";
+    }
+
+    return "${cijenaValue.toStringAsFixed(2)} KM";
   }
 }

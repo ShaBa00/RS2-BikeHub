@@ -107,6 +107,26 @@ class _BiciklDodajProzorState extends State<BiciklDodajProzor> {
     super.dispose();
   }
 
+  void prikaziPorukuUpozorenja(BuildContext context, String poruka) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Upozorenje"),
+          content: Text(poruka),
+          actions: <Widget>[
+            TextButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> postBicikl() async {
     // Validacija podataka
     if (biciklFinal.kategorijaId == null ||
@@ -182,57 +202,63 @@ class _BiciklDodajProzorState extends State<BiciklDodajProzor> {
       velicinaRamaError = null;
       velicinaTockaError = null;
     });
-
+    bool greska = false;
     if (naziv.isEmpty) {
       setState(() {
         nazivError = "Naziv ne može biti prazan";
       });
-      return;
+      greska = true;
     }
     if (cijena == 0.0 || cijena < 0) {
       setState(() {
         cijenaError = "Cijena mora biti numerickog tipa i veca od 0";
       });
-      return;
+      greska = true;
     }
     if (kolicina == 0 || kolicina < 0) {
       setState(() {
-        kolicinaError = "Količina mora biti veća od nule i vica od 0";
+        kolicinaError = "Količina mora biti numerickog tipa i veca od 0";
       });
-      return;
+      greska = true;
     }
     if (brojBrzina == 0 || brojBrzina < 0) {
       setState(() {
-        brojBrzinaError = "Broj brzina mora biti veći od nule i veca od 0";
+        brojBrzinaError = "Broj brzina mora biti numerickog tipa i veca od 0";
       });
-      return;
+      greska = true;
     }
     if (slikeBicikli.isEmpty) {
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Potrebno je dodati barem jednu sliku");
-      return;
+      prikaziPorukuUpozorenja(context, "Potrebno je dodati barem jednu sliku");
+
+      greska = true;
     }
     if (slikeBicikli.length > 8) {
-      PorukaHelper.prikaziPorukuUpozorenja(context, "Moguce je dodati maximalno 8 slika");
-      return;
+      prikaziPorukuUpozorenja(context, "Moguce je dodati maximalno 8 slika");
+
+      greska = true;
     }
     if (velicinaRama.isEmpty) {
       setState(() {
         velicinaRamaError = "Potrebno je odabrati veličinu rama";
       });
-      return;
+      greska = true;
     }
     if (velicinaTocka.isEmpty) {
       setState(() {
         velicinaTockaError = "Potrebno je odabrati veličinu točka";
       });
-      return;
+      greska = true;
     }
     if (selectedKategorijaId == 0 || selectedKategorijaId == null) {
       setState(() {
         kategorijaError = "Potrebno je odabrati kategoriju";
       });
+      greska = true;
+    }
+    if (greska) {
       return;
     }
+
     final korisnikId = int.parse(korisnikInfo['korisnikId'] ?? '0');
     // ignore: unused_local_variable
     Bicikl bicikl = Bicikl(

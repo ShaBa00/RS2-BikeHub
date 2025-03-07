@@ -229,8 +229,6 @@ class _ProfilProzorState extends State<ProfilProzor> {
       postanskiBrojController.text = adresaK?['postanskiBroj'] ?? "N/A";
       ulicaController.text = adresaK?['ulica'] ?? "N/A";
     });
-    PorukaHelper.prikaziPorukuUpozorenja(context,
-        "Moguce je promjenuti samo Username ili Email, a ukoliko mijenjate lozinku potrebno je poslati Novu lozinku, staru lozinku i potvrdu lozinke");
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -772,6 +770,37 @@ class _ProfilProzorState extends State<ProfilProzor> {
                         title: "Adresa",
                         onPressed: () => setState(() => selectedButton = 2),
                         isSelected: selectedButton == 2,
+                      ),
+                      const SizedBox(height: 10), // Razmak između dugmadi
+                      Container(
+                        width: screenWidth * 0.13,
+                        height: screenHeight * 0.16,
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Color.fromARGB(255, 92, 225, 230),
+                              Color.fromARGB(255, 7, 181, 255),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.all(Radius.circular(20)),
+                        ),
+                        child: Center(
+                          child: SingleChildScrollView(
+                            child: Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                "Moguće je promijeniti samo Username ili Email, a ukoliko mijenjate lozinku potrebno je poslati Novu lozinku, staru lozinku i potvrdu lozinke",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),

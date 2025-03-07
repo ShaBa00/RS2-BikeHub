@@ -76,6 +76,7 @@ class DijeloviService {
     int? page = 0,
     int? pageSize = 10,
     bool isSlikaIncluded = true,
+    String? sortOrder,
   }) async {
     try {
       final queryParameters = <String, dynamic>{};
@@ -90,6 +91,7 @@ class DijeloviService {
       if (kategorijaId != null) queryParameters['KategorijaId'] = kategorijaId;
       if (korisniciId != null) queryParameters['korisniciId'] = korisniciId;
       if (isSlikaIncluded != null) queryParameters['isSlikaIncluded'] = isSlikaIncluded;
+      if (sortOrder != null) queryParameters['sortOrder'] = sortOrder;
 
       queryParameters['Page'] = page;
       queryParameters['PageSize'] = pageSize;
@@ -107,9 +109,10 @@ class DijeloviService {
           final filteredDijelovi = dijelovi.where((dio) {
             return korisniciId.contains(dio['korisnikId']);
           }).toList();
-
-          lista_ucitanih_dijelova.value = filteredDijelovi;
-          dijelovi = lista_ucitanih_dijelova.value;
+          if (sortOrder == null) {
+            lista_ucitanih_dijelova.value = filteredDijelovi;
+          }
+          dijelovi = filteredDijelovi;
         } else {
           lista_ucitanih_dijelova.value = dijelovi;
         }

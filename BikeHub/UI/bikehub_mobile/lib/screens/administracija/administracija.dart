@@ -97,8 +97,8 @@ class _AdministracijaPageState extends State<AdministracijaPage> with SingleTick
       page: null,
       pageSize: null,
     );
-    await _biciklService.getBiciklis(status: '');
-    await _dijeloviService.getDijelovis(status: '');
+    await _biciklService.getBiciklis(status: 'sve');
+    await _dijeloviService.getDijelovis(status: 'sve');
     setState(() {
       _listaKorisnika = _korisnikService.listaKorisnika;
       _countKorisnik = _korisnikService.countKorisnika;
@@ -2553,6 +2553,21 @@ class _AdministracijaPageState extends State<AdministracijaPage> with SingleTick
     return 'N/A';
   }
 
+  String getFormattedCijena(dynamic cijena) {
+    if (cijena == null) {
+      return "N/A";
+    }
+
+    final double cijenaValue;
+    try {
+      cijenaValue = double.parse(cijena.toString());
+    } catch (e) {
+      return "N/A";
+    }
+
+    return "${cijenaValue.toStringAsFixed(2)} KM";
+  }
+
   Widget serviserPrikaz(BuildContext context) {
     return FutureBuilder<void>(
       future: ucitavanjeZapisa("Serviser"),
@@ -2654,7 +2669,7 @@ class _AdministracijaPageState extends State<AdministracijaPage> with SingleTick
                                         color: const Color.fromARGB(0, 244, 67, 54), // Prva pozadina
                                         child: Center(
                                           child: Text(
-                                            "Cijena: ${zapis?['cijena'] ?? 'N/A'}",
+                                            "Cijena: ${getFormattedCijena(zapis?['cijena'])}",
                                             style: TextStyle(
                                               color: const Color.fromARGB(255, 0, 0, 0),
                                               fontSize: 17.0,
@@ -2989,7 +3004,7 @@ class _AdministracijaPageState extends State<AdministracijaPage> with SingleTick
                                         color: Colors.transparent,
                                         child: Center(
                                           child: Text(
-                                            "Cijena: ${zapis?['cijena'] ?? 'N/A'}",
+                                            "Cijena: ${getFormattedCijena(zapis?['cijena'])}",
                                             style: TextStyle(
                                               color: Colors.black,
                                               fontSize: 17.0,
@@ -3326,7 +3341,7 @@ class _AdministracijaPageState extends State<AdministracijaPage> with SingleTick
                                         color: Colors.transparent,
                                         child: Center(
                                           child: Text(
-                                            "Cijena: ${zapis?['cijena'] ?? 'N/A'}",
+                                            "Cijena: ${getFormattedCijena(zapis?['cijena'])}",
                                             style: TextStyle(
                                               color: Colors.black,
                                               fontSize: 17.0,

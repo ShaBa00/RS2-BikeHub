@@ -59,6 +59,21 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
   Map<String, dynamic>? zapisSacuvanog;
   bool? isLoggedInCache;
 
+  String getFormattedCijena(dynamic cijena) {
+    if (cijena == null) {
+      return "N/A";
+    }
+
+    final double cijenaValue;
+    try {
+      cijenaValue = double.parse(cijena.toString());
+    } catch (e) {
+      return "N/A";
+    }
+
+    return "${cijenaValue.toStringAsFixed(2)} KM";
+  }
+
   _getSpaseni() async {
     isLoggedInCache ??= await _korisnikServis.isLoggedIn();
     if (isLoggedInCache == true) {
@@ -135,8 +150,12 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
         nazivBicikl = result['naziv'] != null && result['naziv'].toString().isNotEmpty ? result['naziv'].toString() : "N/A";
 
         cijenaBicikl = result['cijena'] != null && result['cijena'].toString().isNotEmpty
-            ? (result['cijena'] is double ? result['cijena'].toInt() : int.tryParse(result['cijena'].toString()) ?? 0)
-            : 0;
+            ? (result['cijena'] is double
+                ? double.parse(result['cijena'].toStringAsFixed(2))
+                : double.tryParse(result['cijena'].toString())?.toStringAsFixed(2) != null
+                    ? double.parse(result['cijena'].toStringAsFixed(2))
+                    : 0.0)
+            : 0.0;
 
         velicinaRama = result['velicinaRama'] != null && result['velicinaRama'].toString().isNotEmpty ? result['velicinaRama'].toString() : "N/A";
 
@@ -449,7 +468,7 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                     ),
                     child: Center(
                       child: Text(
-                        '${zapis?['cijena']?.toString() ?? 'N/A'} KM',
+                        getFormattedCijena(zapis?['cijena']?.toString()),
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
@@ -1019,7 +1038,7 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                             height: MediaQuery.of(context).size.height * 0.05,
                                             alignment: Alignment.center,
                                             child: Text(
-                                              (listaRecomendedDijelova[i]?['cijena']?.toString() ?? 'N/A'),
+                                              (getFormattedCijena(listaRecomendedDijelova[i]?['cijena']?.toString())),
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 color: const Color.fromARGB(255, 255, 255, 255),
@@ -1338,9 +1357,10 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                                 ),
                                                 borderRadius: BorderRadius.circular(10.0),
                                               ),
-                                              child: TextField(
+                                              child: TextFormField(
+                                                initialValue: nazivBicikl.isEmpty ? '' : nazivBicikl,
                                                 decoration: InputDecoration(
-                                                  hintText: nazivBicikl.isEmpty ? "Naziv" : nazivBicikl,
+                                                  hintText: 'Naziv', // Promijenjen hint text
                                                   hintStyle: TextStyle(color: Colors.white),
                                                   border: OutlineInputBorder(
                                                     borderRadius: BorderRadius.circular(10.0),
@@ -1380,10 +1400,11 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                                 ),
                                                 borderRadius: BorderRadius.circular(10.0),
                                               ),
-                                              child: TextField(
+                                              child: TextFormField(
+                                                initialValue: cijenaBicikl == 0 ? '' : cijenaBicikl.toStringAsFixed(2),
                                                 keyboardType: TextInputType.number,
                                                 decoration: InputDecoration(
-                                                  hintText: cijenaBicikl == 0 ? "Cijena" : cijenaBicikl.toString(),
+                                                  hintText: 'Cijena',
                                                   hintStyle: TextStyle(color: Colors.white),
                                                   border: OutlineInputBorder(
                                                     borderRadius: BorderRadius.circular(10.0),
@@ -1393,7 +1414,9 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                                 ),
                                                 style: TextStyle(color: Colors.white),
                                                 onChanged: (text) {
-                                                  cijenaBicikl = int.tryParse(text) ?? 0;
+                                                  setState(() {
+                                                    cijenaBicikl = double.tryParse(text) ?? 0.0;
+                                                  });
                                                 },
                                               ),
                                             ),
@@ -1421,9 +1444,10 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                                 ),
                                                 borderRadius: BorderRadius.circular(10.0),
                                               ),
-                                              child: TextField(
+                                              child: TextFormField(
+                                                initialValue: velicinaRama.isEmpty ? '' : velicinaRama,
                                                 decoration: InputDecoration(
-                                                  hintText: velicinaRama.isEmpty ? "Veličina rama" : velicinaRama,
+                                                  hintText: 'Veličina rama', // Promijenjen hint text
                                                   hintStyle: TextStyle(color: Colors.white),
                                                   border: OutlineInputBorder(
                                                     borderRadius: BorderRadius.circular(10.0),
@@ -1463,9 +1487,10 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                                 ),
                                                 borderRadius: BorderRadius.circular(10.0),
                                               ),
-                                              child: TextField(
+                                              child: TextFormField(
+                                                initialValue: velicinaTocka.isEmpty ? '' : velicinaTocka,
                                                 decoration: InputDecoration(
-                                                  hintText: velicinaTocka.isEmpty ? "Veličina točka" : velicinaTocka,
+                                                  hintText: 'Veličina točka', // Promijenjen hint text
                                                   hintStyle: TextStyle(color: Colors.white),
                                                   border: OutlineInputBorder(
                                                     borderRadius: BorderRadius.circular(10.0),
@@ -1505,10 +1530,10 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                                 ),
                                                 borderRadius: BorderRadius.circular(10.0),
                                               ),
-                                              child: TextField(
-                                                keyboardType: TextInputType.number,
+                                              child: TextFormField(
+                                                initialValue: velicinaTocka.isEmpty ? '' : velicinaTocka,
                                                 decoration: InputDecoration(
-                                                  hintText: brojBrzina == 0 ? "Broj brzina" : brojBrzina.toString(),
+                                                  hintText: 'Veličina točka', // Promijenjen hint text
                                                   hintStyle: TextStyle(color: Colors.white),
                                                   border: OutlineInputBorder(
                                                     borderRadius: BorderRadius.circular(10.0),
@@ -1519,7 +1544,7 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                                 style: TextStyle(color: Colors.white),
                                                 onChanged: (text) {
                                                   setState(() {
-                                                    brojBrzina = int.tryParse(text) ?? 0;
+                                                    velicinaTocka = text;
                                                   });
                                                 },
                                               ),
@@ -1548,10 +1573,11 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                                 ),
                                                 borderRadius: BorderRadius.circular(10.0),
                                               ),
-                                              child: TextField(
+                                              child: TextFormField(
+                                                initialValue: kolicinaBicikla == 0 ? '' : kolicinaBicikla.toString(),
                                                 keyboardType: TextInputType.number,
                                                 decoration: InputDecoration(
-                                                  hintText: kolicinaBicikla == 0 ? "Količina" : kolicinaBicikla.toString(),
+                                                  hintText: 'Količina', // Promijenjen hint text
                                                   hintStyle: TextStyle(color: Colors.white),
                                                   border: OutlineInputBorder(
                                                     borderRadius: BorderRadius.circular(10.0),
@@ -1561,7 +1587,9 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                                 ),
                                                 style: TextStyle(color: Colors.white),
                                                 onChanged: (text) {
-                                                  kolicinaBicikla = int.tryParse(text) ?? 0;
+                                                  setState(() {
+                                                    kolicinaBicikla = int.tryParse(text) ?? 0;
+                                                  });
                                                 },
                                               ),
                                             ),
@@ -1591,33 +1619,52 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
                                               ),
                                               child: DropdownButton<String>(
                                                 isExpanded: true,
-                                                value: _odabranaKategorijaBicikl != null ? _odabranaKategorijaBicikl!['naziv'] ?? 'N/A' : null,
+                                                value: _odabranaKategorijaBicikl != null &&
+                                                        _kategorijeBicikl!
+                                                            .any((kategorija) => kategorija['naziv'] == _odabranaKategorijaBicikl!['naziv'])
+                                                    ? _odabranaKategorijaBicikl!['naziv']
+                                                    : 'Nije dostupna',
                                                 hint: Text(
                                                   'Kategorija',
                                                   style: TextStyle(color: Colors.white),
                                                 ),
                                                 onChanged: (String? newValue) {
                                                   setState(() {
-                                                    _odabranaKategorijaBicikl = _kategorijeBicikl
-                                                        ?.firstWhere((kategorija) => kategorija['naziv'] == newValue, orElse: () => {'naziv': 'N/A'});
+                                                    _odabranaKategorijaBicikl = _kategorijeBicikl?.firstWhere(
+                                                        (kategorija) => kategorija['naziv'] == newValue,
+                                                        orElse: () => {'naziv': 'Nije dostupna'});
                                                   });
                                                 },
-                                                items: _kategorijeBicikl?.map<DropdownMenuItem<String>>((kategorija) {
-                                                      return DropdownMenuItem<String>(
-                                                        value: kategorija['naziv'] ?? 'N/A',
-                                                        child: Container(
-                                                          width: MediaQuery.of(context).size.width * 0.3,
-                                                          height: MediaQuery.of(context).size.height * 0.04,
-                                                          child: Center(
-                                                            child: Text(
-                                                              kategorija['naziv'] ?? 'N/A',
-                                                              style: TextStyle(color: Colors.white),
-                                                            ),
+                                                items: [
+                                                  DropdownMenuItem<String>(
+                                                    value: 'Nije dostupna',
+                                                    child: Container(
+                                                      width: MediaQuery.of(context).size.width * 0.3,
+                                                      height: MediaQuery.of(context).size.height * 0.04,
+                                                      child: Center(
+                                                        child: Text(
+                                                          'Nije dostupna',
+                                                          style: TextStyle(color: Colors.white),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  ...?_kategorijeBicikl?.map<DropdownMenuItem<String>>((kategorija) {
+                                                    return DropdownMenuItem<String>(
+                                                      value: kategorija['naziv'] ?? 'N/A',
+                                                      child: Container(
+                                                        width: MediaQuery.of(context).size.width * 0.3,
+                                                        height: MediaQuery.of(context).size.height * 0.04,
+                                                        child: Center(
+                                                          child: Text(
+                                                            kategorija['naziv'] ?? 'N/A',
+                                                            style: TextStyle(color: Colors.white),
                                                           ),
                                                         ),
-                                                      );
-                                                    }).toList() ??
-                                                    [],
+                                                      ),
+                                                    );
+                                                  })
+                                                ],
                                                 dropdownColor: Colors.blue[700],
                                                 iconEnabledColor: Colors.white,
                                                 style: TextStyle(color: Colors.white),
@@ -1712,7 +1759,7 @@ class _BicikliPrikazState extends State<BicikliPrikaz> {
   }
 
   String nazivBicikl = "";
-  int cijenaBicikl = 0;
+  double cijenaBicikl = 0;
   String velicinaRama = "";
   String velicinaTocka = "";
   int brojBrzina = 0;

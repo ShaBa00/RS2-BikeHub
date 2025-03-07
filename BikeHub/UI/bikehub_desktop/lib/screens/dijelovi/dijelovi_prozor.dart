@@ -20,11 +20,12 @@ class _DijeloviProzorState extends State<DijeloviProzor> {
   final AdresaService adresaService = AdresaService();
   RangeValues _currentRangeValues = const RangeValues(0, 1500);
   double pocetnaCijena = 0;
-  double krajnjaCijena = 1500;
+  double krajnjaCijena = 150000.0;
   String? naziv;
   int? selectedKategorijaId;
   int? kategorijaId;
   int? selectedGradId;
+  double maxCijena = 150000.0;
 
   int _currentPage = 0;
   final int _pageSize = 12;
@@ -34,7 +35,39 @@ class _DijeloviProzorState extends State<DijeloviProzor> {
     super.initState();
     getKategorije();
     _loadDijelovi();
+    getMaxCijena();
     adresaService.getGradKorisniciDto();
+  }
+
+  getMaxCijena() async {
+    final biciklMaxCijena = await dijeloviService.getDijelovi(
+      status: "aktivan",
+      sortOrder: "desc",
+      page: 0,
+      pageSize: 1,
+    );
+
+    // ignore: unnecessary_null_comparison
+    if (biciklMaxCijena != null) {
+      setState(() {
+        maxCijena = biciklMaxCijena[0]["cijena"];
+      });
+    }
+  }
+
+  String getFormattedCijena(dynamic cijena) {
+    if (cijena == null) {
+      return "Cijena nije pronađena";
+    }
+
+    final double cijenaValue;
+    try {
+      cijenaValue = double.parse(cijena.toString());
+    } catch (e) {
+      return "Cijena nije pronađena";
+    }
+
+    return "${cijenaValue.toStringAsFixed(2)} KM";
   }
 
   final ValueNotifier<List<Map<String, dynamic>>> _listaDijeloviKategorijeNotifier = ValueNotifier([]);
@@ -236,13 +269,14 @@ class _DijeloviProzorState extends State<DijeloviProzor> {
                     ),
                     const SizedBox(height: 16),
                     RangeSlider(
-                      values: _currentRangeValues,
+                      values:
+                          _currentRangeValues.start >= 0 && _currentRangeValues.end <= maxCijena ? _currentRangeValues : RangeValues(0, maxCijena),
                       min: 0,
-                      max: 1500,
+                      max: maxCijena,
                       divisions: 15,
                       labels: RangeLabels(
                         _currentRangeValues.start.round().toString(),
-                        _currentRangeValues.end.round().toString(),
+                        _currentRangeValues.end.toString(),
                       ),
                       onChanged: (RangeValues values) {
                         setState(() {
@@ -256,7 +290,7 @@ class _DijeloviProzorState extends State<DijeloviProzor> {
                     ),
                     const Text('Cijena:'),
                     Text(
-                      'Od: ${_currentRangeValues.start.round()} do: ${_currentRangeValues.end.round()}',
+                      'Od: ${_currentRangeValues.start.round()} do: $maxCijena',
                       style: const TextStyle(color: Colors.white),
                     ),
                     const SizedBox(height: 16),
@@ -356,7 +390,7 @@ class _DijeloviProzorState extends State<DijeloviProzor> {
                                               children: [
                                                 Text(naziv, style: const TextStyle(fontWeight: FontWeight.bold)),
                                                 const SizedBox(height: 4),
-                                                Text('Cijena: $cijena KM'),
+                                                Text('Cijena: ${getFormattedCijena(cijena)}'),
                                               ],
                                             ),
                                           ),

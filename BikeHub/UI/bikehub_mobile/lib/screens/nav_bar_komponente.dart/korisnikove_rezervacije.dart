@@ -34,8 +34,7 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
     setState(() {
       prikazRezervacija = false;
     });
-    listaRezervacija = await _rezervacijaServis.getRezervacije(
-        status: st, korisnikId: widget.korisnikId);
+    listaRezervacija = await _rezervacijaServis.getRezervacije(status: st, korisnikId: widget.korisnikId);
 
     setState(() {
       prikazRezervacija = true;
@@ -49,29 +48,25 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
               Container(
                 width: double.infinity,
                 height: MediaQuery.of(context).size.height * 0.07,
-                color: const Color.fromARGB(
-                    0, 76, 175, 79), // Pozadina za prvi kontejner
+                color: const Color.fromARGB(0, 76, 175, 79), // Pozadina za prvi kontejner
                 child: Row(
                   children: [
                     Container(
                       width: MediaQuery.of(context).size.width * 0.5,
                       height: MediaQuery.of(context).size.height * 0.07,
-                      color: const Color.fromARGB(0, 244, 67,
-                          54), // Pozadina za prvi unutarnji kontejner
+                      color: const Color.fromARGB(0, 244, 67, 54), // Pozadina za prvi unutarnji kontejner
                     ),
                     Container(
                       width: MediaQuery.of(context).size.width * 0.5,
                       height: MediaQuery.of(context).size.height * 0.07,
-                      color:
-                          Colors.blue, // Pozadina za drugi unutarnji kontejner
+                      color: Colors.blue, // Pozadina za drugi unutarnji kontejner
                       child: Center(
                         child: ElevatedButton(
                           onPressed: () {
                             _showPopup(context);
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Colors.white, // Boja pozadine dugmeta
+                            backgroundColor: Colors.white, // Boja pozadine dugmeta
                             minimumSize: Size(
                               MediaQuery.of(context).size.width * 0.4,
                               MediaQuery.of(context).size.height * 0.05,
@@ -190,8 +185,7 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
                 final zapis = currentAdmini[index];
                 final String datumKreiranja = zapis['datumRezervacije'];
                 final DateTime parsedDate = DateTime.parse(datumKreiranja);
-                final String formattedDate =
-                    DateFormat('dd/MM/yyyy').format(parsedDate);
+                final String formattedDate = DateFormat('dd/MM/yyyy').format(parsedDate);
                 return GestureDetector(
                   onTap: () async {
                     if (zapis['status'] == 'zavrseno') {
@@ -202,16 +196,24 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
                       });
                       await getRezervacija();
                     } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Moguće je otvoriti samo završene'),
-                        ),
-                      );
+                      if (zapis['status'] == 'kreiran' || zapis['status'] == 'izmijenjen' || zapis['status'] == 'vracen') {
+                        setState(() {
+                          zapisUcitan = false;
+                          odabraniProzor = "rezervacija";
+                          _odabraniId = zapis['rezervacijaId'];
+                        });
+                        await getRezervacija();
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Nije dozvoljeno otvoriti ove rezervacije'),
+                          ),
+                        );
+                      }
                     }
                   },
                   child: Padding(
-                    padding: EdgeInsets.only(
-                        top: index == 0 ? 25.0 : 8.0, bottom: 8.0),
+                    padding: EdgeInsets.only(top: index == 0 ? 25.0 : 8.0, bottom: 8.0),
                     child: Align(
                       alignment: Alignment.center,
                       child: Container(
@@ -303,8 +305,7 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
                   Container(
                     width: double.infinity,
                     height: MediaQuery.of(context).size.height * 0.62,
-                    color:
-                        Color.fromARGB(0, 33, 149, 243), // Pozadina za prvi dio
+                    color: Color.fromARGB(0, 33, 149, 243), // Pozadina za prvi dio
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -331,9 +332,7 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          minimumSize: Size(
-                              MediaQuery.of(context).size.width * 0.4,
-                              MediaQuery.of(context).size.height * 0.05),
+                          minimumSize: Size(MediaQuery.of(context).size.width * 0.4, MediaQuery.of(context).size.height * 0.05),
                         ),
                         child: Text(
                           'Nazad',
@@ -361,8 +360,7 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
       height: MediaQuery.of(context).size.height * 0.05,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor:
-              isSelected ? Color.fromARGB(255, 87, 202, 255) : Colors.white,
+          backgroundColor: isSelected ? Color.fromARGB(255, 87, 202, 255) : Colors.white,
         ),
         onPressed: () {
           handleButtoStatusnPress(title);
@@ -375,8 +373,7 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
         child: Text(
           title,
           style: TextStyle(
-            color:
-                isSelected ? Colors.white : Color.fromARGB(255, 87, 202, 255),
+            color: isSelected ? Colors.white : Color.fromARGB(255, 87, 202, 255),
             fontSize: 17,
           ),
         ),
@@ -474,8 +471,7 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
                         });
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Colors.lightBlue, // Boja pozadine dugmeta
+                        backgroundColor: Colors.lightBlue, // Boja pozadine dugmeta
                         minimumSize: Size(
                           MediaQuery.of(context).size.width * 0.4,
                           MediaQuery.of(context).size.height * 0.055,
@@ -508,17 +504,14 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
                     Container(
                       width: MediaQuery.of(context).size.width * 0.77,
                       height: MediaQuery.of(context).size.height * 0.075,
-                      color: const Color.fromARGB(
-                          0, 244, 67, 54), // Pozadina za prvi kontejner
+                      color: const Color.fromARGB(0, 244, 67, 54), // Pozadina za prvi kontejner
                       child: Center(
                         child: Container(
                           width: MediaQuery.of(context).size.width * 0.5,
                           height: MediaQuery.of(context).size.height * 0.065,
                           decoration: BoxDecoration(
-                            color: Color.fromARGB(0, 255, 255,
-                                255), // Pozadina unutarnjeg kontejnera
-                            borderRadius:
-                                BorderRadius.circular(20.0), // Zaobljene ivice
+                            color: Color.fromARGB(0, 255, 255, 255), // Pozadina unutarnjeg kontejnera
+                            borderRadius: BorderRadius.circular(20.0), // Zaobljene ivice
                             border: Border(
                               bottom: BorderSide(color: Colors.white),
                               right: BorderSide(color: Colors.white),
@@ -527,13 +520,8 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
                           ),
                           child: Center(
                             child: Text(
-                              rezervacija['ocjena'] != null
-                                  ? 'Ocjena: ${rezervacija['ocjena'].toString()}'
-                                  : 'N/A',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color:
-                                      const Color.fromARGB(255, 253, 253, 253)),
+                              rezervacija['ocjena'] != null ? 'Ocjena: ${rezervacija['ocjena'].toString()}' : 'Nema ocjene',
+                              style: TextStyle(fontSize: 16, color: const Color.fromARGB(255, 253, 253, 253)),
                             ),
                           ),
                         ),
@@ -542,17 +530,14 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
                     Container(
                       width: MediaQuery.of(context).size.width * 0.77,
                       height: MediaQuery.of(context).size.height * 0.075,
-                      color: const Color.fromARGB(
-                          0, 76, 175, 79), // Pozadina za drugi kontejner
+                      color: const Color.fromARGB(0, 76, 175, 79), // Pozadina za drugi kontejner
                       child: Center(
                         child: Container(
                           width: MediaQuery.of(context).size.width * 0.5,
                           height: MediaQuery.of(context).size.height * 0.065,
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(0, 255, 255,
-                                255), // Pozadina unutarnjeg kontejnera
-                            borderRadius:
-                                BorderRadius.circular(20.0), // Zaobljene ivice
+                            color: const Color.fromARGB(0, 255, 255, 255), // Pozadina unutarnjeg kontejnera
+                            borderRadius: BorderRadius.circular(20.0), // Zaobljene ivice
                             border: Border(
                               bottom: BorderSide(color: Colors.white),
                               right: BorderSide(color: Colors.white),
@@ -564,87 +549,55 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
                               rezervacija['datumRezervacije'] != null
                                   ? 'Datum: ${DateFormat('dd MM yyyy').format(DateTime.parse(rezervacija['datumRezervacije']))}'
                                   : 'N/A',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color:
-                                      const Color.fromARGB(255, 252, 252, 252)),
+                              style: TextStyle(fontSize: 16, color: const Color.fromARGB(255, 252, 252, 252)),
                             ),
                           ),
                         ),
                       ),
                     ),
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.77,
-                      height: MediaQuery.of(context).size.height * 0.075,
-                      color: const Color.fromARGB(
-                          0, 33, 149, 243), // Pozadina za treći kontejner
-                      child: Center(
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.5,
-                          height: MediaQuery.of(context).size.height * 0.065,
-                          decoration: BoxDecoration(
-                            color: Color.fromARGB(0, 255, 255, 255),
-                            borderRadius:
-                                BorderRadius.circular(20.0), // Zaobljene ivice
-                            border: Border(
-                              bottom: BorderSide(color: Colors.white),
-                              right: BorderSide(color: Colors.white),
-                              left: BorderSide(color: Colors.white),
-                            ),
-                          ),
-                          child: Center(
-                            child: DropdownButton<String>(
-                              value: odabranaOcjena,
-                              icon: Icon(Icons.arrow_downward),
-                              iconSize: 24,
-                              elevation: 16,
-                              style: TextStyle(
-                                  color: Color.fromARGB(255, 0, 0, 0)),
-                              underline: Container(),
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  odabranaOcjena = newValue!;
-                                });
-                              },
-                              items: <String>[
-                                '1',
-                                '2',
-                                '3',
-                                '4',
-                                '5'
-                              ].map<DropdownMenuItem<String>>((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value),
-                                );
-                              }).toList(),
-                              hint: Text(
-                                'Ocjena',
-                                style: TextStyle(
-                                    color: Colors
-                                        .black), // Promijenjeno na crni tekst
+                    if (rezervacija['status'] == 'izmijenjen' || rezervacija['status'] == 'vracen' || rezervacija['status'] == 'kreiran')
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.77,
+                        height: MediaQuery.of(context).size.height * 0.075,
+                        color: const Color.fromARGB(0, 255, 235, 59), // Pozadina za četvrti kontejner
+                        child: Center(
+                          child: GestureDetector(
+                            onTap: () {
+                              obrisiRezervaciju();
+                            },
+                            child: Container(
+                              width: MediaQuery.of(context).size.width * 0.5,
+                              height: MediaQuery.of(context).size.height * 0.065,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20.0), // Zaobljene ivice
+                                border: Border(
+                                  bottom: BorderSide(color: Colors.white),
+                                  right: BorderSide(color: Colors.white),
+                                  left: BorderSide(color: Colors.white),
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  'Obriši',
+                                  style: TextStyle(color: const Color.fromARGB(255, 255, 255, 255)),
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.77,
-                      height: MediaQuery.of(context).size.height * 0.075,
-                      color: const Color.fromARGB(
-                          0, 255, 235, 59), // Pozadina za četvrti kontejner
-                      child: Center(
-                        child: GestureDetector(
-                          onTap: () {
-                            ocjeniRezervaciju();
-                          },
+                      )
+                    else ...[
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.77,
+                        height: MediaQuery.of(context).size.height * 0.075,
+                        color: const Color.fromARGB(0, 33, 149, 243), // Pozadina za treći kontejner
+                        child: Center(
                           child: Container(
                             width: MediaQuery.of(context).size.width * 0.5,
                             height: MediaQuery.of(context).size.height * 0.065,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(
-                                  20.0), // Zaobljene ivice
+                              color: Color.fromARGB(0, 255, 255, 255),
+                              borderRadius: BorderRadius.circular(20.0), // Zaobljene ivice
                               border: Border(
                                 bottom: BorderSide(color: Colors.white),
                                 right: BorderSide(color: Colors.white),
@@ -652,22 +605,109 @@ class _RezervacijeKorisnikaState extends State<RezervacijeKorisnika> {
                               ),
                             ),
                             child: Center(
-                              child: Text(
-                                'Ocjeni',
-                                style: TextStyle(
-                                    color: const Color.fromARGB(
-                                        255, 255, 255, 255)),
+                              child: DropdownButton<String>(
+                                value: odabranaOcjena,
+                                icon: Icon(Icons.arrow_downward),
+                                iconSize: 24,
+                                elevation: 16,
+                                style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                                underline: Container(),
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    odabranaOcjena = newValue!;
+                                  });
+                                },
+                                items: <String>['1', '2', '3', '4', '5'].map<DropdownMenuItem<String>>((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                }).toList(),
+                                hint: Text(
+                                  'Ocjena',
+                                  style: TextStyle(color: Colors.black), // Promijenjeno na crni tekst
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    )
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.77,
+                        height: MediaQuery.of(context).size.height * 0.075,
+                        color: const Color.fromARGB(0, 255, 235, 59), // Pozadina za četvrti kontejner
+                        child: Center(
+                          child: GestureDetector(
+                            onTap: () {
+                              ocjeniRezervaciju();
+                            },
+                            child: Container(
+                              width: MediaQuery.of(context).size.width * 0.5,
+                              height: MediaQuery.of(context).size.height * 0.065,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20.0), // Zaobljene ivice
+                                border: Border(
+                                  bottom: BorderSide(color: Colors.white),
+                                  right: BorderSide(color: Colors.white),
+                                  left: BorderSide(color: Colors.white),
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  'Ocjeni',
+                                  style: TextStyle(color: const Color.fromARGB(255, 255, 255, 255)),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
             ],
           ),
+        ),
+      );
+    }
+  }
+
+  obrisiRezervaciju() async {
+    try {
+      String uspjesno = await _rezervacijaServis.upravljanjeRezervacijom(
+        "obrisan",
+        _odabraniId,
+      );
+      if (uspjesno == "Status uspješno ažuriran") {
+        await getRezervacije(statusRezervacije);
+        setState(() {
+          odabraniProzor = "home";
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Rezervacija uspješno obrisana.',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Neuspješno brisanje rezervacije.',
+              style: TextStyle(color: Colors.white), // Boja teksta
+            ),
+            backgroundColor: Colors.red, // Boja pozadine
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Greška pri brisanju rezervacije: $e'),
         ),
       );
     }

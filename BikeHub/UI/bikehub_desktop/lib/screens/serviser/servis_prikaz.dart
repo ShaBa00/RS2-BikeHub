@@ -221,7 +221,7 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
                           _buildDetailContainer('Grad', serviserDetalji?['grad'] ?? 'Grad nije pronađen'),
                           _buildDetailContainer('Broj servisa', serviserDetalji?['brojServisa']?.toString() ?? 'Broj servisa nije pronađen'),
                           _buildDetailContainer('Ukupna ocjena', serviserDetalji?['ukupnaOcjena']?.toString() ?? 'Ocjena nije pronađena'),
-                          _buildDetailContainer('Cijena', serviserDetalji?['cijena']?.toString() ?? 'Cijena nije pronađena'),
+                          _buildDetailContainer('Cijena', getFormattedCijena(serviserDetalji?['cijena']?.toString())),
                         ],
                       )
                     : const Center(child: CircularProgressIndicator()),
@@ -357,6 +357,21 @@ class _ServiserPrikazState extends State<ServiserPrikaz> {
         ),
       ),
     );
+  }
+
+  String getFormattedCijena(dynamic cijena) {
+    if (cijena == null) {
+      return "Cijena nije pronađena";
+    }
+
+    final double cijenaValue;
+    try {
+      cijenaValue = double.parse(cijena.toString());
+    } catch (e) {
+      return "Cijena nije pronađena";
+    }
+
+    return "${cijenaValue.toStringAsFixed(2)} KM";
   }
 
   Widget _buildDetailContainer(String label, dynamic value) {

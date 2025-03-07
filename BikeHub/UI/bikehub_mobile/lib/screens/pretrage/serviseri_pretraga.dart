@@ -466,20 +466,19 @@ class _ServiseriPretragastate extends State<ServiseriPretraga> with SingleTicker
                                       ),
                                     ),
                                     Container(
-                                      width: MediaQuery.of(context).size.width * 0.3,
-                                      height: MediaQuery.of(context).size.height * 0.06,
-                                      color: const Color.fromARGB(0, 255, 153, 0),
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(right: 8.0),
-                                        child: Align(
-                                          alignment: Alignment.centerRight,
-                                          child: Text(
-                                            serviser['cijena'] != null ? serviser['cijena'].toString() : "N/A",
-                                            style: TextStyle(color: Colors.white),
+                                        width: MediaQuery.of(context).size.width * 0.3,
+                                        height: MediaQuery.of(context).size.height * 0.06,
+                                        color: const Color.fromARGB(0, 255, 153, 0),
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(right: 8.0),
+                                          child: Align(
+                                            alignment: Alignment.centerRight,
+                                            child: Text(
+                                              serviser['cijena'] != null ? getFormattedCijena(serviser['cijena']) : "N/A",
+                                              style: TextStyle(color: Colors.white),
+                                            ),
                                           ),
-                                        ),
-                                      ),
-                                    ),
+                                        )),
                                   ],
                                 ),
                               ),
@@ -537,6 +536,21 @@ class _ServiseriPretragastate extends State<ServiseriPretraga> with SingleTicker
         _buildPopupSort(context),
       ],
     );
+  }
+
+  String getFormattedCijena(dynamic cijena) {
+    if (cijena == null) {
+      return "N/A";
+    }
+
+    final double cijenaValue;
+    try {
+      cijenaValue = double.parse(cijena.toString());
+    } catch (e) {
+      return "N/A";
+    }
+
+    return "${cijenaValue.toStringAsFixed(2)} KM";
   }
 
   Widget _buildPopupFilter(BuildContext context) {

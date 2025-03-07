@@ -486,7 +486,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                           children: [
                             _buildDetailContainer('Naziv:', dio?['naziv'] ?? 'Naziv nije pronađen'),
                             _buildDetailContainer('Opis:', dio?['opis'] ?? 'Opis nije pronađen'),
-                            _buildDetailContainer('Cijena:', dio?['cijena']?.toString() ?? 'Cijena nije pronađena'),
+                            _buildDetailContainer('Cijena:', getFormattedCijena(dio?['cijena'])),
                             _buildDetailContainer('Količina:', dio?['kolicina']?.toString() ?? 'Količina nije pronađena'),
                             _buildDetailContainer('', isPromovisan ? 'Artikal promovisan' : 'Artikal nije promovisan'),
                           ],
@@ -584,7 +584,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                                   children: [
                                                     Text(naziv, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                                                     const SizedBox(height: 4),
-                                                    Text('Cijena: $cijena KM', style: const TextStyle(fontSize: 12)),
+                                                    Text('Cijena: ${getFormattedCijena(cijena)}', style: const TextStyle(fontSize: 12)),
                                                   ],
                                                 ),
                                               ),
@@ -603,6 +603,21 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
               ),
       ),
     );
+  }
+
+  String getFormattedCijena(dynamic cijena) {
+    if (cijena == null) {
+      return "Cijena nije pronađena";
+    }
+
+    final double cijenaValue;
+    try {
+      cijenaValue = double.parse(cijena.toString());
+    } catch (e) {
+      return "Cijena nije pronađena";
+    }
+
+    return "${cijenaValue.toStringAsFixed(2)} KM";
   }
 
   obrisiDio() async {
@@ -697,14 +712,15 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                                 left: BorderSide(color: Colors.white),
                                               ),
                                             ),
-                                            child: TextField(
+                                            child: TextFormField(
+                                              initialValue: nazivNovog,
                                               onChanged: (value) {
                                                 setState(() {
                                                   nazivNovog = value;
                                                 });
                                               },
                                               decoration: InputDecoration(
-                                                hintText: nazivNovog.isNotEmpty ? nazivNovog : 'Naziv',
+                                                hintText: 'Naziv',
                                                 hintStyle: TextStyle(color: Colors.white),
                                                 border: InputBorder.none,
                                                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -728,14 +744,16 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                                 left: BorderSide(color: Colors.white),
                                               ),
                                             ),
-                                            child: TextField(
+                                            child: TextFormField(
+                                              initialValue: CijenaNovog.isNotEmpty ? double.parse(CijenaNovog).toStringAsFixed(2) : '',
+                                              keyboardType: TextInputType.numberWithOptions(decimal: true),
                                               onChanged: (value) {
                                                 setState(() {
                                                   CijenaNovog = value;
                                                 });
                                               },
                                               decoration: InputDecoration(
-                                                hintText: CijenaNovog.isNotEmpty ? CijenaNovog : 'Cijena',
+                                                hintText: 'Cijena',
                                                 hintStyle: TextStyle(color: Colors.white),
                                                 border: InputBorder.none,
                                                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -759,14 +777,16 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                                 left: BorderSide(color: Colors.white),
                                               ),
                                             ),
-                                            child: TextField(
+                                            child: TextFormField(
+                                              initialValue: KolicinaNovog,
+                                              keyboardType: TextInputType.number,
                                               onChanged: (value) {
                                                 setState(() {
                                                   KolicinaNovog = value;
                                                 });
                                               },
                                               decoration: InputDecoration(
-                                                hintText: KolicinaNovog.isNotEmpty ? KolicinaNovog : 'Kolicina',
+                                                hintText: 'Kolicina',
                                                 hintStyle: TextStyle(color: Colors.white),
                                                 border: InputBorder.none,
                                                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -802,14 +822,15 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                                 left: BorderSide(color: Colors.white),
                                               ),
                                             ),
-                                            child: TextField(
+                                            child: TextFormField(
+                                              initialValue: opisNovog,
                                               onChanged: (value) {
                                                 setState(() {
                                                   opisNovog = value;
                                                 });
                                               },
                                               decoration: InputDecoration(
-                                                hintText: opisNovog.isNotEmpty ? opisNovog : 'Opis',
+                                                hintText: 'Opis',
                                                 hintStyle: TextStyle(color: Colors.white),
                                                 border: InputBorder.none,
                                                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -837,8 +858,28 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                               child: ValueListenableBuilder(
                                                 valueListenable: _listaDijeloviKategorijeNotifier,
                                                 builder: (context, kategorije, _) {
+                                                  List<DropdownMenuItem<int?>> dropdownItems = [
+                                                    const DropdownMenuItem<int?>(value: null, child: Text("Sve Kategorije")),
+                                                    ...kategorije.map<DropdownMenuItem<int>>((kategorija) {
+                                                      return DropdownMenuItem<int>(
+                                                        value: kategorija['kategorijaId'],
+                                                        child: Container(
+                                                          width: MediaQuery.of(context).size.width * 0.10,
+                                                          alignment: Alignment.center,
+                                                          child: Text(kategorija['naziv']),
+                                                        ),
+                                                      );
+                                                    }).toList(),
+                                                  ];
+
+                                                  // Postavljanje odabrane kategorije ako postoji
+                                                  int? selectedValue = selectedKategorijaId ??
+                                                      (dio != null && dropdownItems.any((item) => item.value == dio!['kategorijaId'])
+                                                          ? dio!['kategorijaId']
+                                                          : null);
+
                                                   return DropdownButton<int?>(
-                                                    value: selectedKategorijaId,
+                                                    value: selectedValue,
                                                     icon: const Icon(Icons.arrow_downward, color: Colors.white),
                                                     iconSize: 24,
                                                     elevation: 16,
@@ -853,22 +894,10 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                                                     ),
                                                     onChanged: (int? newValue) {
                                                       setState(() {
-                                                        selectedKategorijaId = newValue;
+                                                        selectedKategorijaId = newValue; // Ažurira se vrijednost
                                                       });
                                                     },
-                                                    items: [
-                                                      const DropdownMenuItem<int?>(value: null, child: Text("Sve Kategorije")),
-                                                      ...kategorije.map<DropdownMenuItem<int>>((kategorija) {
-                                                        return DropdownMenuItem<int>(
-                                                          value: kategorija['kategorijaId'],
-                                                          child: Container(
-                                                            width: MediaQuery.of(context).size.width * 0.10,
-                                                            alignment: Alignment.center,
-                                                            child: Text(kategorija['naziv']),
-                                                          ),
-                                                        );
-                                                      }).toList(),
-                                                    ],
+                                                    items: dropdownItems,
                                                     dropdownColor: Colors.transparent,
                                                   );
                                                 },
@@ -1122,7 +1151,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                               ),
                             ),
                             child: Text(
-                              'Edit podatci',
+                              'Snimi',
                               style: TextStyle(
                                 color: Colors.white,
                               ),
@@ -1141,7 +1170,7 @@ class _DijeloviPrikazState extends State<DijeloviPrikaz> {
                               ),
                             ),
                             child: Text(
-                              'Edit slike',
+                              'Snimi slike',
                               style: TextStyle(
                                 color: Colors.white,
                               ),

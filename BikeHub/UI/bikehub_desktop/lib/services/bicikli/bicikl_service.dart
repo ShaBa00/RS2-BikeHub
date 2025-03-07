@@ -31,6 +31,7 @@ class BiciklService {
     int? page = 0,
     int? pageSize = 10,
     bool isSlikaIncluded = true,
+    String? sortOrder,
   }) async {
     try {
       final queryParameters = <String, dynamic>{};
@@ -47,6 +48,7 @@ class BiciklService {
       if (kategorijaId != null) queryParameters['KategorijaId'] = kategorijaId;
       if (korisniciId != null) queryParameters['korisniciId'] = korisniciId;
       if (isSlikaIncluded != null) queryParameters['isSlikaIncluded'] = isSlikaIncluded;
+      if (sortOrder != null) queryParameters['sortOrder'] = sortOrder;
 
       queryParameters['Page'] = page;
       queryParameters['PageSize'] = pageSize;
@@ -64,9 +66,10 @@ class BiciklService {
           final filteredBicikli = bicikli.where((bicikl) {
             return korisniciId.contains(bicikl['korisnikId']);
           }).toList();
-
-          lista_ucitanih_bicikala.value = filteredBicikli;
-          bicikli = lista_ucitanih_bicikala.value;
+          if (sortOrder == null) {
+            lista_ucitanih_bicikala.value = filteredBicikli;
+          }
+          bicikli = filteredBicikli;
         } else {
           lista_ucitanih_bicikala.value = bicikli;
         }

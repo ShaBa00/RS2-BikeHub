@@ -26,8 +26,7 @@ class BiciklService {
     dio.httpClientAdapter = IOHttpClientAdapter(
       createHttpClient: () {
         final HttpClient client = HttpClient();
-        client.badCertificateCallback =
-            (X509Certificate cert, String host, int port) => true;
+        client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
         return client;
       },
     );
@@ -58,16 +57,12 @@ class BiciklService {
   Future<Map<String, dynamic>> getBiciklById(int biciklId) async {
     final String url = '${HelperService.baseUrl}/Bicikli/$biciklId';
 
-    final HttpClient httpClient = HttpClient()
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
+    final HttpClient httpClient = HttpClient()..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
 
     final IOClient ioClient = IOClient(httpClient);
 
     try {
-      final http.Response response = await ioClient
-          .get(Uri.parse(url))
-          .timeout(const Duration(seconds: 10));
+      final http.Response response = await ioClient.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
@@ -112,7 +107,11 @@ class BiciklService {
     }
 
     if (status != null && status.isNotEmpty) {
-      queryParams['status'] = status;
+      if (status != "sve") {
+        queryParams['status'] = status;
+      }
+    } else {
+      queryParams['status'] = "aktivan";
     }
     if (velicinaRama != null && velicinaRama.isNotEmpty) {
       queryParams['velicinaRama'] = velicinaRama;
@@ -145,16 +144,12 @@ class BiciklService {
 
     final String url = uri.toString();
 
-    final HttpClient httpClient = HttpClient()
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
+    final HttpClient httpClient = HttpClient()..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
 
     final IOClient ioClient = IOClient(httpClient);
 
     try {
-      final http.Response response = await ioClient
-          .get(Uri.parse(url))
-          .timeout(const Duration(seconds: 40));
+      final http.Response response = await ioClient.get(Uri.parse(url)).timeout(const Duration(seconds: 40));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -183,16 +178,12 @@ class BiciklService {
 
     final String url = uri.toString();
 
-    final HttpClient httpClient = HttpClient()
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
+    final HttpClient httpClient = HttpClient()..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
 
     final IOClient ioClient = IOClient(httpClient);
 
     try {
-      final http.Response response = await ioClient
-          .get(Uri.parse(url))
-          .timeout(const Duration(seconds: 40));
+      final http.Response response = await ioClient.get(Uri.parse(url)).timeout(const Duration(seconds: 40));
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
@@ -217,19 +208,15 @@ class BiciklService {
     final String baseUrl = '${HelperService.baseUrl}/Bicikli';
     Uri uri;
 
-    HttpClient httpClient = HttpClient()
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
+    HttpClient httpClient = HttpClient()..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
 
     try {
       await _addAuthorizationHeader(); // Dodavanje authorization header-a
 
       if (status == "aktivan") {
-        uri = Uri.parse('$baseUrl/aktivacija/$odabraniId')
-            .replace(queryParameters: {'aktivacija': 'true'});
+        uri = Uri.parse('$baseUrl/aktivacija/$odabraniId').replace(queryParameters: {'aktivacija': 'true'});
       } else if (status == "vracen") {
-        uri = Uri.parse('$baseUrl/aktivacija/$odabraniId')
-            .replace(queryParameters: {'aktivacija': 'false'});
+        uri = Uri.parse('$baseUrl/aktivacija/$odabraniId').replace(queryParameters: {'aktivacija': 'false'});
       } else if (status == "obrisan") {
         uri = Uri.parse('$baseUrl/$odabraniId');
       } else {
@@ -237,9 +224,7 @@ class BiciklService {
       }
 
       final request = await httpClient.openUrl(
-        status == "obrisan"
-            ? 'DELETE'
-            : 'PUT', // Odabir metode temeljem statusa
+        status == "obrisan" ? 'DELETE' : 'PUT', // Odabir metode temeljem statusa
         uri,
       );
 
@@ -300,9 +285,7 @@ class BiciklService {
       'korisnikId': korisnikId.toString(),
     };
 
-    final HttpClient httpClient = HttpClient()
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
+    final HttpClient httpClient = HttpClient()..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
 
     try {
       await _addAuthorizationHeader(); // Dodavanje authorization header-a
@@ -321,18 +304,12 @@ class BiciklService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(responseBody);
-        return {
-          'poruka': "Uspjesno dodat bicikl",
-          'biciklId': data['biciklId']
-        };
+        return {'poruka': "Uspjesno dodat bicikl", 'biciklId': data['biciklId']};
       } else {
         return {'poruka': "Greska prilikom dodavanja", 'biciklId': null};
       }
     } on TimeoutException catch (_) {
-      return {
-        'poruka': "Greska prilikom dodavanja: Server nije dostupan",
-        'biciklId': null
-      };
+      return {'poruka': "Greska prilikom dodavanja: Server nije dostupan", 'biciklId': null};
     } catch (e) {
       logger.e("Greška pri dodavanju bicikla: $e");
       return {'poruka': "Greska prilikom dodavanja", 'biciklId': null};
@@ -344,7 +321,7 @@ class BiciklService {
   Future<String?> putBicikl(
     int biciklId,
     String? naziv,
-    int? cijena,
+    double? cijena,
     String? velicinaRama,
     String? velicinaTocka,
     int? brojBrzina,
@@ -355,9 +332,7 @@ class BiciklService {
     final String baseUrl = '${HelperService.baseUrl}/Bicikli';
     Uri uri;
 
-    HttpClient httpClient = HttpClient()
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
+    HttpClient httpClient = HttpClient()..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
 
     try {
       if (biciklId == 0) {
@@ -405,8 +380,7 @@ class BiciklService {
       final request = await httpClient.putUrl(uri);
       request.headers.set('accept', 'application/json');
       request.headers.set('Content-Type', 'application/json');
-      request.headers
-          .set('Authorization', _dio.options.headers['Authorization']);
+      request.headers.set('Authorization', _dio.options.headers['Authorization']);
 
       request.write(jsonEncode(body));
 
